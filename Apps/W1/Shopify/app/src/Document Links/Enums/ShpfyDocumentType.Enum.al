@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30143 "Shpfy Document Type" implements "Shpfy IOpenBCDocument"
+enum 88019 "Shpfy Document Type" implements "Shpfy IOpenBCDocument"
 {
     Extensible = true;
     DefaultImplementation = "Shpfy IOpenBCDocument" = "Shpfy OpenBCDoc NotSupported";

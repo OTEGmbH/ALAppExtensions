@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-table 30139 "Shpfy Fulfillment Line"
+table 88026 "Shpfy Fulfillment Line"
 {
     Caption = 'Fulfillment Line';
     DataClassification = SystemMetadata;

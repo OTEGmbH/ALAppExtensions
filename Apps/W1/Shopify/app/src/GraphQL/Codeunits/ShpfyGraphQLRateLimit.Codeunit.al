@@ -5,7 +5,7 @@ using System.Utilities;
 /// <summary>
 /// Codeunit Shpfy GraphQL Rate Limit (ID 30153).
 /// </summary>
-codeunit 30153 "Shpfy GraphQL Rate Limit"
+codeunit 88188 "Shpfy GraphQL Rate Limit"
 {
     Access = Internal;
     SingleInstance = true;

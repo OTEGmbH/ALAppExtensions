@@ -6,7 +6,7 @@ using System.Utilities;
 /// <summary>
 /// Table Shpfy Customer Address (ID 30106).
 /// </summary>
-table 30106 "Shpfy Customer Address"
+table 88012 "Shpfy Customer Address"
 {
     Caption = 'Shopify Customer Address';
     DataClassification = CustomerContent;

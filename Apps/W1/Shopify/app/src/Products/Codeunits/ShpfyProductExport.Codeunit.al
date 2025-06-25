@@ -10,7 +10,7 @@ using Microsoft.Inventory.Item.Catalog;
 /// <summary>
 /// Codeunit Shpfy Product Export (ID 30178).
 /// </summary>
-codeunit 30178 "Shpfy Product Export"
+codeunit 88272 "Shpfy Product Export"
 {
     Access = Internal;
     Permissions =

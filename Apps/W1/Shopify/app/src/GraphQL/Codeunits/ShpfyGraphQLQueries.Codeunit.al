@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy GraphQL Queries (ID 30154).
 /// </summary>
-codeunit 30154 "Shpfy GraphQL Queries"
+codeunit 88187 "Shpfy GraphQL Queries"
 {
     Access = Internal;
     SingleInstance = true;

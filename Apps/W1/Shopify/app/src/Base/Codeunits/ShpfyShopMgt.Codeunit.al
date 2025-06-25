@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Environment.Configuration;
 
-codeunit 30211 "Shpfy Shop Mgt."
+codeunit 88009 "Shpfy Shop Mgt."
 {
     var
         DontShowThisAgainMsg: Label 'Don''t show this again.';

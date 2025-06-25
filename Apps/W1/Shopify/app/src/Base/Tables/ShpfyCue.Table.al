@@ -6,7 +6,7 @@ using System.Threading;
 /// <summary>
 /// Table Shpfy Cue (ID 30100).
 /// </summary>
-table 30100 "Shpfy Cue"
+table 88000 "Shpfy Cue"
 {
     Access = Internal;
     Caption = 'Shopify Cue';

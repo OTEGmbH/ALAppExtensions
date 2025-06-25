@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
-tableextension 30111 "Shpfy Return Receipt Line" extends "Return Receipt Line"
+tableextension 88007 "Shpfy Return Receipt Line" extends "Return Receipt Line"
 {
     fields
     {

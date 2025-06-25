@@ -5,7 +5,7 @@ using System.Utilities;
 /// <summary>
 /// Codeunit Shpfy Base64 (ID 30155).
 /// </summary>
-codeunit 30155 "Shpfy Base64"
+codeunit 88189 "Shpfy Base64"
 {
     Access = Internal;
 

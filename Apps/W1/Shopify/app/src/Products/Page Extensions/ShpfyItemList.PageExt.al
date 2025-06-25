@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
-pageextension 30120 "Shpfy Item List" extends "Item List"
+pageextension 88019 "Shpfy Item List" extends "Item List"
 {
     actions
     {

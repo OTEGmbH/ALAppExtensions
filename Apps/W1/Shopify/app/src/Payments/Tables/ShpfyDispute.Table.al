@@ -4,7 +4,7 @@ namespace Microsoft.Integration.Shopify;
 /// Table Shopify Payout (ID 30125).
 /// </summary>
 /// 
-table 30155 "Shpfy Dispute"
+table 88044 "Shpfy Dispute"
 {
     Access = Internal;
     Caption = 'Shopify Dispute';

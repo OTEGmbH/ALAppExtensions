@@ -6,7 +6,7 @@ using System.Environment.Configuration;
 using System.Upgrade;
 using System.Visualization;
 
-codeunit 30273 "Shpfy Installer"
+codeunit 88008 "Shpfy Installer"
 {
     Subtype = Install;
     Access = Internal;

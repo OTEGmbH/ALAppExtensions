@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Financial Status (ID 30117).
 /// </summary>
-enum 30117 "Shpfy Financial Status"
+enum 88036 "Shpfy Financial Status"
 {
     Caption = 'Shopify Financial Status';
     Extensible = false;

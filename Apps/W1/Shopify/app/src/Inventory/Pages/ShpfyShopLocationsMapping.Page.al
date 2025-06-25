@@ -5,7 +5,7 @@ using Microsoft.Inventory.Location;
 /// <summary>
 /// Page Shpfy Shop Locations Mapping (ID 30117).
 /// </summary>
-page 30117 "Shpfy Shop Locations Mapping"
+page 88025 "Shpfy Shop Locations Mapping"
 {
     Caption = 'Shopify Shop Locations';
     InsertAllowed = false;

@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// TableExtension Shpfy Sales Invoice Header (ID 30102) extends Record Sales Invoice Header.
 /// </summary>
-tableextension 30102 "Shpfy Sales Invoice Header" extends "Sales Invoice Header"
+tableextension 88003 "Shpfy Sales Invoice Header" extends "Sales Invoice Header"
 {
     fields
     {

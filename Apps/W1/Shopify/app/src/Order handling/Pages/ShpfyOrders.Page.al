@@ -6,7 +6,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Page Shpfy Orders (ID 30115).
 /// </summary>
-page 30115 "Shpfy Orders"
+page 88042 "Shpfy Orders"
 {
     ApplicationArea = All;
     Caption = 'Shopify Orders';

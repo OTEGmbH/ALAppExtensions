@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Customer Mapping (ID 30106) implements Interface Shpfy ICustomer Mapping.
 /// </summary>
-enum 30106 "Shpfy Customer Mapping" implements "Shpfy ICustomer Mapping"
+enum 88014 "Shpfy Customer Mapping" implements "Shpfy ICustomer Mapping"
 {
     Caption = 'Shopify Customer Mapping';
     Extensible = true;

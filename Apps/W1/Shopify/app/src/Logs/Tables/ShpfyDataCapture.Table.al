@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Reflection;
 
-table 30114 "Shpfy Data Capture"
+table 88022 "Shpfy Data Capture"
 {
     Access = Internal;
     Caption = 'Shopify Data Capture';

@@ -5,7 +5,7 @@ using Microsoft.Sales.Document;
 /// <summary>
 /// PageExtension Shpfy Sales Order Subform (ID 30117) extends Record Sales Order Subform.
 /// </summary>
-pageextension 30117 "Shpfy Sales Order Subform" extends "Sales Order Subform"
+pageextension 88015 "Shpfy Sales Order Subform" extends "Sales Order Subform"
 {
     layout
     {

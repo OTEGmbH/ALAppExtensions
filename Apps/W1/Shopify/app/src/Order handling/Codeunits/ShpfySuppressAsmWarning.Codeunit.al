@@ -5,7 +5,7 @@ using Microsoft.Assembly.Document;
 /// <summary>
 /// Codeunit Shpfy Suppress ASM Warning (ID 30210).
 /// </summary>
-codeunit 30220 "Shpfy Suppress Asm Warning"
+codeunit 88248 "Shpfy Suppress Asm Warning"
 {
     Access = Internal;
     //Set the event subscribers to manual binding;

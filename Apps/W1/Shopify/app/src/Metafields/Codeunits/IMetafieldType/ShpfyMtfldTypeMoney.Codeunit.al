@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Finance.Currency;
 
-codeunit 30317 "Shpfy Mtfld Type Money" implements "Shpfy IMetafield Type"
+codeunit 88222 "Shpfy Mtfld Type Money" implements "Shpfy IMetafield Type"
 {
     var
         MoneyJsonTemplateTxt: Label '{"amount": "%1", "currency_code": "%2"}', Locked = true;

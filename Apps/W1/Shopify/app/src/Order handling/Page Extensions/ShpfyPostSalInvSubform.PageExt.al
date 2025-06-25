@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// PageExtension Shpfy Post. Sal. Inv. Subform (ID 30111) extends Record Posted Sales Invoice Subform.
 /// </summary>
-pageextension 30111 "Shpfy Post. Sal. Inv. Subform" extends "Posted Sales Invoice Subform"
+pageextension 88009 "Shpfy Post. Sal. Inv. Subform" extends "Posted Sales Invoice Subform"
 {
     layout
     {

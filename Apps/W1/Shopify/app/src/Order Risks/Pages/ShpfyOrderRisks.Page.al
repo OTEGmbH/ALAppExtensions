@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Order Risks (ID 30123).
 /// </summary>
-page 30123 "Shpfy Order Risks"
+page 88053 "Shpfy Order Risks"
 {
     Caption = 'Shopify Order Risks';
     PageType = List;

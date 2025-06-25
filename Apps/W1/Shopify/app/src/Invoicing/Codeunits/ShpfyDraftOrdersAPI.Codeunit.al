@@ -7,7 +7,7 @@ using Microsoft.Finance.Currency;
 /// <summary>
 /// Codeunit Draft Orders API (ID 30159).
 /// </summary>
-codeunit 30159 "Shpfy Draft Orders API"
+codeunit 88203 "Shpfy Draft Orders API"
 {
     Access = Internal;
 

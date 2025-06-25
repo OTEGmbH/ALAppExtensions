@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Cancel Reason (ID 30116).
 /// </summary>
-enum 30116 "Shpfy Cancel Reason"
+enum 88035 "Shpfy Cancel Reason"
 {
     Caption = 'Shopify Cancel Reason';
     Extensible = false;

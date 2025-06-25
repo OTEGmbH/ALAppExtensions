@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Reflection;
 
-table 30157 "Shpfy Translation"
+table 88061 "Shpfy Translation"
 {
     Access = Internal;
     Caption = 'Shopify Translation';

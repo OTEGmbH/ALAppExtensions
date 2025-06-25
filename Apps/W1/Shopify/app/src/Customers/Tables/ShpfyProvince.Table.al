@@ -4,7 +4,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Province (ID 30108).
 /// </summary>
-table 30108 "Shpfy Province"
+table 88014 "Shpfy Province"
 {
     Access = Internal;
     Caption = 'Shopify Province';

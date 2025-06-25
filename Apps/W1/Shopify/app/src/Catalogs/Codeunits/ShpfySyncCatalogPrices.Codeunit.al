@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Codeunit Shpfy Sync Catalog Prices (ID 30295).
 /// </summary>
-codeunit 30295 "Shpfy Sync Catalog Prices"
+codeunit 88016 "Shpfy Sync Catalog Prices"
 {
     Access = Internal;
     TableNo = "Shpfy Shop";

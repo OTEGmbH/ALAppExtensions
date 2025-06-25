@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Finance.GeneralLedger.Journal;
 
-tableextension 30202 "Shpfy Gen. Journal Line" extends "Gen. Journal Line"
+tableextension 88014 "Shpfy Gen. Journal Line" extends "Gen. Journal Line"
 {
     fields
     {

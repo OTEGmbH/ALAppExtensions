@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Weight Unit (ID 30163).
 /// </summary>
-enum 30163 "Shpfy Weight Unit"
+enum 88005 "Shpfy Weight Unit"
 {
     Caption = 'Shopify Weight Unit';
     Extensible = false;

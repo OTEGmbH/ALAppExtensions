@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
-codeunit 30314 "Shpfy Translation Mgt."
+codeunit 88295 "Shpfy Translation Mgt."
 {
 
     /// <summary>

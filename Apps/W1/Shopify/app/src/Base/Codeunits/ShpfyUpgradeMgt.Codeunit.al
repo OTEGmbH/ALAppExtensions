@@ -11,12 +11,12 @@ using System.Integration;
 /// <summary>
 /// Codeunit Shpfy Upgrade Mgt. (ID 30106).
 /// </summary>
-codeunit 30106 "Shpfy Upgrade Mgt."
+codeunit 88010 "Shpfy Upgrade Mgt."
 {
     Access = Internal;
     Subtype = Upgrade;
-    Permissions = tabledata "Shpfy Shop" = RM,
-                  tabledata "Webhook Subscription" = rimd;
+    // Permissions = tabledata "Shpfy Shop" = RM,
+    //               tabledata "Webhook Subscription" = rimd;
 
     trigger OnUpgradePerDatabase()
     begin
@@ -389,7 +389,7 @@ codeunit 30106 "Shpfy Upgrade Mgt."
 
     local procedure WebhookSubscriptionUpgrade()
     var
-        WebhookSubscription: Record "Webhook Subscription";
+        // WebhookSubscription: Record "Webhook Subscription";
         UpgradeTag: Codeunit "Upgrade Tag";
         WebhookTopic: Enum "Shpfy Webhook Topic";
     begin
@@ -397,12 +397,12 @@ codeunit 30106 "Shpfy Upgrade Mgt."
             exit;
 
         WebhookTopic := WebhookTopic::BULK_OPERATIONS_FINISH;
-        WebhookSubscription.SetRange(Endpoint, WebhookTopic.Names.Get(WebhookTopic.Ordinals.IndexOf(WebhookTopic.AsInteger())));
-        WebhookSubscription.ModifyAll(Endpoint, Format(WebhookTopic));
+        // WebhookSubscription.SetRange(Endpoint, WebhookTopic.Names.Get(WebhookTopic.Ordinals.IndexOf(WebhookTopic.AsInteger())));
+        // WebhookSubscription.ModifyAll(Endpoint, Format(WebhookTopic));
 
         WebhookTopic := WebhookTopic::ORDERS_CREATE;
-        WebhookSubscription.SetRange(Endpoint, WebhookTopic.Names.Get(WebhookTopic.Ordinals.IndexOf(WebhookTopic.AsInteger())));
-        WebhookSubscription.ModifyAll(Endpoint, Format(WebhookTopic));
+        // WebhookSubscription.SetRange(Endpoint, WebhookTopic.Names.Get(WebhookTopic.Ordinals.IndexOf(WebhookTopic.AsInteger())));
+        // WebhookSubscription.ModifyAll(Endpoint, Format(WebhookTopic));
 
         UpgradeTag.SetUpgradeTag(GetWebhookSubscriptionUpgradeTag());
     end;

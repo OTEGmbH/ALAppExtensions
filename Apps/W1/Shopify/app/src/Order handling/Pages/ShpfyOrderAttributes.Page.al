@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Order Attributes (ID 30114).
 /// </summary>
-page 30114 "Shpfy Order Attributes"
+page 88040 "Shpfy Order Attributes"
 {
 
     Caption = 'Shopify Order Attributes';

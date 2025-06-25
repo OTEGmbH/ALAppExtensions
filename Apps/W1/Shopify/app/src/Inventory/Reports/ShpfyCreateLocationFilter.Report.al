@@ -5,7 +5,7 @@ using Microsoft.Inventory.Location;
 /// <summary>
 /// Report Shpfy Create Location Filter (ID 30101).
 /// </summary>
-report 30101 "Shpfy Create Location Filter"
+report 88008 "Shpfy Create Location Filter"
 {
     Caption = 'Shopify Create Location Filter';
     ProcessingOnly = true;

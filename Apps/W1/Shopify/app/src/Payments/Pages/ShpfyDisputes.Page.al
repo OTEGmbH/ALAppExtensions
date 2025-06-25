@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-page 30161 "Shpfy Disputes"
+page 88054 "Shpfy Disputes"
 {
     Editable = false;
     PageType = List;

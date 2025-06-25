@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Webhook Topic (ID 30167).
 /// </summary>
-enum 30167 "Shpfy Webhook Topic"
+enum 88067 "Shpfy Webhook Topic"
 {
     Caption = 'Shopify Webhook Topic';
     Extensible = false;

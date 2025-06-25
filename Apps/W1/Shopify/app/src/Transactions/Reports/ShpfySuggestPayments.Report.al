@@ -7,7 +7,7 @@ using Microsoft.Sales.History;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Foundation.NoSeries;
 
-report 30118 "Shpfy Suggest Payments"
+report 88020 "Shpfy Suggest Payments"
 {
     Caption = 'Suggest Shopify Payments';
     ProcessingOnly = true;

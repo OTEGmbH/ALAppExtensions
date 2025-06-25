@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy Cust. By Default Cust. (ID 30112) implements Interface Shpfy ICustomer Mapping.
 /// </summary>
-codeunit 30112 "Shpfy Cust. By Default Cust." implements "Shpfy ICustomer Mapping"
+codeunit 88033 "Shpfy Cust. By Default Cust." implements "Shpfy ICustomer Mapping"
 {
     Access = Internal;
 

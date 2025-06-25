@@ -5,7 +5,7 @@ using Microsoft.Sales.RoleCenters;
 /// <summary>
 /// PageExtension Shpfy Order Processor RC (ID 30102) extends Record Order Processor Role Center.
 /// </summary>
-pageextension 30102 "Shpfy Order Processor RC" extends "Order Processor Role Center"
+pageextension 88001 "Shpfy Order Processor RC" extends "Order Processor Role Center"
 {
     layout
     {

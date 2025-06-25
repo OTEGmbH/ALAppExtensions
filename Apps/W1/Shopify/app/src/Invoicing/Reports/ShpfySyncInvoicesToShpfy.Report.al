@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// Report Shpfy Sync Invoices to Shpfy (ID 30117).
 /// </summary>
-report 30119 "Shpfy Sync Invoices to Shpfy"
+report 88010 "Shpfy Sync Invoices to Shpfy"
 {
     ApplicationArea = All;
     Caption = 'Sync Invoices to Shopify';

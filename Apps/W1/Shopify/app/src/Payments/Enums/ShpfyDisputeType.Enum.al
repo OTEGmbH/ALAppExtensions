@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30155 "Shpfy Dispute Type"
+enum 88055 "Shpfy Dispute Type"
 {
     Caption = 'Shopify Dispute Type';
     Extensible = false;

@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30154 "Shpfy Dispute Status"
+enum 88054 "Shpfy Dispute Status"
 {
 
     Caption = 'Shopify Dispute Status';

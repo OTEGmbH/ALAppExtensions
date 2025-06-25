@@ -7,7 +7,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Codeunit Shpfy Hash (ID 30156).
 /// </summary>
-codeunit 30156 "Shpfy Hash"
+codeunit 88190 "Shpfy Hash"
 {
     Access = Internal;
 

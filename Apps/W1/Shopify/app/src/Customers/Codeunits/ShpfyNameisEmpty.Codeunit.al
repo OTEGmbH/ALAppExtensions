@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy Name is Empty (ID 30119) implements Interface Shpfy ICustomer Name.
 /// </summary>
-codeunit 30119 "Shpfy Name is Empty" implements "Shpfy ICustomer Name"
+codeunit 88041 "Shpfy Name is Empty" implements "Shpfy ICustomer Name"
 {
     Access = Internal;
 

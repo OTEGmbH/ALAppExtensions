@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30145 "Shpfy Order Return Status"
+enum 88047 "Shpfy Order Return Status"
 {
     value(0; " ")
     {

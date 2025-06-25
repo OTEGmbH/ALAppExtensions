@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30280 "Shpfy Bulk UpdateProductImage" implements "Shpfy IBulk Operation"
+codeunit 88013 "Shpfy Bulk UpdateProductImage" implements "Shpfy IBulk Operation"
 {
     Access = Internal;
 

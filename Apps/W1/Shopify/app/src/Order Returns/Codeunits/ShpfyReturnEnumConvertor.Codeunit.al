@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30224 "Shpfy Return Enum Convertor"
+codeunit 88258 "Shpfy Return Enum Convertor"
 {
     SingleInstance = true;
     Access = Internal;

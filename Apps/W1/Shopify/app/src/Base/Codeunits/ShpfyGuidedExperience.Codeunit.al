@@ -16,7 +16,7 @@ using System.Media;
 /// <summary>
 /// A codeunit for setting up Shopify guided experience.
 /// </summary>
-codeunit 30201 "Shpfy Guided Experience"
+codeunit 88006 "Shpfy Guided Experience"
 {
     Access = Internal;
 

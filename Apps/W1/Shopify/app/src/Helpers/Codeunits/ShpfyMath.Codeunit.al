@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy Math (ID 30158).
 /// </summary>
-codeunit 30158 "Shpfy Math"
+codeunit 88192 "Shpfy Math"
 {
     Access = Internal;
     SingleInstance = true;

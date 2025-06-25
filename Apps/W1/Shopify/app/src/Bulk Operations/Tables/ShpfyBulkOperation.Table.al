@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-table 30148 "Shpfy Bulk Operation"
+table 88006 "Shpfy Bulk Operation"
 {
     Caption = 'Shopify Bulk Operation';
     DataClassification = SystemMetadata;

@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Reflection;
 
-table 30142 "Shpfy Refund Header"
+table 88038 "Shpfy Refund Header"
 {
     Caption = 'Refund Header';
     DataClassification = SystemMetadata;

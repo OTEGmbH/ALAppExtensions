@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
-pageextension 30123 "Shpfy Sales Shipment Update" extends "Posted Sales Shipment - Update"
+pageextension 88020 "Shpfy Sales Shipment Update" extends "Posted Sales Shipment - Update"
 {
     layout
     {

@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Inventory FactBox (ID 30116).
 /// </summary>
-page 30116 "Shpfy Inventory FactBox"
+page 88024 "Shpfy Inventory FactBox"
 {
     Caption = 'Shopify Inventory Factbox';
     PageType = ListPart;

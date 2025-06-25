@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-page 30154 "Shpfy Order Fulfillment Lines"
+page 88036 "Shpfy Order Fulfillment Lines"
 {
     ApplicationArea = All;
     Caption = 'Shopify Fulfillment Lines';

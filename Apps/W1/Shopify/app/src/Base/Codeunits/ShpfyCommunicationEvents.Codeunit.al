@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy Communication Events (ID 30200).
 /// </summary>
-codeunit 30200 "Shpfy Communication Events"
+codeunit 88003 "Shpfy Communication Events"
 {
     Access = Internal;
 

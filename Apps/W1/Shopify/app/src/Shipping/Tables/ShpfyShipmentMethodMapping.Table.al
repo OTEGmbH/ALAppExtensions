@@ -8,7 +8,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Table Shpfy Shipment Method Mapping (ID 30131).
 /// </summary>
-table 30131 "Shpfy Shipment Method Mapping"
+table 88054 "Shpfy Shipment Method Mapping"
 {
     Access = Internal;
     Caption = 'Shopify Shipment Method';

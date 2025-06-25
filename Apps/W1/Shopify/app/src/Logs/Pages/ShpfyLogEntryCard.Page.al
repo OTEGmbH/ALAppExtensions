@@ -5,7 +5,7 @@ using System.Utilities;
 /// <summary>
 /// Page Shpfy Log Entry Card (ID 30120).
 /// </summary>
-page 30120 "Shpfy Log Entry Card"
+page 88028 "Shpfy Log Entry Card"
 {
     Caption = 'Shopify Log Entry';
     DeleteAllowed = false;

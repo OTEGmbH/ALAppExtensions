@@ -10,7 +10,7 @@ using Microsoft.Sales.Posting;
 /// <summary>
 /// Codeunit Shpfy Process Order (ID 30166).
 /// </summary>
-codeunit 30166 "Shpfy Process Order"
+codeunit 88246 "Shpfy Process Order"
 {
     Access = Internal;
     Permissions =

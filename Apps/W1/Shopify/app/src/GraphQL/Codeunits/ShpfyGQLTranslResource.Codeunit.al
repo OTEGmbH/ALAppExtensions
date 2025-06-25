@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30340 "Shpfy GQL TranslResource" implements "Shpfy IGraphQL"
+codeunit 88177 "Shpfy GQL TranslResource" implements "Shpfy IGraphQL"
 {
 
     internal procedure GetGraphQL(): Text

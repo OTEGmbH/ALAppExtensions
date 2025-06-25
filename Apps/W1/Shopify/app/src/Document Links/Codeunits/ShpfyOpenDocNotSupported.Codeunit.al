@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30253 "Shpfy OpenDoc NotSupported" implements "Shpfy IOpenShopifyDocument"
+codeunit 88050 "Shpfy OpenDoc NotSupported" implements "Shpfy IOpenShopifyDocument"
 {
 
     procedure OpenDocument(DocumentId: BigInteger)

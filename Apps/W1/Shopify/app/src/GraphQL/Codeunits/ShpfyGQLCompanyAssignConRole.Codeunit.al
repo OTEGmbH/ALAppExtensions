@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30289 "Shpfy GQL CompanyAssignConRole" implements "Shpfy IGraphQL"
+codeunit 88074 "Shpfy GQL CompanyAssignConRole" implements "Shpfy IGraphQL"
 {
     Access = Internal;
 

@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Document;
 
-codeunit 30243 "Shpfy RetRefProc Cr.Memo" implements "Shpfy IReturnRefund Process"
+codeunit 88255 "Shpfy RetRefProc Cr.Memo" implements "Shpfy IReturnRefund Process"
 {
     procedure IsImportNeededFor(SourceDocumentType: Enum "Shpfy Source Document Type"): Boolean
     begin

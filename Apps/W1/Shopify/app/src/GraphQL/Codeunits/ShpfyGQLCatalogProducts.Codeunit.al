@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy GQL CatalogProducts (ID 30309) implements Interface Shpfy IGraphQL.
 /// </summary>
-codeunit 30309 "Shpfy GQL CatalogProducts" implements "Shpfy IGraphQL"
+codeunit 88070 "Shpfy GQL CatalogProducts" implements "Shpfy IGraphQL"
 {
     Access = Internal;
 

@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30278 "Shpfy Bulk Operation API"
+codeunit 88011 "Shpfy Bulk Operation API"
 {
     var
         Shop: Record "Shpfy Shop";

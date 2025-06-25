@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-page 30143 "Shpfy Products Overview"
+page 88060 "Shpfy Products Overview"
 {
     PageType = List;
     SourceTable = "Shpfy Product";

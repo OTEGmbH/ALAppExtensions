@@ -6,7 +6,7 @@ using System.Environment;
 /// <summary>
 /// Codeunit Shpfy Product API (ID 30176).
 /// </summary>
-codeunit 30176 "Shpfy Product API"
+codeunit 88270 "Shpfy Product API"
 {
     Access = Internal;
     Permissions = tabledata Item = r;

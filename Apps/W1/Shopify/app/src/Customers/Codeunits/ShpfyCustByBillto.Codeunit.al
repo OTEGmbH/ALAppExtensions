@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Codeunit Shpfy Cust. By Bill-to (ID 30111) implements Interface Shpfy ICustomer Mapping.
 /// </summary>
-codeunit 30111 "Shpfy Cust. By Bill-to" implements "Shpfy ICustomer Mapping"
+codeunit 88032 "Shpfy Cust. By Bill-to" implements "Shpfy ICustomer Mapping"
 {
     Access = Internal;
 

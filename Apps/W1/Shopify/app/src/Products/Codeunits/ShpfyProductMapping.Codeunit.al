@@ -7,7 +7,7 @@ using Microsoft.Purchases.Vendor;
 /// <summary>
 /// Codeunit Shpfy Product Mapping (ID 30181).
 /// </summary>
-codeunit 30181 "Shpfy Product Mapping"
+codeunit 88275 "Shpfy Product Mapping"
 {
     Access = Internal;
     Permissions =

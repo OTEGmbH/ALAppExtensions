@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Report Shpfy Sync Images (ID 30107).
 /// </summary>
-report 30107 "Shpfy Sync Images"
+report 88017 "Shpfy Sync Images"
 {
     Caption = 'Shopify Sync Images';
     UsageCategory = Tasks;

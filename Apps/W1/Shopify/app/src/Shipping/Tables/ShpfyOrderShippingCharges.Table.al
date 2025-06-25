@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Order Shipping Charges (ID 30130).
 /// </summary>
-table 30130 "Shpfy Order Shipping Charges"
+table 88053 "Shpfy Order Shipping Charges"
 {
     Caption = 'Shopify Order Shipping Charges';
     DataClassification = CustomerContent;

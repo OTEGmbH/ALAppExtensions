@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy GraphQL Type (ID 70007617).
 /// </summary>
-enum 30111 "Shpfy GraphQL Type" implements "Shpfy IGraphQL"
+enum 88021 "Shpfy GraphQL Type" implements "Shpfy IGraphQL"
 {
     Access = Internal;
     Caption = 'Shopify GraphQL Type';

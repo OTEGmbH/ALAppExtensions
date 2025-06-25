@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Tax Type (ID 30110).
 /// </summary>
-enum 30110 "Shpfy Tax Type"
+enum 88018 "Shpfy Tax Type"
 {
     Access = Internal;
     Caption = 'Shopify Tax Type';

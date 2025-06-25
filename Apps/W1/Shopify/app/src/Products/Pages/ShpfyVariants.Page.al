@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Page Shpfy Variants (ID 30127).
 /// </summary>
-page 30127 "Shpfy Variants"
+page 88062 "Shpfy Variants"
 {
 
     Caption = 'Shopify Variants';

@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// PageExtension Shpfy Post. Sales Shipments (ID 30110) extends Record Posted Sales Shipments.
 /// </summary>
-pageextension 30110 "Shpfy Post. Sales Shipments" extends "Posted Sales Shipments"
+pageextension 88007 "Shpfy Post. Sales Shipments" extends "Posted Sales Shipments"
 {
     layout
     {

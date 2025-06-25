@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Inventory Policy (ID 30125).
 /// </summary>
-enum 30125 "Shpfy Inventory Policy"
+enum 88023 "Shpfy Inventory Policy"
 {
     Caption = 'Shopify Inventory Policy';
     Extensible = false;

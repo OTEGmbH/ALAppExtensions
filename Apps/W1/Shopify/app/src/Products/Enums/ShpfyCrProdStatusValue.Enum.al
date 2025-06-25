@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Create Product Status Value (ID 30129) implements Interface Shpfy ICreateProductStatusValue.
 /// </summary>
-enum 30129 "Shpfy Cr. Prod. Status Value" implements "Shpfy ICreateProductStatusValue"
+enum 88059 "Shpfy Cr. Prod. Status Value" implements "Shpfy ICreateProductStatusValue"
 {
     Caption = 'Shopify Create Product Status Value';
     Extensible = false;

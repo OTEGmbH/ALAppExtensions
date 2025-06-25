@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Integration;
 
-codeunit 30251 "Shpfy Webhooks API"
+codeunit 88297 "Shpfy Webhooks API"
 {
     Access = Internal;
 

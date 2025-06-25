@@ -5,7 +5,7 @@ using Microsoft.CRM.RoleCenters;
 /// <summary>
 /// PageExtension Shpfy Sales and Rel. Mgr. RC (ID 30104) extends Record Sales and Relationship Mgr. RC.
 /// </summary>
-pageextension 30104 "Shpfy Sales & Rel. Mgr. RC" extends "Sales & Relationship Mgr. RC"
+pageextension 88002 "Shpfy Sales & Rel. Mgr. RC" extends "Sales & Relationship Mgr. RC"
 {
     actions
     {

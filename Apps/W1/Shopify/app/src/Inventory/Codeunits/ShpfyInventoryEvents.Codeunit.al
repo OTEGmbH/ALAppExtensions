@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Codeunit Shpfy Inventory Events (ID 30196).
 /// </summary>
-codeunit 30196 "Shpfy Inventory Events"
+codeunit 88200 "Shpfy Inventory Events"
 {
     [IntegrationEvent(false, false)]
     /// <summary> 

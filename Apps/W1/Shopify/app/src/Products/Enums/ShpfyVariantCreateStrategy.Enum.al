@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Variant Create Strategy (ID 30165).
 /// </summary>
-enum 30165 "Shpfy Variant Create Strategy"
+enum 88063 "Shpfy Variant Create Strategy"
 {
     Access = Internal;
     Caption = 'Shopify Variant Create Strategy';

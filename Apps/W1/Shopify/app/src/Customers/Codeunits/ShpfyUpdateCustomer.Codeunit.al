@@ -7,7 +7,7 @@ using Microsoft.Foundation.Address;
 /// <summary>
 /// Codeunit Shpfy Update Customer (ID 30124).
 /// </summary>
-codeunit 30124 "Shpfy Update Customer"
+codeunit 88046 "Shpfy Update Customer"
 {
     Access = Internal;
     Permissions =

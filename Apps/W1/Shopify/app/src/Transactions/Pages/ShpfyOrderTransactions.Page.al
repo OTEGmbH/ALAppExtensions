@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Order Transactions (ID 30131).
 /// </summary>
-page 30131 "Shpfy Order Transactions"
+page 88066 "Shpfy Order Transactions"
 {
     Caption = 'Shopify Order Transactions';
     PromotedActionCategories = 'New,Process,Report,Inspect';

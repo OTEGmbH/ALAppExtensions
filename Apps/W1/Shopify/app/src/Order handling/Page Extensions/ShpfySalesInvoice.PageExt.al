@@ -5,7 +5,7 @@ using Microsoft.Sales.Document;
 /// <summary>
 /// PageExtension Shpfy Sales Invoice (ID 30113) extends Record Sales Invoice.
 /// </summary>
-pageextension 30113 "Shpfy Sales Invoice" extends "Sales Invoice"
+pageextension 88010 "Shpfy Sales Invoice" extends "Sales Invoice"
 {
     layout
     {

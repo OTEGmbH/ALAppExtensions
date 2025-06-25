@@ -9,7 +9,7 @@ using Microsoft.Foundation.Company;
 using System.Telemetry;
 using System.Utilities;
 
-page 30136 "Shpfy Connector Guide"
+page 88001 "Shpfy Connector Guide"
 {
     Caption = 'Shopify Connector Setup';
     PageType = NavigatePage;
@@ -560,7 +560,7 @@ page 30136 "Shpfy Connector Guide"
             AccessRequested := true;
 
             CreateShop(Shop);
-            Shop.RequestAccessToken();
+            // Shop.RequestAccessToken();
             Shop.Enabled := true;
             Shop.Modify();
 

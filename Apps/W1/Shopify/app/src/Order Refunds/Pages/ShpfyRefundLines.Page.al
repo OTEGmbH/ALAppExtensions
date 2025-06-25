@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-page 30146 "Shpfy Refund Lines"
+page 88047 "Shpfy Refund Lines"
 {
     Caption = 'Refund Lines';
     PageType = ListPart;

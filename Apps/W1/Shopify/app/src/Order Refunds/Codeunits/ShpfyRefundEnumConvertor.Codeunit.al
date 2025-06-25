@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30231 "Shpfy Refund Enum Convertor"
+codeunit 88249 "Shpfy Refund Enum Convertor"
 {
     SingleInstance = true;
     Access = Internal;

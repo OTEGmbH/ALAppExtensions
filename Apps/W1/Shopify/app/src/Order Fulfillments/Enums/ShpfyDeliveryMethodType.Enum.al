@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Delivery Method Type (ID 30152).
 /// </summary>
-enum 30152 "Shpfy Delivery Method Type"
+enum 88031 "Shpfy Delivery Method Type"
 {
     Caption = 'Shopify Delivery Method Type';
     Extensible = false;

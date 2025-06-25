@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Tax Areas (ID 30109).
 /// </summary>
-page 30109 "Shpfy Tax Areas"
+page 88019 "Shpfy Tax Areas"
 {
     Caption = 'Shopify Tax Areas';
     PageType = ListPart;

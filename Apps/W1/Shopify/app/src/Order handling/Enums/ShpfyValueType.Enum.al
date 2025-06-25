@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Value Type (ID 30123).
 /// </summary>
-enum 30123 "Shpfy Value Type"
+enum 88043 "Shpfy Value Type"
 {
     Access = Internal;
     Caption = 'Shopify Value Type';

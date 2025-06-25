@@ -7,7 +7,7 @@ using Microsoft.Finance.GeneralLedger.Setup;
 /// <summary>
 /// Codeunit Shpfy Import Order (ID 30161).
 /// </summary>
-codeunit 30161 "Shpfy Import Order"
+codeunit 88241 "Shpfy Import Order"
 {
     Access = Internal;
     Permissions = tabledata "Sales Line" = rim;

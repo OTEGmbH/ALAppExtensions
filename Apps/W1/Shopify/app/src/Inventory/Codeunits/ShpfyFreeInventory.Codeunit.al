@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
-codeunit 30283 "Shpfy Free Inventory" implements "Shpfy Stock Calculation"
+codeunit 88198 "Shpfy Free Inventory" implements "Shpfy Stock Calculation"
 {
     procedure GetStock(var Item: Record Item): decimal;
     begin

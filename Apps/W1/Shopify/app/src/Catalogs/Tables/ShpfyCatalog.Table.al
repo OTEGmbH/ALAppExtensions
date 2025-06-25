@@ -10,7 +10,7 @@ using Microsoft.Finance.SalesTax;
 /// <summary>
 /// Table Shpfy Catalog (ID 30152).
 /// </summary>
-table 30152 "Shpfy Catalog"
+table 88007 "Shpfy Catalog"
 {
     Caption = 'Shopify Catalog';
     DataClassification = CustomerContent;

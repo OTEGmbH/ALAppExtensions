@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// Page Shpfy Order Fulfillments (ID 30112).
 /// </summary>
-page 30112 "Shpfy Order Fulfillments"
+page 88037 "Shpfy Order Fulfillments"
 {
     Caption = 'Shopify Fulfillments';
     CardPageID = "Shpfy Order Fulfillment";

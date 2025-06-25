@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30218 "Shpfy GQL CreateUploadUrl" implements "Shpfy IGraphQL"
+codeunit 88085 "Shpfy GQL CreateUploadUrl" implements "Shpfy IGraphQL"
 {
     Access = Internal;
 

@@ -5,7 +5,7 @@ using Microsoft.Foundation.PaymentTerms;
 /// <summary>
 /// Table Shpfy Payment Terms (ID 30157).
 /// </summary>
-table 30158 "Shpfy Payment Terms"
+table 88045 "Shpfy Payment Terms"
 {
     Caption = 'Payment Terms';
     DataClassification = CustomerContent;

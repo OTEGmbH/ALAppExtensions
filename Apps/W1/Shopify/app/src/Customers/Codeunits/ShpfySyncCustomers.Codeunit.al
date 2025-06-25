@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Codeunit Shpfy Sync Customers (ID 30123).
 /// </summary>
-codeunit 30123 "Shpfy Sync Customers"
+codeunit 88045 "Shpfy Sync Customers"
 {
     Access = Internal;
     TableNo = "Shpfy Shop";

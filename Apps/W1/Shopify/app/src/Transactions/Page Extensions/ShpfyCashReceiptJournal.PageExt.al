@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Finance.GeneralLedger.Journal;
 
-pageextension 30124 "Shpfy Cash Receipt Journal" extends "Cash Receipt Journal"
+pageextension 88022 "Shpfy Cash Receipt Journal" extends "Cash Receipt Journal"
 {
     actions
     {

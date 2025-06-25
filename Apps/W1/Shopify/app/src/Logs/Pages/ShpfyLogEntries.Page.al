@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Log Entries (ID 30119).
 /// </summary>
-page 30119 "Shpfy Log Entries"
+page 88027 "Shpfy Log Entries"
 {
     ApplicationArea = All;
     Caption = 'Shopify Log Entries';

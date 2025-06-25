@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Gift Card (ID 30110).
 /// </summary>
-table 30110 "Shpfy Gift Card"
+table 88017 "Shpfy Gift Card"
 {
     Access = Internal;
     Caption = 'Shopify Gift Card';

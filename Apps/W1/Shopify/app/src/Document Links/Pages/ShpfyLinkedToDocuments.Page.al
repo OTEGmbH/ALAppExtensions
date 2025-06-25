@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-page 30148 "Shpfy Linked To Documents"
+page 88020 "Shpfy Linked To Documents"
 {
     ApplicationArea = All;
     Caption = 'Linked Documents';

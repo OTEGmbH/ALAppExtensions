@@ -6,7 +6,7 @@ using Microsoft.Finance.VAT.Setup;
 /// <summary>
 /// Table Shpfy Tax Area (ID 30109).
 /// </summary>
-table 30109 "Shpfy Tax Area"
+table 88015 "Shpfy Tax Area"
 {
     Access = Internal;
     Caption = 'Shopify Tax Area';

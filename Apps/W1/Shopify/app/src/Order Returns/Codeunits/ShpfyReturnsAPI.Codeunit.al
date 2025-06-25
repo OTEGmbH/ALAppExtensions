@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30250 "Shpfy Returns API"
+codeunit 88259 "Shpfy Returns API"
 {
     var
         CommunicationMgt: Codeunit "Shpfy Communication Mgt.";

@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy SKU Mapping (ID 30132).
 /// </summary>
-enum 30132 "Shpfy SKU Mapping"
+enum 88062 "Shpfy SKU Mapping"
 {
     Caption = 'Shopify SKU Mapping';
     Extensible = false;

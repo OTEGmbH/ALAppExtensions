@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Order Fulfillment (ID 30111).
 /// </summary>
-table 30111 "Shpfy Order Fulfillment"
+table 88029 "Shpfy Order Fulfillment"
 {
     Access = Internal;
     Caption = 'Shopify Order Fulfillment';

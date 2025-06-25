@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Codeunit Shpfy County Name (ID 30109) implements Interface Shpfy ICounty.
 /// </summary>
-codeunit 30109 "Shpfy County Name" implements "Shpfy ICounty"
+codeunit 88030 "Shpfy County Name" implements "Shpfy ICounty"
 {
     Access = Internal;
 

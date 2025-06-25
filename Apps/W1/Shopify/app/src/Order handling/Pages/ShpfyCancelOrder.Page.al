@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Cancel Order (ID 30160).
 /// </summary>
-page 30160 "Shpfy Cancel Order"
+page 88038 "Shpfy Cancel Order"
 {
     Caption = 'Shopify Cancel Order';
     Editable = true;

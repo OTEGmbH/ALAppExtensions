@@ -7,7 +7,7 @@ using System.Environment;
 /// <summary>
 /// Codeunit Shpfy Communication Mgt. (ID 30103).
 /// </summary>
-codeunit 30103 "Shpfy Communication Mgt."
+codeunit 88004 "Shpfy Communication Mgt."
 {
     Access = Internal;
     SingleInstance = true;
@@ -645,19 +645,19 @@ codeunit 30103 "Shpfy Communication Mgt."
         Result: Text;
         ResultList: List of [Text];
     begin
-        if not GetApiVersionCache(ApiVersionExpiryDate) then begin
-            Result := GetApiVersionExpiryDateFromAKV();
-            ResultList := Result.Split('-');
-            if ResultList.Count <> 3 then
-                ApiVersionExpiryDate := CreateDateTime(CalcDate('<+1Y>', Today()), 0T)
-            else begin
-                Evaluate(Day, ResultList.Get(3));
-                Evaluate(Month, ResultList.Get(2));
-                Evaluate(Year, ResultList.Get(1));
-                ApiVersionExpiryDate := CreateDateTime(DMY2Date(Day, Month, Year), 0T);
-            end;
-            SetApiVersionCache(Result);
-        end;
+        // if not GetApiVersionCache(ApiVersionExpiryDate) then begin
+        //     Result := GetApiVersionExpiryDateFromAKV();
+        //     ResultList := Result.Split('-');
+        //     if ResultList.Count <> 3 then
+        //         ApiVersionExpiryDate := CreateDateTime(CalcDate('<+1Y>', Today()), 0T)
+        //     else begin
+        //         Evaluate(Day, ResultList.Get(3));
+        //         Evaluate(Month, ResultList.Get(2));
+        //         Evaluate(Year, ResultList.Get(1));
+        //         ApiVersionExpiryDate := CreateDateTime(DMY2Date(Day, Month, Year), 0T);
+        //     end;
+        //     SetApiVersionCache(Result);
+        // end;
 
         exit(ApiVersionExpiryDate);
     end;
@@ -721,10 +721,10 @@ codeunit 30103 "Shpfy Communication Mgt."
         if not EnvironmentInformation.IsSaaS() then
             exit(Format(CalcDate('<+1M>', Today()), 0, 9));
 
-        if not AzureKeyVault.GetAzureKeyVaultSecret(ApiVersionExpiryDateAKVSecretNameLbl, ApiVersionJsonTxt) then begin
-            Session.LogMessage('0000KO2', MissingApiVersionExpiryDateTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
-            exit;
-        end;
+        // if not AzureKeyVault.GetAzureKeyVaultSecret(ApiVersionExpiryDateAKVSecretNameLbl, ApiVersionJsonTxt) then begin
+        //     Session.LogMessage('0000KO2', MissingApiVersionExpiryDateTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+        //     exit;
+        // end;
 
         if not JObject.ReadFrom(ApiVersionJsonTxt) then begin
             Session.LogMessage('0000KO3', CannotParseParametersTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);

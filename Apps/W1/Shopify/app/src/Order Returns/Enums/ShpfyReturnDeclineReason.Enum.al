@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30137 "Shpfy Return Decline Reason"
+enum 88048 "Shpfy Return Decline Reason"
 {
     Extensible = true;
 

@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Utilities;
 
-codeunit 30327 "Shpfy Mtfld Type Metaobj. Ref" implements "Shpfy IMetafield Type"
+codeunit 88220 "Shpfy Mtfld Type Metaobj. Ref" implements "Shpfy IMetafield Type"
 {
     procedure HasAssistEdit(): Boolean
     begin

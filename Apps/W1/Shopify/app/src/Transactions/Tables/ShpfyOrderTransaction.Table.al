@@ -7,7 +7,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// Table Shpfy Order Transaction (ID 30133).
 /// </summary>
-table 30133 "Shpfy Order Transaction"
+table 88056 "Shpfy Order Transaction"
 {
     Caption = 'Shopify Order Transaction';
     DataClassification = SystemMetadata;

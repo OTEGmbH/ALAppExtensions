@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30242 "Shpfy GQL NextAllCustomerIds" implements "Shpfy IGraphQL"
+codeunit 88117 "Shpfy GQL NextAllCustomerIds" implements "Shpfy IGraphQL"
 {
     Access = Internal;
 

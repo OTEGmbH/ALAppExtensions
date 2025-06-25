@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Report Shpfy Sync Catalog Prices (ID 30116).
 /// </summary>
-report 30116 "Shpfy Sync Catalog Prices"
+report 88001 "Shpfy Sync Catalog Prices"
 {
     Caption = 'Shopify Sync Catalog Prices';
     UsageCategory = Tasks;

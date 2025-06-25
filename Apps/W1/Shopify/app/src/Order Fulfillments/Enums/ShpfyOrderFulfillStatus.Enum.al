@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Order Fulfillment Status (ID 30113).
 /// </summary>
-enum 30113 "Shpfy Order Fulfill. Status"
+enum 88033 "Shpfy Order Fulfill. Status"
 {
     Caption = 'Shopify Order Fulfill. Status';
     Extensible = false;

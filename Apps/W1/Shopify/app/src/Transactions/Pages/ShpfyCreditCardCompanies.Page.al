@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Credit Card Companies (ID 30130).
 /// </summary>
-page 30130 "Shpfy Credit Card Companies"
+page 88065 "Shpfy Credit Card Companies"
 {
     Caption = 'Shopify Credit Card Companies';
     PageType = List;

@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
-query 30100 "Shpfy Shipment Location"
+query 88000 "Shpfy Shipment Location"
 {
     Access = Internal;
     Caption = 'Shopify Shipment Location';

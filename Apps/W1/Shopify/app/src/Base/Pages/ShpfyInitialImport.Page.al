@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-page 30137 "Shpfy Initial Import"
+page 88002 "Shpfy Initial Import"
 {
     Caption = 'Shopify Initial Import';
     PageType = Worksheet;

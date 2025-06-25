@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30161 "Shpfy Resource Type" implements "Shpfy ICreate Translation"
+enum 88066 "Shpfy Resource Type" implements "Shpfy ICreate Translation"
 {
     Access = Internal;
     Caption = 'Shopify  Resource Type';

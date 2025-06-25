@@ -9,7 +9,7 @@ using System.Apps;
 /// <summary>
 /// Codeunit Shpfy Authentication Mgt. (ID 30199).
 /// </summary>
-codeunit 30199 "Shpfy Authentication Mgt."
+codeunit 88193 "Shpfy Authentication Mgt."
 {
     Access = Internal;
 
@@ -36,10 +36,10 @@ codeunit 30199 "Shpfy Authentication Mgt."
         if not EnvironmentInformation.IsSaaS() then
             Error(NotSupportedOnPremErr);
 
-        if not AzureKeyVault.GetAzureKeyVaultSecret(ShopifyAPIKeyAKVSecretNameLbl, ClientId) then
-            Session.LogMessage('0000HCA', MissingAPIKeyTelemetryTxt, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok)
-        else
-            exit(ClientId);
+        // if not AzureKeyVault.GetAzureKeyVaultSecret(ShopifyAPIKeyAKVSecretNameLbl, ClientId) then
+        //     Session.LogMessage('0000HCA', MissingAPIKeyTelemetryTxt, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok)
+        // else
+        //     exit(ClientId);
     end;
 
     [Scope('OnPrem')]
@@ -52,10 +52,10 @@ codeunit 30199 "Shpfy Authentication Mgt."
         if not EnvironmentInformation.IsSaaS() then
             Error(NotSupportedOnPremErr);
 
-        if not AzureKeyVault.GetAzureKeyVaultSecret(ShopifyAPISecretAKVSecretNameLbl, ClientSecret) then
-            Session.LogMessage('0000HCB', MissingAPISecretTelemetryTxt, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok)
-        else
-            exit(ClientSecret);
+        // if not AzureKeyVault.GetAzureKeyVaultSecret(ShopifyAPISecretAKVSecretNameLbl, ClientSecret) then
+        //     Session.LogMessage('0000HCB', MissingAPISecretTelemetryTxt, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok)
+        // else
+        //     exit(ClientSecret);
     end;
 
     [Scope('OnPrem')]
@@ -74,23 +74,24 @@ codeunit 30199 "Shpfy Authentication Mgt."
         InstallURLWithClientIdParamTok: Label '%1&client_id=%2', Comment = '%1 = InstallURLTxt, %2 = ClientId', Locked = true;
         NotMatchingStateErr: Label 'The state parameter value does not match.';
     begin
+        exit;
         OAuth2.GetDefaultRedirectURL(RedirectUrl);
         State := Random(999);
         Url := StrSubstNo(InstallURLTxt, InstalllToStore, ScopeTxt, RedirectUrl, State, GrandOptionsTxt);
-        FullUrl := SecretStrSubstNo(InstallURLWithClientIdParamTok, Url, GetClientId());
+        // FullUrl := SecretStrSubstNo(InstallURLWithClientIdParamTok, Url, GetClientId());
         ShopifyAuthentication.SetOAuth2Properties(FullUrl);
         Commit();
         ShopifyAuthentication.RunModal();
         Store := ShopifyAuthentication.Store();
         AuthorizationCode := ShopifyAuthentication.GetAuthorizationCode();
-        if AuthorizationCode.IsEmpty() then
-            if ShopifyAuthentication.GetAuthError() <> '' then
-                Error(ShopifyAuthentication.GetAuthError())
-            else
-                Error(NoCallbackErr);
+        if AuthorizationCode.IsEmpty() then;
+        // if ShopifyAuthentication.GetAuthError() <> '' then
+        //     Error(ShopifyAuthentication.GetAuthError())
+        // else
+        //     Error(NoCallbackErr);
         if State <> ShopifyAuthentication.State() then
             Error(NotMatchingStateErr);
-        GetToken(Store, AuthorizationCode);
+        // GetToken(Store, AuthorizationCode);
     end;
 
     [NonDebuggable]
@@ -109,10 +110,11 @@ codeunit 30199 "Shpfy Authentication Mgt."
         AccessTokenURLTxt: Label 'https://%1/admin/oauth/access_token', Comment = '%1 = Store', Locked = true;
         HttpRequestBlockedErrorInfo: ErrorInfo;
     begin
-        RequestBody.Add('client_id', GetClientId().Unwrap());
-        RequestBody.Add('client_secret', GetClientSecret().Unwrap());
-        RequestBody.Add('code', AuthorizationCode.Unwrap());
-        RequestBody.WriteTo(Body);
+        exit;
+        // RequestBody.Add('client_id', GetClientId().Unwrap());
+        // RequestBody.Add('client_secret', GetClientSecret().Unwrap());
+        // RequestBody.Add('code', AuthorizationCode.Unwrap());
+        // RequestBody.WriteTo(Body);
 
         Url := StrSubstNo(AccessTokenURLTxt, Store);
 
@@ -135,7 +137,7 @@ codeunit 30199 "Shpfy Authentication Mgt."
         Clear(Body);
         HttpResponseMessage.Content().ReadAs(Body);
         JObject.ReadFrom(Body);
-        SaveStoreInfo(Store, JsonHelper.GetValueAsText(JObject.AsToken(), 'scope'), JsonHelper.GetValueAsText(JObject.AsToken(), 'access_token'));
+        // SaveStoreInfo(Store, JsonHelper.GetValueAsText(JObject.AsToken(), 'scope'), JsonHelper.GetValueAsText(JObject.AsToken(), 'access_token'));
     end;
 
 
@@ -153,7 +155,7 @@ codeunit 30199 "Shpfy Authentication Mgt."
         RegisteredStoreNew."Requested Scope" := ScopeTxt;
         RegisteredStoreNew."Actual Scope" := CopyStr(ActualScope, 1, MaxStrLen(RegisteredStoreNew."Actual Scope"));
         RegisteredStoreNew.Modify();
-        RegisteredStoreNew.SetAccessToken(AccessToken);
+        // RegisteredStoreNew.SetAccessToken(AccessToken);
     end;
 
     [Scope('OnPrem')]
@@ -166,7 +168,7 @@ codeunit 30199 "Shpfy Authentication Mgt."
     begin
         if RegisteredStoreNew.Get(Store) then
             if RegisteredStoreNew."Requested Scope" = ScopeTxt then begin
-                AccessToken := RegisteredStoreNew.GetAccessToken();
+                // AccessToken := RegisteredStoreNew.GetAccessToken();
                 if not AccessToken.IsEmpty() then
                     exit(AccessToken)
                 else
@@ -181,9 +183,9 @@ codeunit 30199 "Shpfy Authentication Mgt."
     var
         RegisteredStoreNew: Record "Shpfy Registered Store New";
     begin
-        if RegisteredStoreNew.Get(Store) then
-            if RegisteredStoreNew."Requested Scope" = ScopeTxt then
-                exit(not RegisteredStoreNew.GetAccessToken().IsEmpty());
+        // if RegisteredStoreNew.Get(Store) then
+        //     if RegisteredStoreNew."Requested Scope" = ScopeTxt then
+        //         exit(not RegisteredStoreNew.GetAccessToken().IsEmpty());
     end;
 
     procedure IsValidShopUrl(ShopUrl: Text): Boolean

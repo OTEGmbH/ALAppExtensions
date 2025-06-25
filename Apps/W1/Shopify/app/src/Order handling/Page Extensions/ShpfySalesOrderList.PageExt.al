@@ -5,7 +5,7 @@ using Microsoft.Sales.Document;
 /// <summary>
 /// PageExtension Shpfy Sales Order List (ID 30116) extends Record Sales Order List.
 /// </summary>
-pageextension 30116 "Shpfy Sales Order List" extends "Sales Order List"
+pageextension 88014 "Shpfy Sales Order List" extends "Sales Order List"
 {
     layout
     {

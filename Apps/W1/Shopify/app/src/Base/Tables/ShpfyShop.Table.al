@@ -1,5 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
+using app.app;
 using Microsoft.Finance.GeneralLedger.Account;
 using System.Globalization;
 using System.IO;
@@ -20,7 +21,7 @@ using Microsoft.Inventory.Location;
 /// <summary>
 /// Table Shpfy Shop (ID 30102).
 /// </summary>
-table 30102 "Shpfy Shop"
+table 88002 "Shpfy Shop"
 {
     Caption = 'Shopify Shop';
     DataClassification = SystemMetadata;
@@ -67,12 +68,12 @@ table 30102 "Shpfy Shop"
                 if Rec."Enabled" then begin
                     Rec.TestField("Shopify URL");
                     Rec."Enabled" := CustomerConsentMgt.ConfirmUserConsent();
-                    if Rec.Enabled then
-                        Session.LogAuditMessage(StrSubstNo(ShopifyConsentProvidedLbl, UserSecurityId(), CompanyName()), SecurityOperationResult::Success, AuditCategory::ApplicationManagement, 4, 0);
+                    if Rec.Enabled then;
+                    // Session.log(StrSubstNo(ShopifyConsentProvidedLbl, UserSecurityId(), CompanyName()), SecurityOperationResult::Success, AuditCategory::ApplicationManagement, 4, 0);
                 end else begin
                     Rec.Enabled := true;
                     Rec.Validate("Order Created Webhooks", false);
-                    WebhooksMgt.DisableBulkOperationsWebhook(Rec);
+                    // WebhooksMgt.DisableBulkOperationsWebhook(Rec);
                     Rec.Enabled := false;
                 end;
             end;
@@ -574,10 +575,10 @@ table 30102 "Shpfy Shop"
             var
                 ShpfyWebhooksMgt: Codeunit "Shpfy Webhooks Mgt.";
             begin
-                if "Order Created Webhooks" then
-                    ShpfyWebhooksMgt.EnableOrderCreatedWebhook(Rec)
-                else
-                    ShpfyWebhooksMgt.DisableOrderCreatedWebhook(Rec);
+                // if "Order Created Webhooks" then
+                //     ShpfyWebhooksMgt.EnableOrderCreatedWebhook(Rec)
+                // else
+                //     ShpfyWebhooksMgt.DisableOrderCreatedWebhook(Rec);
             end;
         }
         field(109; "Order Created Webhook User"; Code[50])
@@ -801,8 +802,8 @@ table 30102 "Shpfy Shop"
     var
         ShpfyWebhooksMgt: Codeunit "Shpfy Webhooks Mgt.";
     begin
-        ShpfyWebhooksMgt.DisableOrderCreatedWebhook(Rec);
-        ShpfyWebhooksMgt.DisableBulkOperationsWebhook(Rec);
+        // ShpfyWebhooksMgt.DisableOrderCreatedWebhook(Rec);
+        // ShpfyWebhooksMgt.DisableBulkOperationsWebhook(Rec);
     end;
 
     var
@@ -814,7 +815,7 @@ table 30102 "Shpfy Shop"
         CategoryTok: Label 'Shopify Integration', Locked = true;
         ShopifyConsentProvidedLbl: Label 'Shopify - consent provided by UserSecurityId %1 for company %2.', Comment = '%1 - User Security ID, %2 - Company name', Locked = true;
 
-    [Scope('OnPrem')]
+    // [Scope('OnPrem')]
     internal procedure GetAccessToken() Result: SecretText
     var
         AuthenticationMgt: Codeunit "Shpfy Authentication Mgt.";
@@ -822,8 +823,10 @@ table 30102 "Shpfy Shop"
     begin
         Rec.Testfield(Enabled, true);
         Store := GetStoreName();
-        if Store <> '' then
-            exit(AuthenticationMgt.GetAccessToken(Store));
+
+
+        // if Store <> '' then
+        //     exit(AuthenticationMgt.GetAccessToken(Store));
     end;
 
     [Scope('OnPrem')]
@@ -833,8 +836,8 @@ table 30102 "Shpfy Shop"
         Store: Text;
     begin
         Store := GetStoreName();
-        if Store <> '' then
-            AuthenticationMgt.InstallShopifyApp(Store);
+        // if Store <> '' then
+        // AuthenticationMgt.InstallShopifyApp(Store);
     end;
 
     [Scope('OnPrem')]
@@ -844,8 +847,8 @@ table 30102 "Shpfy Shop"
         Store: Text;
     begin
         Store := GetStoreName();
-        if Store <> '' then
-            exit(AuthenticationMgt.AccessTokenExist(Store));
+        // if Store <> '' then
+        // exit(AuthenticationMgt.AccessTokenExist(Store));
     end;
 
     internal procedure TestConnection(): Boolean
@@ -1048,4 +1051,26 @@ table 30102 "Shpfy Shop"
                 Session.LogMessage('0000KO0', ExpirationNotificationTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
             end;
     end;
+
+    /*
+
+    ..#######..########.########
+    .##.....##....##....##......
+    .##.....##....##....##......
+    .##.....##....##....######..
+    .##.....##....##....##......
+    .##.....##....##....##......
+    ..#######.....##....########
+
+    */
+
+    procedure GetAccessToken(_OBCShpfyAuthMethod: Interface "OBC Shpfy Auth. Method") Result: SecretText
+    var
+
+    begin
+        if not _OBCShpfyAuthMethod.GetAuthToken(Rec, Result) then
+            Error('Failed to get access token for Shopify shop %1', Rec."Shopify URL");
+        exit(result);
+    end;
+
 }

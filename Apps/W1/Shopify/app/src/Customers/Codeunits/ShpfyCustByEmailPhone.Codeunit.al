@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit ShoShpfypify Cust. By Email/Phone (ID 30113) implements Interface Shpfy ICustomer Mapping.
 /// </summary>
-codeunit 30113 "Shpfy Cust. By Email/Phone" implements "Shpfy ICustomer Mapping"
+codeunit 88034 "Shpfy Cust. By Email/Phone" implements "Shpfy ICustomer Mapping"
 {
     Access = Internal;
 

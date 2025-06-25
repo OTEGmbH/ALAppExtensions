@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Page Shpfy Customer Card (ID 30106).
 /// </summary>
-page 30106 "Shpfy Customer Card"
+page 88016 "Shpfy Customer Card"
 {
     Caption = 'Shopify Customer Card';
     InsertAllowed = false;

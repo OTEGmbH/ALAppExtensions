@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Codeunit Shpfy CreateProdStatusDraft (ID 30173) implements Interface Shopify.ICreateProductStatusValue.
 /// </summary>
-codeunit 30173 "Shpfy CreateProdStatusDraft" implements "Shpfy ICreateProductStatusValue"
+codeunit 88267 "Shpfy CreateProdStatusDraft" implements "Shpfy ICreateProductStatusValue"
 {
     Access = Internal;
 

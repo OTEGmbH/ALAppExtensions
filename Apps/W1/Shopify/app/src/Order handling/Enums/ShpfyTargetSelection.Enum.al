@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Target Selection (ID 30120).
 /// </summary>
-enum 30120 "Shpfy Target Selection"
+enum 88040 "Shpfy Target Selection"
 {
     Access = Internal;
     Caption = 'Shopify Target Selection';

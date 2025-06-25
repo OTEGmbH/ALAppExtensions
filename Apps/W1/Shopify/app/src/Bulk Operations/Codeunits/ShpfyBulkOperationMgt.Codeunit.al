@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Integration;
 
-codeunit 30270 "Shpfy Bulk Operation Mgt."
+codeunit 88012 "Shpfy Bulk Operation Mgt."
 {
     var
         InvalidUserErr: Label 'You must sign in with a Business Central licensed user to enable the feature.';
@@ -23,7 +23,7 @@ codeunit 30270 "Shpfy Bulk Operation Mgt."
         end;
 
         Shop."Bulk Operation Webhook User Id" := UserSecurityID();
-        WebhooksMgt.EnableBulkOperationWebhook(Shop);
+        // WebhooksMgt.EnableBulkOperationWebhook(Shop);
     end;
 
     internal procedure SendBulkMutation(var Shop: Record "Shpfy Shop"; BulkOperationType: Enum "Shpfy Bulk Operation Type"; Jsonl: Text; RequestData: JsonArray): Boolean

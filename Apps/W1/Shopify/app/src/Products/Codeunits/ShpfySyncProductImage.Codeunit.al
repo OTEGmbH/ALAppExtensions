@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Codeunit Shpfy Sync Product Image (ID 30184).
 /// </summary>
-codeunit 30184 "Shpfy Sync Product Image"
+codeunit 88279 "Shpfy Sync Product Image"
 {
     Access = Internal;
     TableNo = "Shpfy Shop";

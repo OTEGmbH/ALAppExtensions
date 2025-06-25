@@ -7,7 +7,7 @@ using Microsoft.CRM.BusinessRelation;
 /// <summary>
 /// Codeunit Shpfy Order Mapping (ID 30163).
 /// </summary>
-codeunit 30163 "Shpfy Order Mapping"
+codeunit 88243 "Shpfy Order Mapping"
 {
     Access = Internal;
     Permissions =

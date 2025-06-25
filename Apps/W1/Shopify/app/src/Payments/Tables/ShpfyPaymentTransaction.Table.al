@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// Table Shpfy Payment Transaction (ID 30124).
 /// </summary>
-table 30124 "Shpfy Payment Transaction"
+table 88046 "Shpfy Payment Transaction"
 {
     Caption = 'Shopify Payment Transaction';
     DataClassification = CustomerContent;

@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30334 "Shpfy Metafield Owner Product" implements "Shpfy IMetafield Owner Type"
+codeunit 88236 "Shpfy Metafield Owner Product" implements "Shpfy IMetafield Owner Type"
 {
     procedure GetTableId(): Integer
     begin

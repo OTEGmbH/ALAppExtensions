@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shopify Synchronization Type (ID 30103).
 /// </summary>
-enum 30103 "Shpfy Synchronization Type"
+enum 88004 "Shpfy Synchronization Type"
 {
     Access = Internal;
     Caption = 'Shopify Synchronization Type';

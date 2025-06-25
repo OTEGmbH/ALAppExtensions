@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Company Import Range (ID 30149).
 /// </summary>
-enum 30149 "Shpfy Company Import Range"
+enum 88008 "Shpfy Company Import Range"
 {
     Caption = 'Shopify Company Import Range';
     Extensible = false;

@@ -4,7 +4,7 @@ using Microsoft.Sales.History;
 using Microsoft.Utilities;
 using Microsoft.Sales.Document;
 
-codeunit 30364 "Shpfy Update Sales Invoice"
+codeunit 88206 "Shpfy Update Sales Invoice"
 {
     Access = Internal;
 

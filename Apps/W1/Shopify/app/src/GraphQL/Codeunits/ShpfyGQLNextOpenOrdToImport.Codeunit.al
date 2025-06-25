@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30206 "Shpfy GQL NextOpenOrdToImport" implements "Shpfy IGraphQL"
+codeunit 88133 "Shpfy GQL NextOpenOrdToImport" implements "Shpfy IGraphQL"
 {
     Access = Internal;
 

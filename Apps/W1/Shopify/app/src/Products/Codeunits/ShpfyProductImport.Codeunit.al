@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy Product Import (ID 30180).
 /// </summary>
-codeunit 30180 "Shpfy Product Import"
+codeunit 88274 "Shpfy Product Import"
 {
     Access = Internal;
     trigger OnRun()

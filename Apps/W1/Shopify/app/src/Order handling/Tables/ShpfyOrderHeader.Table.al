@@ -10,7 +10,7 @@ using System.Reflection;
 /// <summary>
 /// Table Shpfy Order Header (ID 30118).
 /// </summary>
-table 30118 "Shpfy Order Header"
+table 88032 "Shpfy Order Header"
 {
     Caption = 'Shopify Order Header';
     DataCaptionFields = "Shopify Order No.", "Sell-to Customer Name";

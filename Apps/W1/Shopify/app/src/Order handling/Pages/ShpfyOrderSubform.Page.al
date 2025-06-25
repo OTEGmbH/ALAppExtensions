@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Order Subform (ID 30122).
 /// </summary>
-page 30122 "Shpfy Order Subform"
+page 88044 "Shpfy Order Subform"
 {
     Caption = 'Shopify Order Lines';
     DeleteAllowed = false;

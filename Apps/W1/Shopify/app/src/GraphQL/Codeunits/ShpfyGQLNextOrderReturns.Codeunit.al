@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30223 "Shpfy GQL NextOrderReturns" implements "Shpfy IGraphQL"
+codeunit 88135 "Shpfy GQL NextOrderReturns" implements "Shpfy IGraphQL"
 {
 
     internal procedure GetGraphQL(): Text

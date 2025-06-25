@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Order Risk (ID 30123).
 /// </summary>
-table 30123 "Shpfy Order Risk"
+table 88043 "Shpfy Order Risk"
 {
     Access = Internal;
     Caption = 'Shopify Order Risk';

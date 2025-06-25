@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Transaction Gateways (ID 30133).
 /// </summary>
-page 30133 "Shpfy Transaction Gateways"
+page 88068 "Shpfy Transaction Gateways"
 {
 
     Caption = 'Shopify Transaction Gateways';

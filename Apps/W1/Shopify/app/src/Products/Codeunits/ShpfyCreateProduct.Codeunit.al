@@ -6,7 +6,7 @@ using Microsoft.Inventory.Item.Catalog;
 /// <summary>
 /// Codeunit Shpfy Create Product (ID 30174).
 /// </summary>
-codeunit 30174 "Shpfy Create Product"
+codeunit 88268 "Shpfy Create Product"
 {
     Access = Internal;
     Permissions =

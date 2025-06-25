@@ -6,7 +6,7 @@ using System.Environment.Configuration;
 /// <summary>
 /// Page Shpfy Products (ID 30126).
 /// </summary>
-page 30126 "Shpfy Products"
+page 88059 "Shpfy Products"
 {
 
     ApplicationArea = All;

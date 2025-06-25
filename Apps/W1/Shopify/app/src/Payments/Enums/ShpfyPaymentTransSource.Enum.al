@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Payment Transaction Source (ID 30114).
 /// </summary>
-enum 30114 "Shpfy Payment Trans. Source"
+enum 88056 "Shpfy Payment Trans. Source"
 {
     Access = Internal;
     Caption = 'Shopify Payment Trans. Source';

@@ -5,7 +5,7 @@ using Microsoft.Inventory.Location;
 /// <summary>
 /// Table Shpfy Shop Location (ID 30113).
 /// </summary>
-table 30113 "Shpfy Shop Location"
+table 88020 "Shpfy Shop Location"
 {
     Caption = 'Shopify Shop Location';
     DataClassification = CustomerContent;

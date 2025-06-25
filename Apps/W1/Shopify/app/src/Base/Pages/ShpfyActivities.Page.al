@@ -7,7 +7,7 @@ using System.Visualization;
 /// <summary>
 /// Page Shpfy Activities (ID 30100).
 /// </summary>
-page 30100 "Shpfy Activities"
+page 88000 "Shpfy Activities"
 {
     Caption = 'Shopify Activities';
     PageType = CardPart;

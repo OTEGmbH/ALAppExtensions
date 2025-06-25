@@ -6,7 +6,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Tracking Companies (ID 30122).
 /// </summary>
-enum 30122 "Shpfy Tracking Companies"
+enum 88042 "Shpfy Tracking Companies"
 {
     Caption = 'Shopify Tracking Companies';
     Extensible = false;

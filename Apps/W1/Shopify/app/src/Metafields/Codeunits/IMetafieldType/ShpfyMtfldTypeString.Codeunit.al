@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30337 "Shpfy Mtfld Type String" implements "Shpfy IMetafield Type"
+codeunit 88229 "Shpfy Mtfld Type String" implements "Shpfy IMetafield Type"
 {
     procedure HasAssistEdit(): Boolean
     begin

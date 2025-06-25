@@ -8,7 +8,7 @@ using Microsoft.Finance.VAT.Setup;
 /// <summary>
 /// Table Shpfy Shop Collection Map (ID 30128).
 /// </summary>
-table 30128 "Shpfy Shop Collection Map"
+table 88051 "Shpfy Shop Collection Map"
 {
     Access = Internal;
     Caption = 'Shopify Shop Collection';

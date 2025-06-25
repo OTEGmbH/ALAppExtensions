@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Environment.Configuration;
 
-tableextension 30200 "Shpfy Feature Data Update" extends "Feature Data Update Status"
+tableextension 88000 "Shpfy Feature Data Update" extends "Feature Data Update Status"
 {
     fields
     {

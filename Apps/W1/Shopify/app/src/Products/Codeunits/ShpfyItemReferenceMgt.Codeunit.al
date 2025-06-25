@@ -6,7 +6,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Codeunit Shpfy Item Reference Mgt. (ID 30175).
 /// </summary>
-codeunit 30175 "Shpfy Item Reference Mgt."
+codeunit 88269 "Shpfy Item Reference Mgt."
 {
     Access = Internal;
 

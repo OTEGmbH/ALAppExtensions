@@ -4,7 +4,7 @@ namespace Microsoft.Integration.Shopify;
 /// Shpfy - Read Permissions (ID 30100).
 /// </summary>
 #pragma warning disable AS0090, AS0049
-permissionset 30100 "Shpfy - Read"
+permissionset 88004 "Shpfy - Read"
 {
     Access = Internal;
     Assignable = false;

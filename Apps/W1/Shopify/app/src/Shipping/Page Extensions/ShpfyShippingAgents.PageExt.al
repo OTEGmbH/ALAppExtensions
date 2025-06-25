@@ -5,7 +5,7 @@ using Microsoft.Foundation.Shipping;
 /// <summary>
 /// PageExtension Shpfy Shipping Agents (ID 30118) extends Record Shipping Agents.
 /// </summary>
-pageextension 30118 "Shpfy Shipping Agents" extends "Shipping Agents"
+pageextension 88021 "Shpfy Shipping Agents" extends "Shipping Agents"
 {
     layout
     {

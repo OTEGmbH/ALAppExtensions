@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// PageExtension Shpfy Posted Sales Invoice (ID 30160) extends Record Posted Sales Invoice.
 /// </summary>
-pageextension 30106 "Shpfy Posted Sales Invoice" extends "Posted Sales Invoice"
+pageextension 88004 "Shpfy Posted Sales Invoice" extends "Posted Sales Invoice"
 {
     layout
     {

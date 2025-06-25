@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Refund Shipping Line (ID 30162).
 /// </summary>
-table 30162 "Shpfy Refund Shipping Line"
+table 88040 "Shpfy Refund Shipping Line"
 {
     Access = Internal;
     Caption = 'Refund Shipping Line';

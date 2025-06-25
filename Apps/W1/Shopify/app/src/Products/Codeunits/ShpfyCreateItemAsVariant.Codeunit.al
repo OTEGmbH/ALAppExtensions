@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
-codeunit 30343 "Shpfy Create Item As Variant"
+codeunit 88265 "Shpfy Create Item As Variant"
 {
     TableNo = Item;
     Access = Internal;

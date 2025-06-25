@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Sales Channel (ID 30159).
 /// </summary>
-table 30160 "Shpfy Sales Channel"
+table 88050 "Shpfy Sales Channel"
 {
     Caption = 'Shopify Sales Channel';
     DataClassification = CustomerContent;

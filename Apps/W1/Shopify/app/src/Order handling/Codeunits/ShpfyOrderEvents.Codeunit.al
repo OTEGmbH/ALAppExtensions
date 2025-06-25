@@ -5,7 +5,7 @@ using Microsoft.Sales.Document;
 /// <summary>
 /// Codeunit Shpfy Order Events (ID 30162).
 /// </summary>
-codeunit 30162 "Shpfy Order Events"
+codeunit 88242 "Shpfy Order Events"
 {
     [IntegrationEvent(false, false)]
     /// <summary> 

@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Document;
 
-codeunit 30246 "Shpfy Create Sales Doc. Refund"
+codeunit 88251 "Shpfy Create Sales Doc. Refund"
 {
 
     var

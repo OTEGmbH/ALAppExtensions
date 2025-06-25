@@ -7,7 +7,7 @@ using Microsoft.Foundation.Address;
 /// <summary>
 /// Codeunit Shpfy Customer Export (ID 30116).
 /// </summary>
-codeunit 30116 "Shpfy Customer Export"
+codeunit 88037 "Shpfy Customer Export"
 {
     Access = Internal;
     TableNo = Customer;

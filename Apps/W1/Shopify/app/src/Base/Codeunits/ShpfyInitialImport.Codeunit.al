@@ -4,7 +4,7 @@ using System.Threading;
 using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
 
-codeunit 30202 "Shpfy Initial Import"
+codeunit 88007 "Shpfy Initial Import"
 {
     Access = Internal;
 

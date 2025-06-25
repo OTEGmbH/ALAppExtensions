@@ -8,7 +8,7 @@ using Microsoft.Finance.VAT.Setup;
 /// <summary>
 /// Codeunit Shpfy Product Price Calc. (ID 30182).
 /// </summary>
-codeunit 30182 "Shpfy Product Price Calc."
+codeunit 88276 "Shpfy Product Price Calc."
 {
     Access = Internal;
     SingleInstance = true;

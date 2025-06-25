@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30147 "Shpfy Bulk Operation Status"
+enum 88006 "Shpfy Bulk Operation Status"
 {
     Access = Internal;
     Caption = 'Shopify Fulfillment Status';

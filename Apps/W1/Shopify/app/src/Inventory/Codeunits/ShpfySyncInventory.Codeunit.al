@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy Sync Inventory (ID 30197).
 /// </summary>
-codeunit 30197 "Shpfy Sync Inventory"
+codeunit 88201 "Shpfy Sync Inventory"
 {
     Access = Internal;
     TableNo = "Shpfy Shop Inventory";

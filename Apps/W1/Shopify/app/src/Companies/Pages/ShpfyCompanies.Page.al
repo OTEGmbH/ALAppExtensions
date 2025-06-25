@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Page Shpfy Companies (ID 30156).
 /// </summary>
-page 30156 "Shpfy Companies"
+page 88010 "Shpfy Companies"
 {
     ApplicationArea = All;
     Caption = 'Shopify Companies';

@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// TableExtension Shpfy Sales Invoice Line (ID 30103) extends Record Sales Invoice Line.
 /// </summary>
-tableextension 30103 "Shpfy Sales Invoice Line" extends "Sales Invoice Line"
+tableextension 88004 "Shpfy Sales Invoice Line" extends "Sales Invoice Line"
 {
     fields
     {

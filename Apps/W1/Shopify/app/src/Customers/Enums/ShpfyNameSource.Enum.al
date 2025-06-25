@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Name Source (ID 30108) implements Interface Shpfy ICustomer Name.
 /// </summary>
-enum 30108 "Shpfy Name Source" implements "Shpfy ICustomer Name"
+enum 88016 "Shpfy Name Source" implements "Shpfy ICustomer Name"
 {
     Caption = 'Shopify Name Source';
     Extensible = false;

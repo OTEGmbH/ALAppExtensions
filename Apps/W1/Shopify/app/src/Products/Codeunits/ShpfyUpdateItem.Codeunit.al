@@ -6,7 +6,7 @@ using Microsoft.Purchases.Vendor;
 /// <summary>
 /// Codeunit Shpfy Update Item (ID 30188).
 /// </summary>
-codeunit 30188 "Shpfy Update Item"
+codeunit 88283 "Shpfy Update Item"
 {
     Access = Internal;
     Permissions =

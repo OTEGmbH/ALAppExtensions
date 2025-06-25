@@ -6,7 +6,7 @@ using System.DateTime;
 /// <summary>
 /// Page Shpfy Shop Card (ID 30101).
 /// </summary>
-page 30101 "Shpfy Shop Card"
+page 88003 "Shpfy Shop Card"
 {
     Caption = 'Shopify Shop Card';
     PageType = Card;
@@ -62,7 +62,7 @@ page 30101 "Shpfy Shop Card"
                     begin
                         if not Rec.Enabled then
                             exit;
-                        Rec.RequestAccessToken();
+                        // Rec.RequestAccessToken();
                         BulkOperationMgt.EnableBulkOperations(Rec);
                         Rec."B2B Enabled" := Rec.GetB2BEnabled();
                         Rec."Weight Unit" := Rec.GetShopWeightUnit();
@@ -70,14 +70,14 @@ page 30101 "Shpfy Shop Card"
                         FeatureTelemetry.LogUptake('0000HUT', 'Shopify', Enum::"Feature Uptake Status"::"Set up");
                     end;
                 }
-                field(HasAccessKey; Rec.HasAccessToken())
-                {
-                    ApplicationArea = All;
-                    Caption = 'Has AccessKey';
-                    Importance = Additional;
-                    ShowMandatory = true;
-                    ToolTip = 'Specifies if an access key is available for this store.';
-                }
+                // field(HasAccessKey; Rec.HasAccessToken())
+                // {
+                //     ApplicationArea = All;
+                //     Caption = 'Has AccessKey';
+                //     Importance = Additional;
+                //     ShowMandatory = true;
+                //     ToolTip = 'Specifies if an access key is available for this store.';
+                // }
                 field(CurrencyCode; Rec."Currency Code")
                 {
                     ApplicationArea = All;
@@ -839,7 +839,7 @@ page 30101 "Shpfy Shop Card"
 
                     trigger OnAction()
                     begin
-                        Rec.RequestAccessToken();
+                        // Rec.RequestAccessToken();
                     end;
                 }
                 action(TestConnection)
@@ -1187,7 +1187,7 @@ page 30101 "Shpfy Shop Card"
 
             if AuthenticationMgt.CheckScopeChange(Rec) then
                 if Confirm(StrSubstNo(ScopeChangeConfirmLbl, Rec.Code)) then begin
-                    Rec.RequestAccessToken();
+                    // Rec.RequestAccessToken();
                     Rec."B2B Enabled" := Rec.GetB2BEnabled();
                     Rec."Weight Unit" := Rec.GetShopWeightUnit();
                     Rec.Modify();

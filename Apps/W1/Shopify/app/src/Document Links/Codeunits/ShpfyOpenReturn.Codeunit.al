@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30265 "Shpfy Open Return" implements "Shpfy IOpenShopifyDocument"
+codeunit 88056 "Shpfy Open Return" implements "Shpfy IOpenShopifyDocument"
 {
 
     procedure OpenDocument(DocumentId: BigInteger)

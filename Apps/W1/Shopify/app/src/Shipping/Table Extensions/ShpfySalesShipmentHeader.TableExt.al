@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// TableExtensionShpfy Sales Shipment Header (ID 30106) extends Record Sales Shipment Header.
 /// </summary>
-tableextension 30106 "Shpfy Sales Shipment Header" extends "Sales Shipment Header"
+tableextension 88010 "Shpfy Sales Shipment Header" extends "Sales Shipment Header"
 {
     fields
     {

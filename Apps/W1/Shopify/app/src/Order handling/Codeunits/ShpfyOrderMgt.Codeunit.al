@@ -6,7 +6,7 @@ using Microsoft.Sales.Document;
 /// <summary>
 /// Codeunit Shpfy Order Mgt. (ID 30164).
 /// </summary>
-codeunit 30164 "Shpfy Order Mgt."
+codeunit 88244 "Shpfy Order Mgt."
 {
     Access = Internal;
 

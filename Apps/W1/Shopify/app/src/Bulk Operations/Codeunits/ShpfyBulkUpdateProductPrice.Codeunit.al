@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Reflection;
 
-codeunit 30281 "Shpfy Bulk UpdateProductPrice" implements "Shpfy IBulk Operation"
+codeunit 88014 "Shpfy Bulk UpdateProductPrice" implements "Shpfy IBulk Operation"
 {
     Access = Internal;
 

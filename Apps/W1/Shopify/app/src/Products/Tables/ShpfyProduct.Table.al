@@ -6,7 +6,7 @@ using System.Reflection;
 /// <summary>
 /// Table Shpfy Product (ID 30127).
 /// </summary>
-table 30127 "Shpfy Product"
+table 88049 "Shpfy Product"
 {
     Caption = 'Shopify Product';
     DataClassification = CustomerContent;

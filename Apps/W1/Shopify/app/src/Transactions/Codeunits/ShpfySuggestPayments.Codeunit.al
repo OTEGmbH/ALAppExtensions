@@ -5,7 +5,7 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Reversal;
 
-codeunit 30311 "Shpfy Suggest Payments"
+codeunit 88291 "Shpfy Suggest Payments"
 {
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Line", 'OnAfterInitCustLedgEntry', '', false, false)]
     local procedure TransferTransactionIdOnAfterInitCustLedgEntry(var CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line")

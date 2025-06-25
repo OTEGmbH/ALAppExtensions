@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Order Payment Gateway (ID 30120).
 /// </summary>
-table 30120 "Shpfy Order Payment Gateway"
+table 88035 "Shpfy Order Payment Gateway"
 {
     Access = Internal;
     Caption = 'Shopify Order Payment Gateway';

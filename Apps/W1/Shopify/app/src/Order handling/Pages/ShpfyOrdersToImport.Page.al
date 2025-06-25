@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Orders to Import (ID 30121).
 /// </summary>
-page 30121 "Shpfy Orders to Import"
+page 88043 "Shpfy Orders to Import"
 {
 
     ApplicationArea = All;

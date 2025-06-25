@@ -8,7 +8,7 @@ using Microsoft.Warehouse.Setup;
 /// <summary>
 /// Page Shpfy Order (ID 30113).
 /// </summary>
-page 30113 "Shpfy Order"
+page 88039 "Shpfy Order"
 {
     Caption = 'Shopify Order';
     DataCaptionFields = "Shopify Order No.";

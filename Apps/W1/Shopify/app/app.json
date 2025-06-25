@@ -1,23 +1,20 @@
 {
-  "id": "ec255f57-31d0-4ca2-b751-f2fa7c745abb",
-  "name": "Shopify Connector",
-  "publisher": "Microsoft",
+  "id": "76af2562-1e35-42f5-8ff1-cee2aa423a8f",
+  "name": "OTE Shopify Connector",
+  "publisher": "OTE GmbH",
   "brief": "Seamless connection between Shopify and Dynamics 365 Business Central will synchronize order, stock, and customer information to ensure that merchants can fulfill orders faster and better serve their customers.",
   "description": "Connecting Dynamics 365 Business Central with Shopify will help merchants implement more agile online business processes, while keeping people focused on selling. With support for multitier pricing structures and multiple currencies, companies, and entities, Business Central will support multiple Shopify store scenarios with ease. By connecting Shopify and Business Central, you will improve visibility into stock, pricing, existing customers and order history, order status, billing, and payments.",
   "version": "27.0.0.0",
-  "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
-  "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
-  "help": "https://go.microsoft.com/fwlink/?linkid=2179727",
   "url": "https://go.microsoft.com/fwlink/?LinkId=724011",
   "logo": "ExtensionLogo.png",
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2179727",
   "dependencies": [],
   "screenshots": [],
-  "platform": "27.0.0.0",
+  "platform": "25.0.0.0",
   "idRanges": [
     {
-      "from": 30100,
-      "to": 30399
+      "from": 88000,
+      "to": 88999
     }
   ],
   "internalsVisibleTo": [
@@ -32,8 +29,8 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "27.0.0.0",
-  "target": "OnPrem",
+  "application": "25.0.0.0",
+  "target": "Cloud",
   "features": [
     "NoImplicitWith"
   ],

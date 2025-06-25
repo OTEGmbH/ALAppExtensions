@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy GQL GetWebhookSubs (ID 30394) implements Interface Shpfy IGraphQL.
 /// </summary>
-codeunit 30394 "Shpfy GQL GetWebhookSubs" implements "Shpfy IGraphQL"
+codeunit 88107 "Shpfy GQL GetWebhookSubs" implements "Shpfy IGraphQL"
 {
     Access = Internal;
 

@@ -6,7 +6,7 @@ using System.Environment.Configuration;
 /// <summary>
 /// Codeunit Shpfy Background Syncs (ID 30101).
 /// </summary>
-codeunit 30101 "Shpfy Background Syncs"
+codeunit 88001 "Shpfy Background Syncs"
 {
     Access = Internal;
 

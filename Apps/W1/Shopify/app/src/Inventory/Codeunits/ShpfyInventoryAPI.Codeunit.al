@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Codeunit Shpfy Inventory API (ID 30195).
 /// </summary>
-codeunit 30195 "Shpfy Inventory API"
+codeunit 88199 "Shpfy Inventory API"
 {
     Access = Internal;
     Permissions =

@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Shpfy - Edit Permissions (ID 30102).
 /// </summary>
-permissionset 30102 "Shpfy - Edit"
+permissionset 88001 "Shpfy - Edit"
 {
     Access = Internal;
     Assignable = false;

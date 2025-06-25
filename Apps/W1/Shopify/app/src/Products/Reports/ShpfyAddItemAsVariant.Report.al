@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// A report to add items as variants to a parent product.
 /// </summary>
-report 30117 "Shpfy Add Item As Variant"
+report 88015 "Shpfy Add Item As Variant"
 {
     ApplicationArea = All;
     Caption = 'Add Item as Shopify Variant';

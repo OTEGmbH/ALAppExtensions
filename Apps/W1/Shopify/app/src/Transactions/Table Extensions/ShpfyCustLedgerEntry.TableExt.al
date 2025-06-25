@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Receivables;
 
-tableextension 30201 "Shpfy Cust. Ledger Entry" extends "Cust. Ledger Entry"
+tableextension 88013 "Shpfy Cust. Ledger Entry" extends "Cust. Ledger Entry"
 {
     fields
     {

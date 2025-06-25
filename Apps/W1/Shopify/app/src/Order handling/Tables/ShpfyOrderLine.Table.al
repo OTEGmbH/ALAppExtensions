@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Table Shpfy Order Line (ID 30119).
 /// </summary>
-table 30119 "Shpfy Order Line"
+table 88033 "Shpfy Order Line"
 {
     Caption = 'Shopify Order Line';
     DataClassification = SystemMetadata;

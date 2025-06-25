@@ -5,7 +5,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// Codeunit Shpfy Shipping Events (ID 30192).
 /// </summary>
-codeunit 30192 "Shpfy Shipping Events"
+codeunit 88288 "Shpfy Shipping Events"
 {
     [IntegrationEvent(false, false)]
     /// <summary> 

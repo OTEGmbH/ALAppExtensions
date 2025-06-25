@@ -1,7 +1,7 @@
 #if not CLEANSCHEMA25
 namespace Microsoft.Integration.Shopify;
 
-table 30140 "Shpfy Templates Warnings"
+table 88005 "Shpfy Templates Warnings"
 {
     Access = Internal;
     TableType = Temporary;

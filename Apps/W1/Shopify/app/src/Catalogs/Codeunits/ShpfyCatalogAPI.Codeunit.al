@@ -6,7 +6,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Codeunit Shpfy Catalog API (ID 30290).
 /// </summary>
-codeunit 30290 "Shpfy Catalog API"
+codeunit 88015 "Shpfy Catalog API"
 {
     Access = Internal;
 

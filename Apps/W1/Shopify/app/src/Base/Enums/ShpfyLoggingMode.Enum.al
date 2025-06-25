@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30141 "Shpfy Logging Mode"
+enum 88001 "Shpfy Logging Mode"
 {
     Extensible = false;
 

@@ -7,7 +7,7 @@ using System.Reflection;
 /// <summary>
 /// Table Shpfy Log Entry (ID 30115).
 /// </summary>
-table 30115 "Shpfy Log Entry"
+table 88023 "Shpfy Log Entry"
 {
     Access = Internal;
     Caption = 'Shopify Log Entry';

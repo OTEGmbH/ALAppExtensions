@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Codeunit Shpfy Customer Events (ID 30115).
 /// </summary>
-codeunit 30115 "Shpfy Customer Events"
+codeunit 88036 "Shpfy Customer Events"
 {
     [IntegrationEvent(false, false)]
     /// <summary> 

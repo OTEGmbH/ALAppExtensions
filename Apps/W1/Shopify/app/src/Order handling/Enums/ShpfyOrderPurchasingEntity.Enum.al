@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Order Purchasing Entity (ID 30150).
 /// </summary>
-enum 30150 "Shpfy Order Purchasing Entity"
+enum 88037 "Shpfy Order Purchasing Entity"
 {
     Access = Internal;
     Caption = 'Shopify Order Purchasing Entity';

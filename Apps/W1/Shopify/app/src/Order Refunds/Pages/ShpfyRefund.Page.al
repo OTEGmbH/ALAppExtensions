@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-page 30145 "Shpfy Refund"
+page 88046 "Shpfy Refund"
 {
     ApplicationArea = All;
     Caption = 'Shopify Refund';

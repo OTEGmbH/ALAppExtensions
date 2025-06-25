@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Transaction Gateway (ID 30135).
 /// </summary>
-table 30135 "Shpfy Transaction Gateway"
+table 88059 "Shpfy Transaction Gateway"
 {
     Access = Internal;
     Caption = 'Shopify Transaction Gateway';

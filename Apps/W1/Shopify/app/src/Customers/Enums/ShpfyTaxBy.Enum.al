@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Tax By (ID 30109).
 /// </summary>
-enum 30109 "Shpfy Tax By"
+enum 88017 "Shpfy Tax By"
 {
     Caption = 'Shopify Tax By';
     Extensible = false;

@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Company Locations (ID 30165).
 /// </summary>
-page 30165 "Shpfy Comp. Locations"
+page 88012 "Shpfy Comp. Locations"
 {
     ApplicationArea = All;
     Caption = 'Shopify Company Locations';

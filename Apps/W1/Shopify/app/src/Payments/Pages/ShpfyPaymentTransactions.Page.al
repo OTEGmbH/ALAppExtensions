@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Payment Transactions (ID 30124).
 /// </summary>
-page 30124 "Shpfy Payment Transactions"
+page 88056 "Shpfy Payment Transactions"
 {
 
     Caption = 'Shopify Payment Transactions';

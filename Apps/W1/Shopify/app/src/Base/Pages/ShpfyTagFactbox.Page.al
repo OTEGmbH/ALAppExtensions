@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Tag Factbox (ID 30103).
 /// </summary>
-page 30103 "Shpfy Tag Factbox"
+page 88006 "Shpfy Tag Factbox"
 {
     Caption = 'Shopify Tags';
     DeleteAllowed = false;

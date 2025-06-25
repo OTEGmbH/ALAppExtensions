@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Allocation Method (ID 30115).
 /// </summary>
-enum 30115 "Shpfy Allocation Method"
+enum 88034 "Shpfy Allocation Method"
 {
     Access = Internal;
     Caption = 'Shopify Allocation Method';

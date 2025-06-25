@@ -5,7 +5,7 @@ using System.Utilities;
 /// <summary>
 /// Page Shpfy Data Capture List (ID 30118).
 /// </summary>
-page 30118 "Shpfy Data Capture List"
+page 88026 "Shpfy Data Capture List"
 {
 
     Caption = 'Shopify Data Capture List';

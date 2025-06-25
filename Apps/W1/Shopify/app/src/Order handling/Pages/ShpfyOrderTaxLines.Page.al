@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Order Tax Lines (ID 30168).
 /// </summary>
-page 30168 "Shpfy Order Tax Lines"
+page 88045 "Shpfy Order Tax Lines"
 {
     Caption = 'Shopify Order Tax Lines';
     DeleteAllowed = false;

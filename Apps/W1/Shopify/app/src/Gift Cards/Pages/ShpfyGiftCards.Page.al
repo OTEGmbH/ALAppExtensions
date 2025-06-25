@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Gift Cards (ID 30110).
 /// </summary>
-page 30110 "Shpfy Gift Cards"
+page 88021 "Shpfy Gift Cards"
 {
 
     ApplicationArea = All;

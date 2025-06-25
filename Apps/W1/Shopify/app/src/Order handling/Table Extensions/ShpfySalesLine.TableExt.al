@@ -5,7 +5,7 @@ using Microsoft.Sales.Document;
 /// <summary>
 /// TableExtension Shpfy Sales Line (ID 30104) extends Record Sales Line.
 /// </summary>
-tableextension 30104 "Shpfy Sales Line" extends "Sales Line"
+tableextension 88005 "Shpfy Sales Line" extends "Sales Line"
 {
     fields
     {

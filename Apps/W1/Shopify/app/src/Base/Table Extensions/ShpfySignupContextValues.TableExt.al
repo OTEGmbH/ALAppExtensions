@@ -5,7 +5,7 @@ using System.Environment.Configuration;
 /// <summary>
 /// Table extension for the Signup Context values
 /// </summary>
-tableextension 30199 "Shpfy Signup Context Values" extends "Signup Context Values"
+tableextension 88001 "Shpfy Signup Context Values" extends "Signup Context Values"
 {
     fields
     {

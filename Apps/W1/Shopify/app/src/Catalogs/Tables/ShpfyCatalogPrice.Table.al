@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Catalog Price (ID 30153).
 /// </summary>
-table 30153 "Shpfy Catalog Price"
+table 88008 "Shpfy Catalog Price"
 {
     Caption = 'Shopify Catalog Price';
     DataClassification = CustomerContent;

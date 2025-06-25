@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Codeunit Shpfy Tax Registration No. (ID 30367) implements Interface Shpfy Tax Registration Id Mapping.
 /// </summary>
-codeunit 30367 "Shpfy Tax Registration No." implements "Shpfy Tax Registration Id Mapping"
+codeunit 88025 "Shpfy Tax Registration No." implements "Shpfy Tax Registration Id Mapping"
 {
     Access = Internal;
 

@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-table 30146 "Shpfy Doc. Link To Doc."
+table 88016 "Shpfy Doc. Link To Doc."
 {
     Caption = 'Doc. Link To BC Doc.';
     DataClassification = SystemMetadata;

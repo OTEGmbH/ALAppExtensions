@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-report 30120 "Shpfy Sync Disputes"
+report 88013 "Shpfy Sync Disputes"
 {
     ApplicationArea = All;
     Caption = 'Shopify Sync Disputes';

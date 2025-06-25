@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30316 "Shpfy Metafield API"
+codeunit 88238 "Shpfy Metafield API"
 {
     Access = Internal;
 

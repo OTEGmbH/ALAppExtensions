@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30156 "Shpfy Metafield Owner Type" implements "Shpfy IMetafield Owner Type"
+enum 88026 "Shpfy Metafield Owner Type" implements "Shpfy IMetafield Owner Type"
 {
     value(0; Customer)
     {

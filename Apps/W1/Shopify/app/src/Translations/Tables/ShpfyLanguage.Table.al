@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Globalization;
 
-table 30156 "Shpfy Language"
+table 88060 "Shpfy Language"
 {
     Caption = 'Shopify Language';
     DataClassification = CustomerContent;

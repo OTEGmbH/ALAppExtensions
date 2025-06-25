@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Report Shpfy Add Item to Shopify (ID 30106).
 /// </summary>
-report 30106 "Shpfy Add Item to Shopify"
+report 88016 "Shpfy Add Item to Shopify"
 {
     ApplicationArea = All;
     Caption = 'Add Item to Shopify';

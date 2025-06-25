@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30276 "Shpfy GQL BulkOpMutation" implements "Shpfy IGraphQL"
+codeunit 88068 "Shpfy GQL BulkOpMutation" implements "Shpfy IGraphQL"
 {
     Access = Internal;
 

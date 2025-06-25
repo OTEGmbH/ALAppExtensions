@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Codeunit Shpfy Company API (ID 30286).
 /// </summary>
-codeunit 30286 "Shpfy Company API"
+codeunit 88017 "Shpfy Company API"
 {
     Access = Internal;
     Permissions = tabledata Customer = rim;

@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shopify Payout (ID 30125).
 /// </summary>
-table 30125 "Shpfy Payout"
+table 88047 "Shpfy Payout"
 {
     Caption = 'Shopify Payout';
     DataClassification = CustomerContent;

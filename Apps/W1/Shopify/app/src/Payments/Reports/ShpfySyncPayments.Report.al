@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Report Shpfy Sync Payments (ID 30105).
 /// </summary>
-report 30105 "Shpfy Sync Payments"
+report 88014 "Shpfy Sync Payments"
 {
     ApplicationArea = All;
     Caption = 'Shopify Sync Payments';

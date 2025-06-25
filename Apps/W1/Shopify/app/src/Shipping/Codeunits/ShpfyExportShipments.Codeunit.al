@@ -6,7 +6,7 @@ using Microsoft.Sales.History;
 /// <summary>
 /// Codeunit Shpfy Export Shipments (ID 30190).
 /// </summary>
-codeunit 30190 "Shpfy Export Shipments"
+codeunit 88286 "Shpfy Export Shipments"
 {
     Access = Internal;
     Permissions =

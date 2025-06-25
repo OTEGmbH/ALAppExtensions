@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30351 "Shpfy Mtfld Type Dimension" implements "Shpfy IMetafield Type"
+codeunit 88216 "Shpfy Mtfld Type Dimension" implements "Shpfy IMetafield Type"
 {
     var
         DimensionJsonTemplateTxt: Label '{"value": %1, "unit": "%2"}', Locked = true;

@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy County Source (ID 30104) implements Interface Shpfy ICounty.
 /// </summary>
-enum 30104 "Shpfy County Source" implements "Shpfy ICounty", "Shpfy ICounty From Json"
+enum 88012 "Shpfy County Source" implements "Shpfy ICounty", "Shpfy ICounty From Json"
 {
     Caption = 'Shopify County Source';
     Extensible = false;

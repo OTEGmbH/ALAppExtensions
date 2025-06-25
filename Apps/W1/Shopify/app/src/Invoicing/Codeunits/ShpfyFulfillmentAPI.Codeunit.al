@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy Fulfillment API (ID 30315).
 /// </summary>
-codeunit 30361 "Shpfy Fulfillment API"
+codeunit 88204 "Shpfy Fulfillment API"
 {
     Access = Internal;
 

@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Shipment Status (ID 30119).
 /// </summary>
-enum 30119 "Shpfy Shipment Status"
+enum 88039 "Shpfy Shipment Status"
 {
     Access = Internal;
     Caption = 'Shopify Shipment Status';

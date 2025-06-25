@@ -8,7 +8,7 @@ using Microsoft.Foundation.Address;
 /// <summary>
 /// Codeunit Shpfy Create Customer (ID 30110).
 /// </summary>
-codeunit 30110 "Shpfy Create Customer"
+codeunit 88031 "Shpfy Create Customer"
 {
     Access = Internal;
     Permissions =

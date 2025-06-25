@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30326 "Shpfy Mtfld Type Weight" implements "Shpfy IMetafield Type"
+codeunit 88233 "Shpfy Mtfld Type Weight" implements "Shpfy IMetafield Type"
 {
     var
         WeightJsonTemplateTxt: Label '{"value": %1,"unit":"%2"}', Locked = true;

@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Bulk Operation Type.
 /// </summary>
-enum 30146 "Shpfy Bulk Operation Type" implements "Shpfy IBulk Operation"
+enum 88007 "Shpfy Bulk Operation Type" implements "Shpfy IBulk Operation"
 {
     Access = Internal;
     Caption = 'Shopify Bulk Mutation Type';

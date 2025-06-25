@@ -8,7 +8,7 @@ using Microsoft.Sales.Receivables;
 /// <summary>
 /// Table Shpfy Suggest Payment (ID 30154).
 /// </summary>
-table 30154 "Shpfy Suggest Payment"
+table 88058 "Shpfy Suggest Payment"
 {
     Access = Internal;
     Caption = 'Shopify Suggest Payment';

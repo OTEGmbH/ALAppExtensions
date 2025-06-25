@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Table Shpfy Order Line Attribute (ID 30123).
 /// </summary>
-table 30149 "Shpfy Order Line Attribute"
+table 88034 "Shpfy Order Line Attribute"
 {
     Caption = 'Shopify Order Attributes';
     DataClassification = SystemMetadata;

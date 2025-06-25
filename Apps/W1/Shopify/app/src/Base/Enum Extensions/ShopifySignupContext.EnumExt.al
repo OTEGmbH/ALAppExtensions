@@ -5,7 +5,7 @@ using System.Environment.Configuration;
 /// <summary>
 /// Extension Signup Context enum
 /// </summary>
-enumextension 30100 ShopifySignupContext extends "Signup Context"
+enumextension 88000 ShopifySignupContext extends "Signup Context"
 {
     /// <summary>
     /// Value for the Shopify context. This value is defined in the signup URL and stored by Platform

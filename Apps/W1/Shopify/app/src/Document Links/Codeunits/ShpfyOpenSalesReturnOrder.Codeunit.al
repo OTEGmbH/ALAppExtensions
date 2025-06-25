@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Document;
 
-codeunit 30256 "Shpfy Open SalesReturnOrder" implements "Shpfy IOpenBCDocument"
+codeunit 88060 "Shpfy Open SalesReturnOrder" implements "Shpfy IOpenBCDocument"
 {
 
     procedure OpenDocument(DocumentNo: Code[20])

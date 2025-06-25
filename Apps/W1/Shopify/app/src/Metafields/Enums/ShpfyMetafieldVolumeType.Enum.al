@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30158 "Shpfy Metafield Volume Type"
+enum 88029 "Shpfy Metafield Volume Type"
 {
     Access = Internal;
 

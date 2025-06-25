@@ -5,7 +5,7 @@ using Microsoft.Sales.Receivables;
 /// <summary>
 /// Page Shpfy Transactions (ID 30134).
 /// </summary>
-page 30134 "Shpfy Transactions"
+page 88069 "Shpfy Transactions"
 {
     ApplicationArea = All;
     Caption = 'Shopify Transactions';

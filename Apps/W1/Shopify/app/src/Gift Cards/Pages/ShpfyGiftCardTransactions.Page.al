@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Gift Card Transactions (ID 30111).
 /// </summary>
-page 30111 "Shpfy Gift Card Transactions"
+page 88022 "Shpfy Gift Card Transactions"
 {
     Caption = 'Shopify Gift Card Transactions';
     DeleteAllowed = false;

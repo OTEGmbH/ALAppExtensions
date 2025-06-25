@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Codeunit Shpfy Product Image Export (ID 30179).
 /// </summary>
-codeunit 30179 "Shpfy Product Image Export"
+codeunit 88273 "Shpfy Product Image Export"
 {
     Access = Internal;
     Permissions = tabledata Item = r;

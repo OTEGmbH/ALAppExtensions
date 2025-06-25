@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Document;
 
-codeunit 30247 "Shpfy Refund Process Events"
+codeunit 88254 "Shpfy Refund Process Events"
 {
     [IntegrationEvent(false, false)]
     /// <summary>

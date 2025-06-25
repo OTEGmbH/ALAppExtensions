@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Shipment Methods Mapping (ID 30129).
 /// </summary>
-page 30129 "Shpfy Shipment Methods Mapping"
+page 88064 "Shpfy Shipment Methods Mapping"
 {
     Caption = 'Shopify Shipment Methods';
     PageType = List;

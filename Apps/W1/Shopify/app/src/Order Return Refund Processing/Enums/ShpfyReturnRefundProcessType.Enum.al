@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30139 "Shpfy ReturnRefund ProcessType" implements "Shpfy IReturnRefund Process"
+enum 88045 "Shpfy ReturnRefund ProcessType" implements "Shpfy IReturnRefund Process"
 {
     Extensible = true;
     DefaultImplementation = "Shpfy IReturnRefund Process" = "Shpfy RetRefProc Default";

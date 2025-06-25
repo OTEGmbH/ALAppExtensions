@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Enum Shpfy Contact State (ID 30107).
 /// </summary>
-enum 30148 "Shpfy Default Cont. Permission"
+enum 88011 "Shpfy Default Cont. Permission"
 {
     Caption = 'Shopify Default Contact Permission';
     Extensible = false;

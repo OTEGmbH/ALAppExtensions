@@ -6,7 +6,7 @@ using Microsoft.Finance.GeneralLedger.Setup;
 /// <summary>
 /// Codeunit Shpfy Posted Invoice Export" (ID 30316).
 /// </summary>
-codeunit 30362 "Shpfy Posted Invoice Export"
+codeunit 88205 "Shpfy Posted Invoice Export"
 {
     Access = Internal;
     TableNo = "Sales Invoice Header";

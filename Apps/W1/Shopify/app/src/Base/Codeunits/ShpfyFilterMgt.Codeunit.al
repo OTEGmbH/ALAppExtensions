@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30104 "Shpfy Filter Mgt."
+codeunit 88005 "Shpfy Filter Mgt."
 {
     Access = Internal;
 

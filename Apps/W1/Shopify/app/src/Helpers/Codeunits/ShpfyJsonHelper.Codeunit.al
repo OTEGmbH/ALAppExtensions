@@ -9,7 +9,7 @@ using System.DateTime;
 /// <summary>
 /// Codeunit Shpfy Json Helper (ID 30157).
 /// </summary>
-codeunit 30157 "Shpfy Json Helper"
+codeunit 88191 "Shpfy Json Helper"
 {
     Access = Internal;
     SingleInstance = true;

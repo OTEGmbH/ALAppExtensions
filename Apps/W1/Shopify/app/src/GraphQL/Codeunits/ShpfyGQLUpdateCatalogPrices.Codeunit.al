@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30298 "Shpfy GQL UpdateCatalogPrices" implements "Shpfy IGraphQL"
+codeunit 88178 "Shpfy GQL UpdateCatalogPrices" implements "Shpfy IGraphQL"
 {
     /// <summary>
     /// GetGraphQL.

@@ -5,7 +5,7 @@ using Microsoft.Bank.BankAccount;
 /// <summary>
 /// Table Shpfy Payment Method Mapping (ID 30134).
 /// </summary>
-table 30134 "Shpfy Payment Method Mapping"
+table 88057 "Shpfy Payment Method Mapping"
 {
     Access = Internal;
     Caption = 'Shopify Payment Method';

@@ -5,7 +5,7 @@ using System.Security.Authentication;
 /// <summary>
 /// Page Shpfy Authentication (ID 30135).
 /// </summary>
-page 30135 "Shpfy Authentication"
+page 88023 "Shpfy Authentication"
 {
     Extensible = false;
     Caption = 'Waiting for a response - do not close this page';
@@ -53,7 +53,7 @@ page 30135 "Shpfy Authentication"
     [NonDebuggable]
     local procedure StartAuthorization()
     begin
-        CurrPage.OAuthIntegration.StartAuthorization(OAuthRequestUrl.Unwrap());
+        // CurrPage.OAuthIntegration.StartAuthorization(OAuthRequestUrl.Unwrap());
     end;
 
     internal procedure SetOAuth2Properties(AuthRequestUrl: SecretText)
@@ -91,7 +91,7 @@ page 30135 "Shpfy Authentication"
         if Code.IsEmpty() then
             exit;
 
-        Response := Code.Unwrap();
+        // Response := Code.Unwrap();
 
         if Response.EndsWith('#') then
             Response := CopyStr(Response, 1, StrLen(Response) - 1);

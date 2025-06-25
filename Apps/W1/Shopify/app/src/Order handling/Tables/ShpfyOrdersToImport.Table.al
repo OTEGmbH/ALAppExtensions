@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using System.Reflection;
 
-table 30121 "Shpfy Orders to Import"
+table 88036 "Shpfy Orders to Import"
 {
     Access = Internal;
     Caption = 'Shopify Orders to Import';

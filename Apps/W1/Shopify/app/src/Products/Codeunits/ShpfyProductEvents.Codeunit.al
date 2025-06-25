@@ -5,7 +5,7 @@ using Microsoft.Inventory.Item;
 /// <summary>
 /// Codeunit Shpfy Product Events (ID 30177).
 /// </summary>
-codeunit 30177 "Shpfy Product Events"
+codeunit 88271 "Shpfy Product Events"
 {
     /// <summary> 
     /// Description for OnAfterSetProductTitle.

@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Metafields (ID 30163).
 /// </summary>
-page 30163 "Shpfy Metafields"
+page 88031 "Shpfy Metafields"
 {
     Caption = 'Shopify Metafields';
     Extensible = false;

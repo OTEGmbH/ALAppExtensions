@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 
-codeunit 30259 "Shpfy BC Document Type Convert"
+codeunit 88047 "Shpfy BC Document Type Convert"
 {
     var
         NotSupportedErr: Label 'Not Supported';

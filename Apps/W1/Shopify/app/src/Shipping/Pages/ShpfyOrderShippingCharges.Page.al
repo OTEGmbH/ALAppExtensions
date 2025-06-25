@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Order Shipping Charges (ID 30128).
 /// </summary>
-page 30128 "Shpfy Order Shipping Charges"
+page 88063 "Shpfy Order Shipping Charges"
 {
     Caption = 'Shopify Order Shipping Charges';
     DeleteAllowed = false;

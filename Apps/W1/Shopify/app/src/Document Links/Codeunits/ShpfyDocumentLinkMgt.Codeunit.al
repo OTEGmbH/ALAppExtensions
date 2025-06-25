@@ -4,7 +4,7 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 
-codeunit 30262 "Shpfy Document Link Mgt."
+codeunit 88048 "Shpfy Document Link Mgt."
 {
     Permissions = TableData "Shpfy Doc. Link To Doc." = imd;
 

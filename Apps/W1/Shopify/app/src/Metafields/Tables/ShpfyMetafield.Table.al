@@ -5,7 +5,7 @@ using Microsoft.Finance.GeneralLedger.Setup;
 /// <summary>
 /// Table Shpfy Metafield (ID 30101).
 /// </summary>
-table 30101 "Shpfy Metafield"
+table 88025 "Shpfy Metafield"
 {
     Caption = 'Shopify Metafield';
     DataClassification = CustomerContent;

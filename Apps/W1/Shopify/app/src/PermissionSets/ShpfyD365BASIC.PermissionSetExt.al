@@ -5,7 +5,7 @@ namespace Microsoft.Integration.Shopify;
 /// </summary>
 using System.Security.AccessControl;
 
-permissionsetextension 30100 "Shpfy D365 BASIC" extends "D365 BASIC"
+permissionsetextension 88000 "Shpfy D365 BASIC" extends "D365 BASIC"
 {
     IncludedPermissionSets = "Shpfy - Read";
 

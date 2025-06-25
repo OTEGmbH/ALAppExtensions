@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Page Shpfy Comp. Locations Subform (ID 30170).
 /// </summary>
-page 30170 "Shpfy Comp. Locations Subform"
+page 88013 "Shpfy Comp. Locations Subform"
 {
     ApplicationArea = All;
     Caption = 'Locations';

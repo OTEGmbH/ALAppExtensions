@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-page 30152 "Shpfy Bulk Operations"
+page 88008 "Shpfy Bulk Operations"
 {
     ApplicationArea = All;
     Caption = 'Shopify Bulk Operations';

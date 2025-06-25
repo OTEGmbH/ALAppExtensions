@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy Gift Cards (ID 30125).
 /// </summary>
-codeunit 30125 "Shpfy Gift Cards"
+codeunit 88062 "Shpfy Gift Cards"
 {
     Access = Internal;
 

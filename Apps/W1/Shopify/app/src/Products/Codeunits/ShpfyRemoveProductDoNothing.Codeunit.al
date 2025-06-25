@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 /// <summary>
 /// Codeunit Shpfy RemoveProductDoNothing (ID 30183) implements Interface Shpfy IRemoveProductAction.
 /// </summary>
-codeunit 30183 "Shpfy RemoveProductDoNothing" implements "Shpfy IRemoveProductAction"
+codeunit 88277 "Shpfy RemoveProductDoNothing" implements "Shpfy IRemoveProductAction"
 {
     Access = Internal;
 

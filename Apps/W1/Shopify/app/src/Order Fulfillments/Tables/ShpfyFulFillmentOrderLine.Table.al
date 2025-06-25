@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-table 30144 "Shpfy FulFillment Order Line"
+table 88028 "Shpfy FulFillment Order Line"
 {
     Caption = 'FulFillment Order Line';
     DataClassification = CustomerContent;

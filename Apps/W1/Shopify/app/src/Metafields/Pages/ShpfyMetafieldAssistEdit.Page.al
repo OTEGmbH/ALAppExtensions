@@ -2,7 +2,7 @@ namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Finance.Currency;
 
-page 30164 "Shpfy Metafield Assist Edit"
+page 88030 "Shpfy Metafield Assist Edit"
 {
     Caption = 'Metafield Assist Edit';
     PageType = StandardDialog;

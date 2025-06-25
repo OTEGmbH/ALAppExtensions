@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-codeunit 30213 "Shpfy Translation API"
+codeunit 88294 "Shpfy Translation API"
 {
 
     #region Shop Locales

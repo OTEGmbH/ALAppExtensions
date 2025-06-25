@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Report Shpfy Add Company to Shopify (ID 30113).
 /// </summary>
-report 30113 "Shpfy Add Company to Shopify"
+report 88003 "Shpfy Add Company to Shopify"
 {
     ApplicationArea = All;
     Caption = 'Add Company to Shopify';

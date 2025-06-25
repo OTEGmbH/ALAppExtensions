@@ -5,7 +5,7 @@ using Microsoft.Finance.RoleCenters;
 /// <summary>
 /// PageExtension Shpfy Business Manager RC (ID 30101) extends Record Business Manager Role Center.
 /// </summary>
-pageextension 30101 "Shpfy Business Manager RC" extends "Business Manager Role Center"
+pageextension 88000 "Shpfy Business Manager RC" extends "Business Manager Role Center"
 {
     layout
     {

@@ -6,7 +6,7 @@ using Microsoft.Utilities;
 /// <summary>
 /// Table Shpfy Skipped Record (ID 30159).
 /// </summary>
-table 30159 "Shpfy Skipped Record"
+table 88024 "Shpfy Skipped Record"
 {
     Caption = 'Shopify Skipped Record';
     DataClassification = CustomerContent;

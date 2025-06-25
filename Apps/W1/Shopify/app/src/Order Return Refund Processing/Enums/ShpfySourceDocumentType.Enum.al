@@ -1,6 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
-enum 30142 "Shpfy Source Document Type" implements "Shpfy IDocument Source"
+enum 88046 "Shpfy Source Document Type" implements "Shpfy IDocument Source"
 {
     Extensible = true;
     DefaultImplementation = "Shpfy IDocument Source" = "Shpfy IDocSource Default";

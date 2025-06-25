@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 /// <summary>
 /// Codeunit Shpfy Name is Last. FirstName" (ID 30122) implements Interface Shpfy ICustomer Name.
 /// </summary>
-codeunit 30122 "Shpfy Name is Last. FirstName" implements "Shpfy ICustomer Name"
+codeunit 88043 "Shpfy Name is Last. FirstName" implements "Shpfy ICustomer Name"
 {
     Access = Internal;
 
