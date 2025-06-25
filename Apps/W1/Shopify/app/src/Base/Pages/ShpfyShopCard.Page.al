@@ -46,6 +46,14 @@ page 88003 "Shpfy Shop Card"
                         CurrPage.SaveRecord();
                     end;
                 }
+                field("Shop Access Token"; Rec."Shop Access Token")
+                {
+                    ApplicationArea = All;
+                }
+                field("Shop Access Auth. Type"; Rec."Shop Access Auth. Type")
+                {
+                    ApplicationArea = All;
+                }
                 field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
@@ -63,7 +71,7 @@ page 88003 "Shpfy Shop Card"
                         if not Rec.Enabled then
                             exit;
                         // Rec.RequestAccessToken();
-                        BulkOperationMgt.EnableBulkOperations(Rec);
+                        // BulkOperationMgt.EnableBulkOperations(Rec);
                         Rec."B2B Enabled" := Rec.GetB2BEnabled();
                         Rec."Weight Unit" := Rec.GetShopWeightUnit();
                         Rec.SyncCountries();

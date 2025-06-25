@@ -622,6 +622,8 @@ codeunit 88004 "Shpfy Communication Mgt."
     var
         ApiVersionExpiryDate: DateTime;
     begin
+        //#OBC exit
+        exit;
         ApiVersionExpiryDate := GetApiVersionExpiryDate();
 
         if CurrentDateTime() > ApiVersionExpiryDate then begin

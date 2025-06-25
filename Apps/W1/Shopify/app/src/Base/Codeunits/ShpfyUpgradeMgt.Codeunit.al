@@ -258,7 +258,7 @@ codeunit 88010 "Shpfy Upgrade Mgt."
         ShopDataTransfer.SetTables(Database::"Shpfy Shop", Database::"Shpfy Shop");
         ShopDataTransfer.AddSourceFilter(Shop.FieldNo("Log Enabled"), '=%1', true);
         ShopDataTransfer.AddConstantValue("Shpfy Logging Mode"::All, Shop.FieldNo("Logging Mode"));
-        ShopDataTransfer.UpdateAuditFields := false;
+        // ShopDataTransfer.UpdateAuditFields := false;
         ShopDataTransfer.CopyFields();
 
         UpgradeTag.SetUpgradeTag(GetLoggingModeUpgradeTag());
@@ -338,7 +338,7 @@ codeunit 88010 "Shpfy Upgrade Mgt."
         if not OrderAttribute.IsEmpty() then begin
             OrderAttributeDataTransfer.SetTables(Database::"Shpfy Order Attribute", Database::"Shpfy Order Attribute");
             OrderAttributeDataTransfer.AddFieldValue(OrderAttribute.FieldNo(Value), OrderAttribute.FieldNo("Attribute Value"));
-            OrderAttributeDataTransfer.UpdateAuditFields := false;
+            // OrderAttributeDataTransfer.UpdateAuditFields := false;
             OrderAttributeDataTransfer.CopyFields();
         end;
 
@@ -383,7 +383,7 @@ codeunit 88010 "Shpfy Upgrade Mgt."
         RefundLineDataTransfer.SetTables(Database::"Shpfy Refund Line", Database::"Shpfy Refund Line");
         RefundLineDataTransfer.AddSourceFilter(RefundLine.FieldNo("Refund Id"), RefundIdFilter);
         RefundLineDataTransfer.AddConstantValue(true, RefundLine.FieldNo("Can Create Credit Memo"));
-        RefundLineDataTransfer.UpdateAuditFields(false);
+        // RefundLineDataTransfer.UpdateAuditFields(false);
         RefundLineDataTransfer.CopyFields();
     end;
 

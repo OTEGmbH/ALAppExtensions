@@ -1,18 +1,6 @@
 {
 	"folders": [
 		{
-			"name": "System",
-			"path": "../../../BCApps/src/System Application/App"
-		},
-		{
-			"name": "BaseApp",
-			"path": "../../../Layers/W1/BaseApp"
-		},
-		{
-			"name": "Application",
-			"path": "../../../Layers/W1/Application"
-		},
-		{
 			"name": "app",
 			"path": "app"
 		},
@@ -20,5 +8,96 @@
 			"name": "test",
 			"path": "test"
 		}
-	]
+	],
+	"settings": {
+		"al.enableCodeAnalysis": true,
+		"al.codeAnalyzers": [
+			"${CodeCop}",
+			"${UICop}",
+			"${analyzerFolder}BusinessCentral.LinterCop.dll"
+		],
+		"CRS.AlSubFolderName": "src",
+		"CRS.ExtensionObjectNamePattern": null,
+		"CRS.FileNamePattern": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+		"CRS.FileNamePatternExtensions": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+		"CRS.FileNamePatternPageCustomizations": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+		"CRS.OnSaveAlFileAction": "Rename",
+		"CRS.RenameWithGit": true,
+		"git.autofetch": "all",
+		"editor.formatOnSave": true,
+		"al.compilationOptions": {
+			"generateReportLayout": false
+		},
+		"al.packageCachePath": "./.alpackages",
+		"alOutline.codeActionsOnSave": [
+			"SortVariables"
+		],
+		"alOutline.completionProviders": [
+			"VariableNamesWithType"
+		],
+		"alOutline.codeCleanupActions": [
+			"AddEnumValuesCaptions",
+			"AddEnumValuesCaptions",
+			"AddMissingParentheses",
+			"AddObjectCaptions",
+			"AddPageFieldCaptions",
+			"AddTableFieldCaptions",
+			"ConvertObjectIdsToNames",
+			"FixIdentifiersCase",
+			"FixKeywordsCase",
+			"MakeFlowFieldsReadOnly",
+			"RemoveRedundantAppAreas",
+			"RemoveRedundantDataClassification",
+			"RemoveWithStatements",
+			"SortPermissionSetList",
+			"SortProperties",
+			"SortUsings",
+			"SortVariables",
+			"TrimTrailingWhitespace"
+		],
+		"_OTEComment": "bei Bedarf für dotnet, auch dotnet.al beachten, dort müssen die Assemblies noch referenziert werden",
+		"al.assemblyProbingPaths": [
+			"./.netpackages",
+			"C:\\Program Files (x86)\\Microsoft Dynamics 365 Business Central\\210\\RoleTailored Client",
+			"C:\\Program Files (x86)\\Microsoft Dynamics 365 Business Central\\210\\RoleTailored Client\\Add-ins",
+			"C:/Windows/Microsoft.NET/Framework64"
+		],
+		"xliffSync.enableSnippetsForLanguages": [
+			"al"
+		],
+		"xliffSync.autoCheckNeedWorkTranslations": true,
+		"xliffSync.findBySourceAndDeveloperNote": true,
+		"xliffSync.parseFromDeveloperNote": true,
+		"xliffSync.snippetTargetLanguage": "de-DE",
+		"xliffSync.syncCrossWorkspaceFolders": true,
+		"xliffSync.equivalentLanguagesEnabled": true,
+		"xliffSync.equivalentLanguages": {
+			"de-DE": "de-.*",
+			"en-US": "en-.*",
+			"es-ES": "es-.*",
+			"fr-FR": "fr-.*",
+			"nl-NL": "nl-.*"
+		},
+		"al.ruleSetPath": "./OTE.ruleset.json",
+		"alOutline.idReservationProvider": "ALObjectIdNinja"
+	},
+	"extensions": {
+		"recommendations": [
+			"andrzejzwierzchowski.al-code-outline",
+			"BartPermentier.al-toolbox",
+			"davidfeldhoff.al-codeactions",
+			"donjayamanne.githistory",
+			"eamodio.gitlens",
+			"GitHub.vscode-pull-request-github",
+			"mhutchie.git-graph",
+			"ms-dynamics-smb.al",
+			"nabsolutions.nab-al-tools",
+			"rvanbekkum.xliff-sync",
+			"stefanmaron.businesscentral-lintercop",
+			"usernamehw.errorlens",
+			"vjeko.vjeko-al-objid",
+			"waldo.al-extension-pack",
+			"waldo.crs-al-language-extension"
+		]
+	}
 }

@@ -1,0 +1,37 @@
+{
+    "name": "OTE Ruleset",
+    "description": "OTE Ruleset for deactivating rules",
+    "rules": [
+    
+            {
+                "id": "AA0072",
+                "action": "None",
+                "justification": "Suffix of Objectname is not always needed."
+            },
+            {
+                "id": "AA0073",
+                "action": "None",
+                "justification": "Name of temp Variables before VariableName not always needed."
+            },
+            {
+                "id": "AA0074",
+                "action": "None",
+                "justification": "TextConst is not always needed with suffix."
+            },
+            {
+                "id": "AA0005",
+                "action": "None",
+                "justification": "Begin End is more stable than without it."
+            },
+            {
+                "id": "AA0220",
+                "action": "Info",
+                "justification": "Tooltip is not always needed."
+            },
+            {
+                "id": "AA0218",
+                "action": "Info",
+                "justification": "Tooltip is not always needed."
+            }
+    ]
+}

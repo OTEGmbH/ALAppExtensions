@@ -785,6 +785,16 @@ table 88002 "Shpfy Shop"
         {
             Caption = 'Posted Invoice Sync';
         }
+
+        field(88000; "Shop Access Token"; text[500])
+        {
+            caption = 'Shop Access Token';
+            ExtendedDatatype = Masked;
+        }
+        field(88001; "Shop Access Auth. Type"; enum "OBC Shpfy Auth Method Type")
+        {
+            Caption = 'Shop Access Auth. Type';
+        }
     }
 
     keys
@@ -823,6 +833,8 @@ table 88002 "Shpfy Shop"
     begin
         Rec.Testfield(Enabled, true);
         Store := GetStoreName();
+        Result := rec.GetAccessToken(rec."Shop Access Auth. Type");
+        exit(result);
 
 
         // if Store <> '' then
