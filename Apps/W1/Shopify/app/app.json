@@ -18,7 +18,13 @@
       "to": 88999
     }
   ],
-
+"internalsVisibleTo": [
+  {
+    "id": "d0db3ba9-6d76-43b2-a68a-7da79247318e",
+    "name": "vitaform Shopify",
+    "publisher": "OTE GmbH"
+  }
+],
   "resourceExposurePolicy": {
     "allowDebugging": true,
     "allowDownloadingSource": true,
