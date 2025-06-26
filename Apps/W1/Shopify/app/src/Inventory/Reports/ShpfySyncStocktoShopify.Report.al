@@ -22,9 +22,22 @@ report 88009 "Shpfy Sync Stock to Shopify"
             begin
                 ShopifyShopInventory.Reset();
                 ShopifyShopInventory.SetRange("Shop Code", Shop.Code);
+                //OTE SHOPIFY 26.06.2025 JR START
+                if g_ShopifyShopInventory.GetFilters <> '' then
+                    ShopifyShopInventory.copy(g_ShopifyShopInventory);
+                //OTE SHOPIFY 26.06.2025 JR STOP 
                 CodeUnit.Run(Codeunit::"Shpfy Sync Inventory", ShopifyShopInventory);
             end;
         }
     }
+
+    //OTE
+    procedure SetShopifyShopInventoryFilters(var _ShopifyShopInventory: Record "Shpfy Shop Inventory")
+    begin
+        g_ShopifyShopInventory.Copy(_ShopifyShopInventory);
+    end;
+
+    var
+        g_ShopifyShopInventory: Record "Shpfy Shop Inventory";
 
 }

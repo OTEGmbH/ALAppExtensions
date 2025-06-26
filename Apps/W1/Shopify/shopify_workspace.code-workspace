@@ -3,11 +3,8 @@
 		{
 			"name": "app",
 			"path": "app"
-		},
-		{
-			"name": "test",
-			"path": "test"
 		}
+		
 	],
 	"settings": {
 		"al.enableCodeAnalysis": true,
@@ -21,8 +18,6 @@
 		"CRS.FileNamePattern": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
 		"CRS.FileNamePatternExtensions": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
 		"CRS.FileNamePatternPageCustomizations": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
-		"CRS.OnSaveAlFileAction": "Rename",
-		"CRS.RenameWithGit": true,
 		"git.autofetch": "all",
 		"editor.formatOnSave": true,
 		"al.compilationOptions": {
