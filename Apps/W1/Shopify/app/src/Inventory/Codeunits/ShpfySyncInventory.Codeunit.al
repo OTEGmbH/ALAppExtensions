@@ -22,6 +22,7 @@ codeunit 88201 "Shpfy Sync Inventory"
             ShopLocation.SetRange("Shop Code", ShopFilter);
             ShopInventory.SetRange("Shop Code", ShopFilter);
         end;
+
         ShopLocation.SetFilter("Stock Calculation", '<>%1', ShopLocation."Stock Calculation"::Disabled);
         if ShopLocation.FindSet(false) then begin
             InventoryApi.SetShop(ShopLocation."Shop Code");
@@ -31,7 +32,35 @@ codeunit 88201 "Shpfy Sync Inventory"
             until ShopLocation.Next() = 0;
         end;
         InventoryApi.RemoveUnusedInventoryIds();
-
         InventoryApi.ExportStock(ShopInventory);
+    end;
+
+    procedure ImportStock(_shopCode: code[20])
+    var
+        ShopLocation: Record "Shpfy Shop Location";
+    begin
+        ShopLocation.SetRange("Shop Code", _shopCode);
+        ShopLocation.SetFilter("Stock Calculation", '<>%1', ShopLocation."Stock Calculation"::Disabled);
+        if ShopLocation.FindSet(false) then begin
+            InventoryApi.SetShop(ShopLocation."Shop Code");
+            InventoryApi.SetInventoryIds();
+            repeat
+                InventoryApi.ImportStock(ShopLocation);
+            until ShopLocation.Next() = 0;
+        end;
+        InventoryApi.RemoveUnusedInventoryIds();
+    end;
+
+    procedure ExportStock(var _ShopInventory: Record "Shpfy Shop Inventory")
+    var
+        ShopInventoryTEMP: Record "Shpfy Shop Inventory" temporary;
+    begin
+        if _ShopInventory.findset(false) then
+            repeat
+                ShopInventoryTEMP.Init();
+                ShopInventoryTEMP := _ShopInventory;
+                ShopInventoryTEMP.insert(false);
+            until _ShopInventory.Next() = 0;
+        InventoryApi.ExportStock(ShopInventoryTEMP);
     end;
 }

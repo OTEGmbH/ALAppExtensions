@@ -537,7 +537,7 @@ codeunit 88272 "Shpfy Product Export"
     end;
 
 
-    internal procedure SetOnlyUpdatePriceOn()
+    procedure SetOnlyUpdatePriceOn()
     begin
         OnlyUpdatePrice := true;
     end;
