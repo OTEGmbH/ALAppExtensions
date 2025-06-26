@@ -141,6 +141,7 @@ codeunit 88199 "Shpfy Inventory API"
         InputSize: Integer;
     begin
         if ShopInventory.FindSet() then begin
+
             IGraphQL := Enum::"Shpfy GraphQL Type"::ModifyInventory;
             JGraphQL.ReadFrom(IGraphQL.GetGraphQL());
             JSetQuantities := JsonHelper.GetJsonArray(JGraphQL, 'variables.input.setQuantities');
