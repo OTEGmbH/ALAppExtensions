@@ -11,7 +11,7 @@
   "dependencies": [],
   "screenshots": [],
   "platform": "25.0.0.0",
-  "runtime": "15.1",
+  "runtime": "15.0",
   "idRanges": [
     {
       "from": 88000,
