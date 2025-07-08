@@ -69,6 +69,9 @@ codeunit 88246 "Shpfy Process Order"
         if not IsHandled then begin
             ShopifyOrderHeader.TestField("Sell-to Customer No.");
             SalesHeader.Init();
+            //OTE use shop oder id 08.07.2025 JR START
+            SalesHeader."No." := format(ShopifyOrderHeader."Shopify Order Id");
+            //OTE use shop oder id 08.07.2025 JR STOP 
             SalesHeader.SetHideValidationDialog(true);
             if ShopifyOrderHeader."Fulfillment Status" = ShopifyOrderHeader."Fulfillment Status"::Fulfilled then
                 SalesHeader.Validate("Document Type", SalesHeader."Document Type"::Invoice)
