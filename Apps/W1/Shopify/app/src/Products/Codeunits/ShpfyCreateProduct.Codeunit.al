@@ -79,6 +79,9 @@ codeunit 88268 "Shpfy Create Product"
         ItemVariant.SetRange("Item No.", Item."No.");
         if ItemVariant.FindSet(false) then
             repeat
+                //OTE Skip other variants 08.07.2025 JR START
+                OnBeforeProcessItemVariant(ItemVariant, TempShopifyProduct, Shop);
+                //OTE Skip other variants 08.07.2025 JR STOP 
                 if ItemVariant.Blocked or ItemVariant."Sales Blocked" then
                     SkippedRecord.LogSkippedRecord(ItemVariant.RecordId, ItemVariantIsBlockedLbl, Shop)
                 else begin
@@ -276,4 +279,11 @@ codeunit 88268 "Shpfy Create Product"
             Page.Run(Page::"Shpfy Shop Locations Mapping", ShopLocation);
         end;
     end;
+
+    //OTE BC 08.07.2025 JR START
+    [BusinessEvent(false)]
+    local procedure OnBeforeProcessItemVariant(var ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop")
+    begin
+    end;
+    //OTE BC 08.07.2025 JR STOP 
 }
