@@ -111,6 +111,11 @@ codeunit 88268 "Shpfy Create Product"
                                 TempShopifyVariant."Item Variant SystemId" := ItemVariant.SystemId;
                                 TempShopifyVariant."UoM Option Id" := 2;
                                 TempShopifyVariant.Insert(false);
+
+                                //OTE Variant Options overwrite 09.07.2025 JR START
+                                OnAfterInsertShopifyVariant(TempShopifyVariant, ItemVariant, TempShopifyProduct, Shop);
+                            //OTE Variant Options overwrite 09.07.2025 JR STOP 
+
                             until ItemUnitofMeasure.Next() = 0;
                     end else begin
                         Id += 1;
@@ -131,6 +136,9 @@ codeunit 88268 "Shpfy Create Product"
                         TempShopifyVariant."Item SystemId" := Item.SystemId;
                         TempShopifyVariant."Item Variant SystemId" := ItemVariant.SystemId;
                         TempShopifyVariant.Insert(false);
+                        //OTE Variant Options overwrite 09.07.2025 JR START
+                        OnAfterInsertShopifyVariant(TempShopifyVariant, ItemVariant, TempShopifyProduct, Shop);
+                        //OTE Variant Options overwrite 09.07.2025 JR STOP 
                     end;
                 end;
             until ItemVariant.Next() = 0
@@ -158,6 +166,9 @@ codeunit 88268 "Shpfy Create Product"
                         TempShopifyVariant."Item SystemId" := Item.SystemId;
                         TempShopifyVariant."UoM Option Id" := 1;
                         TempShopifyVariant.Insert(false);
+                        //OTE Variant Options overwrite 09.07.2025 JR START
+                        OnAfterInsertShopifyVariant(TempShopifyVariant, ItemVariant, TempShopifyProduct, Shop);
+                    //OTE Variant Options overwrite 09.07.2025 JR STOP 
                     until ItemUnitofMeasure.Next() = 0;
             end else
                 CreateTempShopifyVariantFromItem(Item, TempShopifyVariant);
@@ -283,6 +294,11 @@ codeunit 88268 "Shpfy Create Product"
     //OTE BC 08.07.2025 JR START
     [BusinessEvent(false)]
     local procedure OnBeforeProcessItemVariant(var ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertShopifyVariant(var TempShopifyVariant: Record "Shpfy Variant" temporary; ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop")
     begin
     end;
     //OTE BC 08.07.2025 JR STOP 

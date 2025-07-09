@@ -30,9 +30,7 @@ codeunit 88270 "Shpfy Product API"
         JResponse: JsonToken;
         Data: Text;
         GraphQuery: TextBuilder;
-        option1Values: list of [text];
-        option2Values: list of [text];
-        option3Values: list of [text];
+        isHandled: boolean;
 
     begin
         ShopifyVariant.FindSet();
@@ -66,29 +64,32 @@ codeunit 88270 "Shpfy Product API"
             GraphQuery.Append('\"');
         end;
         if ShopifyProduct."Has Variants" or (ShopifyVariant."UoM Option Id" > 0) then begin
-            GraphQuery.Append(', productOptions: [{name: \"');
-            GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 1 Name"));
-            GraphQuery.Append('\", values: [{name: \"');
-            GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 1 Value"));
-            GraphQuery.Append('\"}]}');
-            //#TODO Optionen hinzufügen für Farbe und Größe in den ShopifyVarianten
-            if (ShopifyVariant."Option 2 Name" <> '') then begin
-                // if (ShopifyVariant."Option 2 Name" <> '') and (option2Values.Contains()) then begin
+            OnBeforeAddProductionOptions(graphquery, ShopifyVariant, ShopifyProduct, isHandled);
+            if not ishandled then begin
+                GraphQuery.Append(', productOptions: [{name: \"');
+                GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 1 Name"));
+                GraphQuery.Append('\", values: [{name: \"');
+                GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 1 Value"));
+                GraphQuery.Append('\"}]}');
+                //#TODO Optionen hinzufügen für Farbe und Größe in den ShopifyVarianten
+                if (ShopifyVariant."Option 2 Name" <> '') then begin
+                    // if (ShopifyVariant."Option 2 Name" <> '') and (option2Values.Contains()) then begin
 
-                GraphQuery.Append(', {name: \"');
-                GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 2 Name"));
-                GraphQuery.Append('\", values: [{name: \"');
-                GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 2 Value"));
-                GraphQuery.Append('\"}]}');
+                    GraphQuery.Append(', {name: \"');
+                    GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 2 Name"));
+                    GraphQuery.Append('\", values: [{name: \"');
+                    GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 2 Value"));
+                    GraphQuery.Append('\"}]}');
+                end;
+                if ShopifyVariant."Option 3 Name" <> '' then begin
+                    GraphQuery.Append(', {name: \"');
+                    GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 3 Name"));
+                    GraphQuery.Append('\", values: [{name: \"');
+                    GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 3 Value"));
+                    GraphQuery.Append('\"}]}');
+                end;
+                GraphQuery.Append(']');
             end;
-            if ShopifyVariant."Option 3 Name" <> '' then begin
-                GraphQuery.Append(', {name: \"');
-                GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 3 Name"));
-                GraphQuery.Append('\", values: [{name: \"');
-                GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 3 Value"));
-                GraphQuery.Append('\"}]}');
-            end;
-            GraphQuery.Append(']');
         end;
         GraphQuery.Append('}) ');
         GraphQuery.Append('{product {legacyResourceId, onlineStoreUrl, onlineStorePreviewUrl, createdAt, updatedAt, tags}, userErrors {field, message}}');
@@ -649,4 +650,11 @@ codeunit 88270 "Shpfy Product API"
         Parameters.Add('OptionName', NewOptionName);
         CommunicationMgt.ExecuteGraphQL("Shpfy GraphQL Type"::UpdateProductOption, Parameters);
     end;
+
+    //OTE Product 09.07.2025 JR START
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAddProductionOptions(var graphquery: TextBuilder; var ShopifyVariant: Record "Shpfy Variant"; var ShopifyProduct: Record "Shpfy Product"; var isHandled: Boolean)
+    begin
+    end;
+    //OTE Product 09.07.2025 JR STOP 
 }
