@@ -1,5 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
+using Microsoft.Integration.Shopify;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Attribute;
@@ -29,6 +30,14 @@ codeunit 88272 "Shpfy Product Export"
         tabledata Vendor = r;
     TableNo = "Shpfy Shop";
 
+    var
+        g_shpfyproduct: record "Shpfy Product";
+
+    procedure SetShopifyProductFilter(var _ShpfyProduct: Record "Shpfy Product")
+    begin
+        g_shpfyproduct.Copy(_ShpfyProduct);
+    end;
+
     trigger OnRun()
     var
         ShopifyProduct: Record "Shpfy Product";
@@ -38,6 +47,8 @@ codeunit 88272 "Shpfy Product Export"
     begin
         ShopifyProduct.SetFilter("Item SystemId", '<>%1', NullGuid);
         ShopifyProduct.SetFilter("Shop Code", Rec.GetFilter(Code));
+        if g_shpfyproduct.GetFilters <> '' then
+            ShopifyProduct.copy(g_shpfyproduct);
 
         ProductEvents.OnAfterProductsToSynchronizeFiltersSet(ShopifyProduct, Shop, OnlyUpdatePrice);
 

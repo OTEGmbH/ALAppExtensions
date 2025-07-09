@@ -30,6 +30,9 @@ codeunit 88270 "Shpfy Product API"
         JResponse: JsonToken;
         Data: Text;
         GraphQuery: TextBuilder;
+        option1Values: list of [text];
+        option2Values: list of [text];
+        option3Values: list of [text];
 
     begin
         ShopifyVariant.FindSet();
@@ -68,7 +71,10 @@ codeunit 88270 "Shpfy Product API"
             GraphQuery.Append('\", values: [{name: \"');
             GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 1 Value"));
             GraphQuery.Append('\"}]}');
-            if ShopifyVariant."Option 2 Name" <> '' then begin
+            //#TODO Optionen hinzufügen für Farbe und Größe in den ShopifyVarianten
+            if (ShopifyVariant."Option 2 Name" <> '') then begin
+                // if (ShopifyVariant."Option 2 Name" <> '') and (option2Values.Contains()) then begin
+
                 GraphQuery.Append(', {name: \"');
                 GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 2 Name"));
                 GraphQuery.Append('\", values: [{name: \"');
