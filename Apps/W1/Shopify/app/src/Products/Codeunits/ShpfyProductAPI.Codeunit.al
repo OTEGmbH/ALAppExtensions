@@ -33,6 +33,9 @@ codeunit 88270 "Shpfy Product API"
         isHandled: boolean;
 
     begin
+        //OTE Tags 10.07.2025 JR START
+        ShopifyProduct.calcfields("Item No.");
+        //OTE Tags 10.07.2025 JR STOP 
         ShopifyVariant.FindSet();
         ProductEvents.OnBeforeSendCreateShopifyProduct(Shop, ShopifyProduct, ShopifyVariant, ShopifyTag);
         GraphQuery.Append('{"query":"mutation {productCreate(product: {');
@@ -52,7 +55,10 @@ codeunit 88270 "Shpfy Product API"
         end;
         GraphQuery.Append(', status: ');
         GraphQuery.Append(ConvertToProductStatus(ShopifyProduct.Status));
-        Data := ShopifyTag.GetCommaSeparatedTags(ShopifyProduct.Id);
+        //OTE Tags 10.07.2025 JR START
+        Data := ShopifyTag.GetCommaSeparatedTags(ShopifyProduct.Id, ShopifyProduct."Item No.");
+        // Data := ShopifyTag.GetCommaSeparatedTags(ShopifyProduct.Id);
+        //OTE Tags 10.07.2025 JR STOP 
         if Data <> '' then begin
             GraphQuery.Append(', tags: \"');
             GraphQuery.Append(Data);
@@ -64,17 +70,16 @@ codeunit 88270 "Shpfy Product API"
             GraphQuery.Append('\"');
         end;
         if ShopifyProduct."Has Variants" or (ShopifyVariant."UoM Option Id" > 0) then begin
+            //OTE Options 10.07.2025 JR START
             OnBeforeAddProductionOptions(graphquery, ShopifyVariant, ShopifyProduct, isHandled);
+            //OTE Options 10.07.2025 JR STOP 
             if not ishandled then begin
                 GraphQuery.Append(', productOptions: [{name: \"');
                 GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 1 Name"));
                 GraphQuery.Append('\", values: [{name: \"');
                 GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 1 Value"));
                 GraphQuery.Append('\"}]}');
-                //#TODO Optionen hinzufügen für Farbe und Größe in den ShopifyVarianten
                 if (ShopifyVariant."Option 2 Name" <> '') then begin
-                    // if (ShopifyVariant."Option 2 Name" <> '') and (option2Values.Contains()) then begin
-
                     GraphQuery.Append(', {name: \"');
                     GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(ShopifyVariant."Option 2 Name"));
                     GraphQuery.Append('\", values: [{name: \"');

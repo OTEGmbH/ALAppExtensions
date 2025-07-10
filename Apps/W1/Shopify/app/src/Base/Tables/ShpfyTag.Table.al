@@ -29,6 +29,15 @@ table 88004 "Shpfy Tag"
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
+
+
+        //OTE Tags 10.07.2025 JR START
+        field(75000; "Item No."; code[20])
+        {
+            Caption = 'Artikelnummer';
+            DataClassification = ToBeClassified;
+        }
+        //OTE Tags 10.07.2025 JR STOP 
     }
 
     keys
@@ -68,6 +77,26 @@ table 88004 "Shpfy Tag"
         end;
         exit(Tags.ToText());
     end;
+
+    //OTE Tags 10.07.2025 JR START
+    procedure GetCommaSeparatedTags(ParentId: BigInteger; ItemNo: code[20]): Text
+    var
+        Tags: TextBuilder;
+    begin
+        if ParentId <> 0 then
+            Rec.SetRange("Parent Id", ParentId)
+        else
+            rec.setrange("Item No.", ItemNo);
+        if Rec.FindSet(false) then begin
+            repeat
+                Tags.Append(',');
+                Tags.Append(Rec.Tag);
+            until Rec.Next() = 0;
+            Tags.Remove(1, 1);
+        end;
+        exit(Tags.ToText());
+    end;
+    //OTE Tags 10.07.2025 JR STOP 
 
     /// <summary> 
     /// Update Tags.

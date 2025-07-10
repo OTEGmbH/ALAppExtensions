@@ -35,6 +35,9 @@ codeunit 88238 "Shpfy Metafield API"
         GraphQuery: TextBuilder;
     begin
         MetafieldIds := RetrieveMetafieldsFromShopify(ParentTableId, OwnerId);
+        //OTE Auto Update Metafields by mapping 10.07.2025 JR START
+        OnAfterRetrieveMetafieldsFromShopify(ParentTableId, OwnerId, MetafieldIds);
+        //OTE Auto Update Metafields by mapping 10.07.2025 JR STOP 
         CollectMetafieldsInBC(ParentTableId, OwnerId, TempMetafieldSet, MetafieldIds);
 
         // MetafieldsSet mutation only accepts 25 metafields at a time
@@ -307,5 +310,12 @@ codeunit 88238 "Shpfy Metafield API"
             Metafield.Delete(false);
         end;
     end;
+
     #endregion
+
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRetrieveMetafieldsFromShopify(ParentTableId: Integer; OwnerId: BigInteger; MetafieldIds: Dictionary of [BigInteger, DateTime])
+    begin
+    end;
 }
