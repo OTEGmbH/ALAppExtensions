@@ -1,5 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
+using Microsoft.Integration.Shopify;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
 
@@ -51,12 +52,19 @@ codeunit 88268 "Shpfy Create Product"
         TempShopifyProduct: Record "Shpfy Product" temporary;
         TempShopifyVariant: Record "Shpfy Variant" temporary;
         TempShopifyTag: Record "Shpfy Tag" temporary;
+        ShpfyProductExport: Codeunit "Shpfy Product Export";
     begin
         CreateTempProduct(Item, TempShopifyProduct, TempShopifyVariant, TempShopifyTag);
         if not VariantApi.FindShopifyProductVariant(TempShopifyProduct, TempShopifyVariant) then
             ProductId := ProductApi.CreateProduct(TempShopifyProduct, TempShopifyVariant, TempShopifyTag)
         else
             ProductId := TempShopifyProduct.Id;
+
+        //OTE Metafields 10.07.2025 JR START
+        OnAfterCreateProduct(ProductId, Shop);
+        if Shop."Product Metafields To Shopify" then
+            ShpfyProductExport.UpdateMetafields(ProductId);
+        //OTE Metafields 10.07.2025 JR STOP 
 
         if ProductId <> 0 then
             ProductExport.UpdateProductTranslations(ProductId, Item);
@@ -299,6 +307,11 @@ codeunit 88268 "Shpfy Create Product"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertShopifyVariant(var TempShopifyVariant: Record "Shpfy Variant" temporary; ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateProduct(ProductId: BigInteger; Shop: Record "Shpfy Shop")
     begin
     end;
     //OTE BC 08.07.2025 JR STOP 

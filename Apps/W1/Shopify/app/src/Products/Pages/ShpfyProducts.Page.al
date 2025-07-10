@@ -181,7 +181,7 @@ page 88059 "Shpfy Products"
             part(ItemTags; "Shpfy Tag Factbox")
             {
                 ApplicationArea = All;
-                SubPageLink = "Parent Table No." = const(30127), "Parent Id" = field(Id);
+                SubPageLink = "Parent Table No." = const(database::"Shpfy Product"), "Parent Id" = field(Id);
             }
             part(Stock; "Shpfy Inventory FactBox")
             {

@@ -756,7 +756,7 @@ codeunit 88272 "Shpfy Product Export"
         end;
     end;
 
-    local procedure UpdateMetafields(ProductId: BigInteger)
+    procedure UpdateMetafields(ProductId: BigInteger)
     var
         ShpfyVariant: Record "Shpfy Variant";
     begin

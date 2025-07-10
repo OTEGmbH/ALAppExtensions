@@ -55,10 +55,7 @@ codeunit 88270 "Shpfy Product API"
         end;
         GraphQuery.Append(', status: ');
         GraphQuery.Append(ConvertToProductStatus(ShopifyProduct.Status));
-        //OTE Tags 10.07.2025 JR START
-        Data := ShopifyTag.GetCommaSeparatedTags(ShopifyProduct.Id, ShopifyProduct."Item No.");
-        // Data := ShopifyTag.GetCommaSeparatedTags(ShopifyProduct.Id);
-        //OTE Tags 10.07.2025 JR STOP 
+        Data := ShopifyTag.GetCommaSeparatedTags(ShopifyProduct.Id);
         if Data <> '' then begin
             GraphQuery.Append(', tags: \"');
             GraphQuery.Append(Data);
