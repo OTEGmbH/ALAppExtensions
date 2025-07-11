@@ -258,6 +258,10 @@ codeunit 88004 "Shpfy Communication Mgt."
         HttpResponseMessage: HttpResponseMessage;
         RetryCounter: Integer;
     begin
+        if G_OverwriteUrl <> '' then begin
+            url := G_OverwriteUrl;
+            G_OverwriteUrl := ''; //clear after because single instance
+        end;
         FeatureTelemetry.LogUptake('0000HUV', 'Shopify', Enum::"Feature Uptake Status"::Used);
         FeatureTelemetry.LogUsage('0000IF5', 'Shopify', 'Shopify web request executed.');
         CheckOutgoingRequests(Url, Method, Request);
@@ -764,5 +768,16 @@ codeunit 88004 "Shpfy Communication Mgt."
     begin
         exit(50000);
     end;
+
+
+    //OTE Overwrite URL
+    procedure SetOverwriteURL(_url: text)
+    begin
+        G_OverwriteUrl := CreateWebRequestURL(_url);
+    end;
+
+    var
+        G_OverwriteUrl: text;
+    //OTE Overwrite URL ---
 }
 
