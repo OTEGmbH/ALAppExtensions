@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL NextRevFulfillOrdLns (ID 30349) implements Interface Shpfy IGraphQL.

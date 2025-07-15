@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Enum Shpfy Payment Transaction Source (ID 30114).

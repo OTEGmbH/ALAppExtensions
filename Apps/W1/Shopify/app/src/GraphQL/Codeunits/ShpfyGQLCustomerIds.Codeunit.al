@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL CustomerIds (ID 30128) implements Interface Shpfy IGraphQL.

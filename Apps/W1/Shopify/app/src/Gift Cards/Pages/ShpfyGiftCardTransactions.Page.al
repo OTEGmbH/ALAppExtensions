@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Page Shpfy Gift Card Transactions (ID 30111).

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88232 "Shpfy Mtfld Type Volume" implements "Shpfy IMetafield Type"
 {

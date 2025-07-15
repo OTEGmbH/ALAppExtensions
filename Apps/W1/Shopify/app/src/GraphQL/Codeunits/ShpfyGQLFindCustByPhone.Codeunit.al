@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL FindCustByPhone (ID 30130) implements Interface Shpfy IGraphQL.

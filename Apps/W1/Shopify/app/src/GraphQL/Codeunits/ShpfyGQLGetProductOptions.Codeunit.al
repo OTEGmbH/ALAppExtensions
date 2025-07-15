@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL GetProductOptions (ID 30345) implements Interface Shpfy IGraphQL.

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 table 88016 "Shpfy Doc. Link To Doc."
 {

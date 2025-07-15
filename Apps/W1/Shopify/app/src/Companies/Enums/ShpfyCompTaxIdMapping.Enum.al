@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Enum Shopify Company Tax Id Mapping (ID 30166) implements Interface Shpfy Tax Registration Id Mapping.

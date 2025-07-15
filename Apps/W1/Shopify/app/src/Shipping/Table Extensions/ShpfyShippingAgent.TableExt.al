@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using Microsoft.Foundation.Shipping;
 
@@ -9,7 +9,7 @@ tableextension 88012 "Shpfy Shipping Agent" extends "Shipping Agent"
 {
     fields
     {
-        field(30100; "Shpfy Tracking Company"; Enum "Shpfy Tracking Companies")
+        field(88000; "Shpfy Tracking Company"; Enum "Shpfy Tracking Companies")
         {
             Caption = 'Shopify Tracking Company';
             DataClassification = CustomerContent;

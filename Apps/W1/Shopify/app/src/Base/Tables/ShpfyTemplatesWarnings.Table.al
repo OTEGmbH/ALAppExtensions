@@ -1,5 +1,5 @@
 #if not CLEANSCHEMA25
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 table 88005 "Shpfy Templates Warnings"
 {

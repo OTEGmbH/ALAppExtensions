@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88175 "Shpfy GQL ShopLocales" implements "Shpfy IGraphQL"
 {

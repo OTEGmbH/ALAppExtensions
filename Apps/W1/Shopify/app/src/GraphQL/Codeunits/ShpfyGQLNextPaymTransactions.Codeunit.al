@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL NextPaymTransactions (ID 30387) implements Interface Shpfy IGraphQL.

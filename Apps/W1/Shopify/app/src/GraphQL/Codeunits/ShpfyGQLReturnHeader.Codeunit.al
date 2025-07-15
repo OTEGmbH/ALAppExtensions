@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88169 "Shpfy GQL ReturnHeader" implements "Shpfy IGraphQL"
 {

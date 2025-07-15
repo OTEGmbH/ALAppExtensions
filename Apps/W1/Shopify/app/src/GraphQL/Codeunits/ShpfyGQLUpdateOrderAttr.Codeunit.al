@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL UpdateOrderAttr (ID 30149) implements Interface Shpfy IGraphQL.

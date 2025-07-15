@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88117 "Shpfy GQL NextAllCustomerIds" implements "Shpfy IGraphQL"
 {

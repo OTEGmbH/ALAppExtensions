@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL Customer Metafield Ids (ID 30374) implements Interface Shpfy IGraphQL.

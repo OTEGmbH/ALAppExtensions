@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL FindVariantBySKU (ID 30131) implements Interface Shpfy IGraphQL.

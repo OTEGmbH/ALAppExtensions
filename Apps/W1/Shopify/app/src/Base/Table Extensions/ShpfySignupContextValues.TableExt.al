@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using System.Environment.Configuration;
 
@@ -9,7 +9,7 @@ tableextension 88001 "Shpfy Signup Context Values" extends "Signup Context Value
 {
     fields
     {
-        field(30100; "Shpfy Signup Shop Url"; Text[250])
+        field(88000; "Shpfy Signup Shop Url"; Text[250])
         {
             DataClassification = SystemMetadata;
             Caption = 'Signup Shop Url';

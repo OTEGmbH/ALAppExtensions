@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88173 "Shpfy GQL ShipmentLines" implements "Shpfy IGraphQL"
 {

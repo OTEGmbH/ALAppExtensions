@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88253 "Shpfy IDocSource Refund" implements "Shpfy IDocument Source"
 {

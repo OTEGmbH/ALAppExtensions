@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88134 "Shpfy GQL NextOrderLines" implements "Shpfy IGraphQL"
 {

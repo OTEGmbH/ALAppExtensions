@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88116 "Shpfy GQL Modify Inventory" implements "Shpfy IGraphQL"
 {

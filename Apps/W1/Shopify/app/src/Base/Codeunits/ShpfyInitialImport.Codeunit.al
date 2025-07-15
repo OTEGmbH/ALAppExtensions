@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using System.Threading;
 using Microsoft.Inventory.Item;

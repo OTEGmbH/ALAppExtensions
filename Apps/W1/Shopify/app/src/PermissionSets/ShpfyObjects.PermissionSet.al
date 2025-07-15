@@ -1,9 +1,9 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Shpfy - Objects Permissions (ID 30104).
 /// </summary>
-permissionset 88003 "Shpfy - Objects"
+permissionset 88003 "OTEShpfy - Objects"
 {
     Access = Internal;
     Assignable = false;

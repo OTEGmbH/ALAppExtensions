@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88082 "Shpfy GQL CreateFulfillmentSvc" implements "Shpfy IGraphQL"
 {

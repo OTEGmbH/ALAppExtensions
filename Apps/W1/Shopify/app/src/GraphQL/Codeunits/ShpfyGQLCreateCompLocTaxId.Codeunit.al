@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL CreateCompLocTaxId (ID 30369) implements Interface Shpfy IGraphQL.

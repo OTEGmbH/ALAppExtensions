@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using Microsoft.Sales.Document;
 
@@ -9,14 +9,14 @@ tableextension 88002 "Shpfy Sales Header" extends "Sales Header"
 {
     fields
     {
-        field(30100; "Shpfy Order Id"; BigInteger)
+        field(88000; "Shpfy Order Id"; BigInteger)
         {
             Caption = 'Shopify Order Id';
             DataClassification = CustomerContent;
             Editable = false;
         }
 
-        field(30101; "Shpfy Order No."; Code[50])
+        field(88001; "Shpfy Order No."; Code[50])
         {
             Caption = 'Shopify Order No.';
             DataClassification = CustomerContent;
@@ -24,7 +24,7 @@ tableextension 88002 "Shpfy Sales Header" extends "Sales Header"
         }
 
 #if not CLEANSCHEMA28
-        field(30102; "Shpfy Risk Level"; Enum "Shpfy Risk Level")
+        field(88002; "Shpfy Risk Level"; Enum "Shpfy Risk Level")
         {
             Caption = 'Risk Level';
             FieldClass = FlowField;
@@ -39,7 +39,7 @@ tableextension 88002 "Shpfy Sales Header" extends "Sales Header"
 #endif
         }
 #endif
-        field(30103; "Shpfy Refund Id"; BigInteger)
+        field(88003; "Shpfy Refund Id"; BigInteger)
         {
             Caption = 'Shopify Refund Id';
             DataClassification = CustomerContent;

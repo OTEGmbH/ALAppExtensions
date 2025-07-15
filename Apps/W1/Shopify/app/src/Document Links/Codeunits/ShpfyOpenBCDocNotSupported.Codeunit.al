@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88049 "Shpfy OpenBCDoc NotSupported" implements "Shpfy IOpenBCDocument"
 {

@@ -1,6 +1,6 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
-using Microsoft.Integration.Shopify;
+using OTE.Shopify;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Attribute;

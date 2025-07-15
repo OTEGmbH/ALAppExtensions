@@ -1,5 +1,5 @@
 #if not CLEANSCHEMA25
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using System.Environment.Configuration;
 
@@ -7,7 +7,7 @@ tableextension 88000 "Shpfy Feature Data Update" extends "Feature Data Update St
 {
     fields
     {
-        field(30200; "Shpfy Templates Migrate"; Boolean)
+        field(88000; "Shpfy Templates Migrate"; Boolean)
         {
             DataClassification = SystemMetadata;
             Caption = 'Migrate Shopify templates';

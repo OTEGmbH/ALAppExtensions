@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using Microsoft.Sales.History;
 
@@ -6,7 +6,7 @@ tableextension 88006 "Shpfy Return Receipt Header" extends "Return Receipt Heade
 {
     fields
     {
-        field(30103; "Shpfy Refund Id"; BigInteger)
+        field(88000; "Shpfy Refund Id"; BigInteger)
         {
             Caption = 'Shopify Refund Id';
             DataClassification = SystemMetadata;

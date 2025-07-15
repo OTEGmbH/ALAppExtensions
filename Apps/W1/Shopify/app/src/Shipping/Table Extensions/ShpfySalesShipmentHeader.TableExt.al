@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using Microsoft.Sales.History;
 
@@ -9,20 +9,20 @@ tableextension 88010 "Shpfy Sales Shipment Header" extends "Sales Shipment Heade
 {
     fields
     {
-        field(30100; "Shpfy Order Id"; BigInteger)
+        field(88000; "Shpfy Order Id"; BigInteger)
         {
             Caption = 'Shopify Order Id';
             DataClassification = CustomerContent;
             Editable = false;
         }
 
-        field(30102; "Shpfy Order No."; Code[50])
+        field(88001; "Shpfy Order No."; Code[50])
         {
             Caption = 'Shopify Order No.';
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(30103; "Shpfy Fulfillment Id"; BigInteger)
+        field(88002; "Shpfy Fulfillment Id"; BigInteger)
         {
             Caption = 'Shopify Fulfillment Id';
             DataClassification = CustomerContent;

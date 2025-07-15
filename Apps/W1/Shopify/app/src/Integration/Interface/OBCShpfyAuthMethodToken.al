@@ -1,6 +1,6 @@
 namespace app.app;
 
-using Microsoft.Integration.Shopify;
+using OTE.Shopify;
 
 codeunit 88299 "OBC Shpfy Auth Method - Token" implements "OBC Shpfy Auth. Method"
 {

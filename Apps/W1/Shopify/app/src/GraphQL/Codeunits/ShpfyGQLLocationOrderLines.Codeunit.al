@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL LocationOrderLines (ID 30134) implements Interface Shpfy IGraphQL.

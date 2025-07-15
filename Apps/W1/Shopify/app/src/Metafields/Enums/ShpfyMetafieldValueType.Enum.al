@@ -1,5 +1,5 @@
 #if not CLEANSCHEMA29
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Enum Shpfy Metafield Value Type (ID 30102).

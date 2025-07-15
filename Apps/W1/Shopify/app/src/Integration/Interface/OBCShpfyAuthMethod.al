@@ -1,5 +1,5 @@
 namespace app.app;
-using Microsoft.Integration.Shopify;
+using OTE.Shopify;
 
 interface "OBC Shpfy Auth. Method"
 {

@@ -1,5 +1,5 @@
 
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL Payment Terms (ID 30213) implements Interface Shpfy IGraphQL.

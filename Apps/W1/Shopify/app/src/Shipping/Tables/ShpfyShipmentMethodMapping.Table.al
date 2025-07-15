@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using Microsoft.Foundation.Shipping;
 using Microsoft.Sales.Document;

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 enum 88053 "Shpfy Dispute Reason"
 {

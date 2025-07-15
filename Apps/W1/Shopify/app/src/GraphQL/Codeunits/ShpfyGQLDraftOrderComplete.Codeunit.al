@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL DraftOrderComplete (ID 30318) implements Interface Shpfy IGraphQL.

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88214 "Shpfy Mtfld Type Date" implements "Shpfy IMetafield Type"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88233 "Shpfy Mtfld Type Weight" implements "Shpfy IMetafield Type"
 {

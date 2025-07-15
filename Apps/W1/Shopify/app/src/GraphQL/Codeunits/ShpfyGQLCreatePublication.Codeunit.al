@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88084 "Shpfy GQL CreatePublication" implements "Shpfy IGraphQL"
 {

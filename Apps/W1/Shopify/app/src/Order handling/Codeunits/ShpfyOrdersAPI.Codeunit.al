@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Orders API (ID 30165).
@@ -87,7 +87,7 @@ codeunit 88245 "Shpfy Orders API"
 #pragma warning disable AA0139
             OrderAttribute."Key" := JsonHelper.GetValueAsText(JItem, 'key', MaxStrLen(OrderAttribute."Key"));
 #pragma warning restore AA0139
-                OrderAttribute."Attribute Value" := CopyStr(JsonHelper.GetValueAsText(JItem, 'value').Replace('\\', '\').Replace('\"', '"'), 1, MaxStrLen(OrderAttribute."Attribute Value"));
+            OrderAttribute."Attribute Value" := CopyStr(JsonHelper.GetValueAsText(JItem, 'value').Replace('\\', '\').Replace('\"', '"'), 1, MaxStrLen(OrderAttribute."Attribute Value"));
 
             if not OrderAttribute.Insert() then
                 OrderAttribute.Modify();
@@ -114,7 +114,7 @@ codeunit 88245 "Shpfy Orders API"
         Clear(OrderAttribute);
         OrderAttribute."Order Id" := OrderHeader."Shopify Order Id";
         OrderAttribute."Key" := CopyStr(KeyName, 1, MaxStrLen(OrderAttribute."Key"));
-            OrderAttribute."Attribute Value" := CopyStr(Value, 1, MaxStrLen(OrderAttribute."Attribute Value"));
+        OrderAttribute."Attribute Value" := CopyStr(Value, 1, MaxStrLen(OrderAttribute."Attribute Value"));
         if not OrderAttribute.Insert() then
             OrderAttribute.Modify();
 
@@ -124,7 +124,7 @@ codeunit 88245 "Shpfy Orders API"
             repeat
                 Clear(JAttrib);
                 JAttrib.Add('key', OrderAttribute."Key");
-                    JAttrib.Add('value', OrderAttribute."Attribute Value");
+                JAttrib.Add('value', OrderAttribute."Attribute Value");
                 JAttributes.Add(JAttrib);
             until OrderAttribute.Next() = 0;
 

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL RefundShippingLines (ID 30397) implements Interface Shpfy IGraphQL.

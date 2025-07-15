@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 enum 88029 "Shpfy Metafield Volume Type"
 {

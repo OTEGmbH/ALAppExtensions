@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88066 "Shpfy GQL BulkOperation" implements "Shpfy IGraphQL"
 {

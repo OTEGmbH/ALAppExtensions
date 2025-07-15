@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88051 "Shpfy Open Order" implements "Shpfy IOpenShopifyDocument"
 {

@@ -1,5 +1,5 @@
 #if not CLEANSCHEMA25
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Table Shpfy Province (ID 30108).

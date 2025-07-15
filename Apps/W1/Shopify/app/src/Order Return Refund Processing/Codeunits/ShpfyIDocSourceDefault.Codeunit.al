@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88252 "Shpfy IDocSource Default" implements "Shpfy IDocument Source"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL DeliveryProfiles (ID 30375) implements Interface Shpfy IGraphQL.

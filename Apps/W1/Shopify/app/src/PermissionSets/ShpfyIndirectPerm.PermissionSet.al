@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.ExtendedText;
@@ -15,7 +15,7 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 
-permissionset 88002 "Shpfy Indirect Perm"
+permissionset 88002 "OTEShpfy Indirect Perm"
 {
     Assignable = false;
     Caption = 'Shopify Indirect Permissions', MaxLength = 30;

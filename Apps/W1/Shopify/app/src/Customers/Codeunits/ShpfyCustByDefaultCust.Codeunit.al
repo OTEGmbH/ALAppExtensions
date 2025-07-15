@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Cust. By Default Cust. (ID 30112) implements Interface Shpfy ICustomer Mapping.

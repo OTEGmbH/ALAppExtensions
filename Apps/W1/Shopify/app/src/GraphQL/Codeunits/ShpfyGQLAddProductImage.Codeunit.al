@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88063 "Shpfy GQL AddProductImage" implements "Shpfy IGraphQL"
 {

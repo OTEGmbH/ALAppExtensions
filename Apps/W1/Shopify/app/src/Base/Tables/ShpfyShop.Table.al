@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using app.app;
 using Microsoft.Finance.GeneralLedger.Account;

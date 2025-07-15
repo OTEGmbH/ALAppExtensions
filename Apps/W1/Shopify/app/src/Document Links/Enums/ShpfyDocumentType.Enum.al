@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 enum 88019 "Shpfy Document Type" implements "Shpfy IOpenBCDocument"
 {

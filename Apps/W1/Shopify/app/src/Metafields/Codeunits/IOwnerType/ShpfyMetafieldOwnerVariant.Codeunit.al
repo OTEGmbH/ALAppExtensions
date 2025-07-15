@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88237 "Shpfy Metafield Owner Variant" implements "Shpfy IMetafield Owner Type"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88013 "Shpfy Bulk UpdateProductImage" implements "Shpfy IBulk Operation"
 {

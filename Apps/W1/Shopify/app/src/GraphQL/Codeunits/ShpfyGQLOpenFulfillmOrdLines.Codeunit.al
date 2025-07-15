@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88150 "Shpfy GQL OpenFulfillmOrdLines" implements "Shpfy IGraphQL"
 {

@@ -1,16 +1,16 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Shpfy - Edit Permissions (ID 30102).
 /// </summary>
-permissionset 88001 "Shpfy - Edit"
+permissionset 88001 "OTEShpfy - Edit"
 {
     Access = Internal;
     Assignable = false;
     Caption = 'Shopify - Edit', MaxLength = 30;
 
-    IncludedPermissionSets = "Shpfy - Read",
-        "Shpfy Indirect Perm";
+    IncludedPermissionSets = "OTEShpfy - Read",
+        "OTEShpfy Indirect Perm";
 
     Permissions =
         tabledata "Shpfy Bulk Operation" = IMD,

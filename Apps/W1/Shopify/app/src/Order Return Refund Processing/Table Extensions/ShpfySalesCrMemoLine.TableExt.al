@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 using Microsoft.Sales.History;
 
@@ -6,7 +6,7 @@ tableextension 88009 "Shpfy Sales Cr.Memo Line" extends "Sales Cr.Memo Line"
 {
     fields
     {
-        field(30103; "Shpfy Refund Id"; BigInteger)
+        field(88003; "Shpfy Refund Id"; BigInteger)
         {
             Caption = 'Shopify Refund Id';
             DataClassification = SystemMetadata;
@@ -14,7 +14,7 @@ tableextension 88009 "Shpfy Sales Cr.Memo Line" extends "Sales Cr.Memo Line"
             TableRelation = "Shpfy Refund Header"."Refund Id";
         }
 
-        field(30104; "Shpfy Refund Line Id"; BigInteger)
+        field(88004; "Shpfy Refund Line Id"; BigInteger)
         {
             Caption = 'Shopify Refund Line Id';
             DataClassification = CustomerContent;

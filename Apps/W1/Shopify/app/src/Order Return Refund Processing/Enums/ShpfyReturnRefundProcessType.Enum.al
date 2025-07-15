@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 enum 88045 "Shpfy ReturnRefund ProcessType" implements "Shpfy IReturnRefund Process"
 {

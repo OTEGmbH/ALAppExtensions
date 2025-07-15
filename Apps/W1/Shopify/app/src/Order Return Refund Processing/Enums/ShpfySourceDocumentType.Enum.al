@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 enum 88046 "Shpfy Source Document Type" implements "Shpfy IDocument Source"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL GetWebhookSubs (ID 30394) implements Interface Shpfy IGraphQL.

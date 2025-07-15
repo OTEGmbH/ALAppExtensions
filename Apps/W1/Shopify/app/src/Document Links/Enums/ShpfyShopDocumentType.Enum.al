@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 enum 88020 "Shpfy Shop Document Type" implements "Shpfy IOpenShopifyDocument"
 {

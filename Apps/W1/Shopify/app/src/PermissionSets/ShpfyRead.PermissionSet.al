@@ -1,16 +1,16 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Shpfy - Read Permissions (ID 30100).
 /// </summary>
 #pragma warning disable AS0090, AS0049
-permissionset 88004 "Shpfy - Read"
+permissionset 88004 "OTEShpfy - Read"
 {
     Access = Internal;
     Assignable = false;
     Caption = 'Shopify - Read', MaxLength = 30;
 
-    IncludedPermissionSets = "Shpfy - Objects";
+    IncludedPermissionSets = "OTEShpfy - Objects";
 
     Permissions =
         tabledata "Shpfy Bulk Operation" = R,

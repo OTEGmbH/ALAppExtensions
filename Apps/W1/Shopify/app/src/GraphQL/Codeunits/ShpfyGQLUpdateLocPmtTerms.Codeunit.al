@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy GQL UpdateLocPmtTerms (ID 30370) implements Interface Shpfy IGraphQL.

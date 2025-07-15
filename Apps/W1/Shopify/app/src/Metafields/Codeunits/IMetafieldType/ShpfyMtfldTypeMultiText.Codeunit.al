@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88223 "Shpfy Mtfld Type Multi Text" implements "Shpfy IMetafield Type"
 {

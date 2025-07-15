@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88069 "Shpfy GQL CatalogPrices" implements "Shpfy IGraphQL"
 {

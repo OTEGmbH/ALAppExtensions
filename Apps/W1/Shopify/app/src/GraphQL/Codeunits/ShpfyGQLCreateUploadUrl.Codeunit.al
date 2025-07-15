@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88085 "Shpfy GQL CreateUploadUrl" implements "Shpfy IGraphQL"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Enum Shpfy Remove Product Action (ID 30131) implements Interface Shpfy IRemoveProductAction.

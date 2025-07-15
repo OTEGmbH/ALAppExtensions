@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 enum 88066 "Shpfy Resource Type" implements "Shpfy ICreate Translation"
 {

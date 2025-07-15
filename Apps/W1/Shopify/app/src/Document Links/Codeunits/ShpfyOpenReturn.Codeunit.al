@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88056 "Shpfy Open Return" implements "Shpfy IOpenShopifyDocument"
 {

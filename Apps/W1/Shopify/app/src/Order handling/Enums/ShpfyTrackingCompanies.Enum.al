@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 // https://shopify.dev/docs/admin-api/rest/reference/shipping-and-fulfillment/fulfillment
 

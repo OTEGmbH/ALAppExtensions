@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88096 "Shpfy GQL FFOrdersFromOrder" implements "Shpfy IGraphQL"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 /// <summary>
 /// Enum Shpfy Company Mapping (ID 30151) implements Interface Shpfy ICompany Mapping.

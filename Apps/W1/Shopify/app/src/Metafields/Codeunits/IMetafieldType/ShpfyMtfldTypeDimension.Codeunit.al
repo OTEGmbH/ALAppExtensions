@@ -1,4 +1,4 @@
-namespace Microsoft.Integration.Shopify;
+namespace OTE.Shopify;
 
 codeunit 88216 "Shpfy Mtfld Type Dimension" implements "Shpfy IMetafield Type"
 {
