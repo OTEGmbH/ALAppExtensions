@@ -180,6 +180,7 @@ codeunit 88243 "Shpfy Order Mapping"
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
+        IsHandled: boolean;
         ShopifyVariant: Record "Shpfy Variant";
         ProductImport: Codeunit "Shpfy Product Import";
     begin
@@ -194,17 +195,20 @@ codeunit 88243 "Shpfy Order Mapping"
                 ShopifyOrderLine."Item No." := Item."No.";
             if (not IsNullGuid(ShopifyVariant."Item Variant SystemId")) and ItemVariant.GetBySystemId(ShopifyVariant."Item Variant SystemId") then
                 ShopifyOrderLine."Variant Code" := ItemVariant.Code;
-            case ShopifyVariant."UoM Option Id" of
-                1:
-                    if StrLen(ShopifyVariant."Option 1 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
-                        ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 1 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
-                2:
-                    if StrLen(ShopifyVariant."Option 2 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
-                        ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 2 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
-                3:
-                    if StrLen(ShopifyVariant."Option 3 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
-                        ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 3 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
-            end;
+
+            OnBeforeSetOrderLineUnitOfMeasure(ShopifyOrderLine, ShopifyVariant, Item, IsHandled);
+            if not IsHandled then
+                case ShopifyVariant."UoM Option Id" of
+                    1:
+                        if StrLen(ShopifyVariant."Option 1 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
+                            ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 1 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
+                    2:
+                        if StrLen(ShopifyVariant."Option 2 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
+                            ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 2 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
+                    3:
+                        if StrLen(ShopifyVariant."Option 3 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
+                            ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 3 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
+                end;
         end;
         if (ShopifyOrderLine."Unit of Measure Code" = '') and (ShopifyOrderLine."Item No." <> '') then
             if Item.Get(ShopifyOrderLine."Item No.") then
@@ -296,5 +300,10 @@ codeunit 88243 "Shpfy Order Mapping"
             end;
             OrderEvents.OnAfterMapPaymentMethod(OrderHeader);
         end;
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnBeforeSetOrderLineUnitOfMeasure(var ShopifyOrderLine: Record "Shpfy Order Line"; ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; var IsHandled: Boolean)
+    begin
     end;
 }
