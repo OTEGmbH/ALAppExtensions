@@ -250,7 +250,7 @@ codeunit 88242 "Shpfy Order Events"
     /// <summary> 
     /// Raised before the timestamp to set the last sync time is set.
     /// </summary>
-    internal procedure OnBeforeSetLastSyncTime(ShpfyShop: Record "Shpfy Shop"; var NewSyncTime: DateTime)
+    internal procedure OnBeforeSetLastSyncTime(ShpfyShop: Record "Shpfy Shop"; var NewSyncTime: DateTime; LastSyncTime: DateTime)
     begin
     end;
 }

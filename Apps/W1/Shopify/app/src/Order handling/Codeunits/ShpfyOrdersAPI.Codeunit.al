@@ -72,7 +72,7 @@ codeunit 88245 "Shpfy Orders API"
                     break;
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.orders.pageInfo.hasNextPage');
         //OTE JR 26.08.2025 JR START
-        ShpfyOrderEvents.OnBeforeSetLastSyncTime(ShopifyShop, NewSyncTime);
+        ShpfyOrderEvents.OnBeforeSetLastSyncTime(ShopifyShop, NewSyncTime, LastSyncTime);
         //OTE JR 26.08.2025 JR STOP 
         ShopifyShop.SetLastSyncTime("Shpfy Synchronization Type"::Orders, NewSyncTime);
         Commit();
