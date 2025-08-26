@@ -1,5 +1,7 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
+
 /// <summary>
 /// Codeunit Shpfy Orders API (ID 30165).
 /// </summary>
@@ -32,6 +34,7 @@ codeunit 88245 "Shpfy Orders API"
     internal procedure GetOrdersToImport(ShopifyShop: Record "Shpfy Shop")
     var
         OrdersToImport: Record "Shpfy Orders to Import";
+        ShpfyOrderEvents: Codeunit "Shpfy Order Events";
         LastSyncTime: DateTime;
         NewSyncTime: DateTime;
         Cursor: Text;
@@ -42,6 +45,11 @@ codeunit 88245 "Shpfy Orders API"
 
         Clear(OrdersToImport);
         LastSyncTime := ShopifyShop.GetLastSyncTime("Shpfy Synchronization Type"::Orders);
+        //OTE JR 26.08.2025 JR START
+        ShpfyOrderEvents.OnBeforeSetLastTimeStamp(ShopifyShop, LastSyncTime);
+        //OTE JR 26.08.2025 JR STOP 
+
+
         Parameters.Add('Time', Format(LastSyncTime, 0, 9));
         if LastSyncTime = Shop.GetEmptySyncTime() then
             GraphQLType := "Shpfy GraphQL Type"::GetOpenOrdersToImport
@@ -63,6 +71,9 @@ codeunit 88245 "Shpfy Orders API"
                 end else
                     break;
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.orders.pageInfo.hasNextPage');
+        //OTE JR 26.08.2025 JR START
+        ShpfyOrderEvents.OnBeforeSetLastSyncTime(ShopifyShop, NewSyncTime);
+        //OTE JR 26.08.2025 JR STOP 
         ShopifyShop.SetLastSyncTime("Shpfy Synchronization Type"::Orders, NewSyncTime);
         Commit();
     end;

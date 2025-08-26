@@ -1,5 +1,6 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
 using Microsoft.Sales.Document;
 
 /// <summary>
@@ -231,6 +232,25 @@ codeunit 88242 "Shpfy Order Events"
     /// <param name="OrderLine">Parameter of type Record "Shopify Order Line".</param>
     /// <param name="RefundLine">Parameter of type Record "Shopify Refund Line".</param>
     internal procedure OnAfterConsiderRefundsInQuantityAndAmounts(OrderHeader: Record "Shpfy Order Header"; var OrderLine: Record "Shpfy Order Line"; RefundLine: Record "Shpfy Refund Line")
+    begin
+    end;
+
+
+    [IntegrationEvent(false, false)]
+    /// <summary> 
+    /// Raised after the timestamp to get orders is set. POS Orders usually have another updated time and wont be picked up otherwise.
+    /// </summary>
+
+
+    internal procedure OnBeforeSetLastTimeStamp(ShpfyShop: Record "Shpfy Shop"; var LastSyncTime: DateTime)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    /// <summary> 
+    /// Raised before the timestamp to set the last sync time is set.
+    /// </summary>
+    internal procedure OnBeforeSetLastSyncTime(ShpfyShop: Record "Shpfy Shop"; var NewSyncTime: DateTime)
     begin
     end;
 }
