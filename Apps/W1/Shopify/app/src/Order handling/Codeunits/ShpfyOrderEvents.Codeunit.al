@@ -253,4 +253,9 @@ codeunit 88242 "Shpfy Order Events"
     internal procedure OnBeforeSetLastSyncTime(ShpfyShop: Record "Shpfy Shop"; var NewSyncTime: DateTime; LastSyncTime: DateTime)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterSetOrderClosed(var closed: Boolean; Id: BigInteger; var ShopifyShop: Record "Shpfy Shop")
+    begin
+    end;
 }

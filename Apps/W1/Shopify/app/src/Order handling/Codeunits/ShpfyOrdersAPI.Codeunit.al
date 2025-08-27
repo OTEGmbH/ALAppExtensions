@@ -190,6 +190,7 @@ codeunit 88245 "Shpfy Orders API"
     var
         OrdersToImport: Record "Shpfy Orders to Import";
         OrderHeader: Record "Shpfy Order Header";
+        ShpfyOrderEvents: Codeunit "Shpfy Order Events";
         RecordRef: RecordRef;
         Id: BigInteger;
         JArray: JsonArray;
@@ -208,6 +209,9 @@ codeunit 88245 "Shpfy Orders API"
                 if JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node') then begin
                     Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
                     Closed := JsonHelper.GetValueAsBoolean(JNode, 'closed');
+                    //OTE JR 27.08.2025 JR START
+                    ShpfyOrderEvents.OnAfterSetOrderClosed(closed, Id, ShopifyShop);
+                    //OTE JR 27.08.2025 JR STOP 
                     OrdersToImport.SetRange(Id, Id);
                     if not OrdersToImport.FindFirst() then
                         Clear(OrdersToImport);
