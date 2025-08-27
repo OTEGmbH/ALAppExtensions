@@ -209,9 +209,7 @@ codeunit 88245 "Shpfy Orders API"
                 if JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node') then begin
                     Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
                     Closed := JsonHelper.GetValueAsBoolean(JNode, 'closed');
-                    //OTE JR 27.08.2025 JR START
-                    ShpfyOrderEvents.OnAfterSetOrderClosed(closed, Id, ShopifyShop);
-                    //OTE JR 27.08.2025 JR STOP 
+
                     OrdersToImport.SetRange(Id, Id);
                     if not OrdersToImport.FindFirst() then
                         Clear(OrdersToImport);
@@ -253,6 +251,9 @@ codeunit 88245 "Shpfy Orders API"
                         end;
                         OrdersToImport.Tags := CopyStr(Tags.ToText(), 2, MaxStrLen(OrdersToImport.Tags));
                     end;
+                    //OTE JR 27.08.2025 JR START
+                    ShpfyOrderEvents.OnAfterSetOrderClosed(closed, OrdersToImport, ShopifyShop);
+                    //OTE JR 27.08.2025 JR STOP 
                     OrdersToImport."High Risk" := IsHighRiskOrder(JNode);
                     OrderHeader.SetRange("Shopify Order Id", Id);
                     if OrderHeader.IsEmpty then

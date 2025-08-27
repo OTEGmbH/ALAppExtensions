@@ -255,7 +255,7 @@ codeunit 88242 "Shpfy Order Events"
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnAfterSetOrderClosed(var closed: Boolean; Id: BigInteger; var ShopifyShop: Record "Shpfy Shop")
+    internal procedure OnAfterSetOrderClosed(var closed: Boolean; ShpfyOrderstoImport: Record "Shpfy Orders to Import"; var ShopifyShop: Record "Shpfy Shop")
     begin
     end;
 }
