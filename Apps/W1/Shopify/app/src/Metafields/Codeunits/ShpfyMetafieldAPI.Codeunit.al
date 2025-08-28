@@ -1,5 +1,7 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
+
 codeunit 88238 "Shpfy Metafield API"
 {
     Access = Internal;
@@ -8,6 +10,8 @@ codeunit 88238 "Shpfy Metafield API"
         Shop: Record "Shpfy Shop";
         JsonHelper: Codeunit "Shpfy Json Helper";
         CommunicationMgt: Codeunit "Shpfy Communication Mgt.";
+        G_ShpfyMetafield: Record "Shpfy Metafield";
+        G_MetafieldViewSet: boolean;
 
 
     internal procedure SetShop(ShopifyShop: Record "Shpfy Shop")
@@ -34,11 +38,21 @@ codeunit 88238 "Shpfy Metafield API"
         Count: Integer;
         GraphQuery: TextBuilder;
     begin
-        MetafieldIds := RetrieveMetafieldsFromShopify(ParentTableId, OwnerId);
-        //OTE Auto Update Metafields by mapping 10.07.2025 JR START
-        OnAfterRetrieveMetafieldsFromShopify(ParentTableId, OwnerId, MetafieldIds);
-        //OTE Auto Update Metafields by mapping 10.07.2025 JR STOP 
-        CollectMetafieldsInBC(ParentTableId, OwnerId, TempMetafieldSet, MetafieldIds);
+        //OTE Update marked Metafields 28.08.2025 JR START
+        if (G_MetafieldViewSet) and (G_ShpfyMetafield.GetFilters <> '') then begin
+            if G_ShpfyMetafield.findset(false) then
+                repeat
+                    TempMetafieldSet := G_ShpfyMetafield;
+                    TempMetafieldSet.Insert(false);
+                until G_ShpfyMetafield.Next() = 0;
+            //OTE Update marked Metafields 28.08.2025 JR STOP 
+        end else begin
+            MetafieldIds := RetrieveMetafieldsFromShopify(ParentTableId, OwnerId);
+            //OTE Auto Update Metafields by mapping 10.07.2025 JR START
+            OnAfterRetrieveMetafieldsFromShopify(ParentTableId, OwnerId, MetafieldIds);
+            //OTE Auto Update Metafields by mapping 10.07.2025 JR STOP 
+            CollectMetafieldsInBC(ParentTableId, OwnerId, TempMetafieldSet, MetafieldIds);
+        end;
 
         // MetafieldsSet mutation only accepts 25 metafields at a time
         Continue := true;
@@ -62,6 +76,14 @@ codeunit 88238 "Shpfy Metafield API"
                 UpdateMetafields(GraphQuery.ToText());
             end;
     end;
+
+    //OTE JR 28.08.2025 JR START
+    procedure SetMetafieldFilterView(var _ShpfyMetafield: Record "Shpfy Metafield")
+    begin
+        G_ShpfyMetafield.Copy(_ShpfyMetafield);
+        G_MetafieldViewSet := true;
+    end;
+    //OTE JR 28.08.2025 JR STOP 
 
     local procedure GetMaxMetafieldsToUpdate(): Integer
     begin

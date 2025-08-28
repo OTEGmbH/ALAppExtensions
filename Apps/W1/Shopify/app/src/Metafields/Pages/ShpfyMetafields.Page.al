@@ -6,7 +6,7 @@ namespace OTE.Shopify;
 page 88031 "Shpfy Metafields"
 {
     Caption = 'Shopify Metafields';
-    Extensible = false;
+    // Extensible = false;
     PageType = List;
     SourceTable = "Shpfy Metafield";
     UsageCategory = None;
