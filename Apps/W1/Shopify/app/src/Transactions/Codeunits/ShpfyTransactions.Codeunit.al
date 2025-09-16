@@ -98,6 +98,10 @@ codeunit 88292 "Shpfy Transactions"
             JsonHelper.GetValueIntoField(JOrderTransaction, 'paymentDetails.number', RecordRef, OrderTransaction.FieldNo("Credit Card Number"));
             JsonHelper.GetValueIntoField(JOrderTransaction, 'paymentDetails.company', RecordRef, OrderTransaction.FieldNo("Credit Card Company"));
         end;
+
+        //OTE JR 2025-09-16 JR START
+        OnBeforeInsertOrModifyOrderTransaction(OrderTransaction, JOrderTransaction, JObject, IsNew, RecordRef, CreditCardCompany, TransactionGateway, PaymentMethodMapping);
+        //OTE JR 2025-09-16 JR STOP 
         if IsNew then
             RecordRef.Insert()
         else
@@ -129,5 +133,10 @@ codeunit 88292 "Shpfy Transactions"
         end;
 
         DataCapture.Add(Database::"Shpfy Order Transaction", OrderTransaction.SystemId, JOrderTransaction);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertOrModifyOrderTransaction(var OrderTransaction: Record "Shpfy Order Transaction"; JOrderTransaction: JsonToken; JObject: JsonObject; IsNew: Boolean; RecordRef: RecordRef; CreditCardCompany: Record "Shpfy Credit Card Company"; TransactionGateway: Record "Shpfy Transaction Gateway"; PaymentMethodMapping: Record "Shpfy Payment Method Mapping")
+    begin
     end;
 }
