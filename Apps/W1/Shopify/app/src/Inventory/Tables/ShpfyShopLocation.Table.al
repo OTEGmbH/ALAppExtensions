@@ -142,6 +142,16 @@ table 88020 "Shpfy Shop Location"
                 end;
             end;
         }
+
+
+        //OTE JR 19.09.2025 JR START
+        field(88000; "Initial Inventory Push"; boolean)
+        {
+            Caption = 'Initial Inventory Push';
+            DataClassification = SystemMetadata;
+            Description = 'Indicates that the initial inventory push has been done for this location.';
+        }
+        //OTE JR 19.09.2025 JR STOP 
     }
 
     keys

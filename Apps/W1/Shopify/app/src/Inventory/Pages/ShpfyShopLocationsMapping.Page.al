@@ -63,6 +63,12 @@ page 88025 "Shpfy Shop Locations Mapping"
                     ApplicationArea = All;
                     ToolTip = 'The default product locations will be added to new products in Shopify.';
                 }
+                //OTE JR 19.09.2025 JR START
+                field("Initial Inventory Push"; Rec."Initial Inventory Push")
+                {
+                    ApplicationArea = All;
+                }
+                //OTE JR 19.09.2025 JR STOP 
                 field("Stock Calculation"; Rec."Stock Calculation")
                 {
                     ApplicationArea = All;

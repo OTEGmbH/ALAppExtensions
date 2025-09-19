@@ -224,7 +224,10 @@ codeunit 88285 "Shpfy Variant API"
     begin
         ShopLocation.SetRange("Shop Code", Shop.Code);
         ShopLocation.SetRange(Active, true);
-        ShopLocation.SetRange("Default Product Location", true);
+        //OTE JR 19.09.2025 JR START
+        ShopLocation.setrange("Initial Inventory Push", true);
+        // ShopLocation.SetRange("Default Product Location", true); 
+        //OTE JR 19.09.2025 JR STOP 
         if ShopLocation.FindSet(false) then begin
             GraphQuery.Append(', inventoryQuantities: [');
             repeat
