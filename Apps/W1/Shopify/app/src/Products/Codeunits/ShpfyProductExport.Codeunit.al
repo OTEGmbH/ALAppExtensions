@@ -613,6 +613,9 @@ codeunit 88272 "Shpfy Product Export"
                         exit;
                     end;
             end;
+            //OTE Ticket 19.09.2025 JR START
+            ProductEvents.OnBeforeFillInProductFields(ShopifyProduct, Item);
+            //OTE Ticket 19.09.2025 JR STOP 
             TempShopifyProduct := ShopifyProduct;
             FillInProductFields(Item, ShopifyProduct);
             RecordRef1.GetTable(ShopifyProduct);

@@ -400,4 +400,15 @@ codeunit 88271 "Shpfy Product Events"
     internal procedure OnAfterProductsToSynchronizeFiltersSet(var ShopifyProduct: Record "Shpfy Product"; Shop: Record "Shpfy Shop"; OnlyUpdatePrice: Boolean)
     begin
     end;
+
+
+
+    //OTE OTE 19.09.2025 JR START
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeFillInProductFields(var ShopifyProduct: Record "Shpfy Product"; Item: Record Item)
+    begin
+    end;
+    //OTE OTE 19.09.2025 JR STOP 
+
+
 }
