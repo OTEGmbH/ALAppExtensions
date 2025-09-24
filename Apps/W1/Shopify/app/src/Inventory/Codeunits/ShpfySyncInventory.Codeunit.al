@@ -1,5 +1,7 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
+
 /// <summary>
 /// Codeunit Shpfy Sync Inventory (ID 30197).
 /// </summary>
@@ -53,14 +55,21 @@ codeunit 88201 "Shpfy Sync Inventory"
 
     procedure ExportStock(var _ShopInventory: Record "Shpfy Shop Inventory")
     var
-        ShopInventoryTEMP: Record "Shpfy Shop Inventory" temporary;
+        ShpfyShopInventory: Record "Shpfy Shop Inventory";
+        MarkedShpfyShopInventory: Record "Shpfy Shop Inventory";
     begin
         if _ShopInventory.findset(false) then
             repeat
-                ShopInventoryTEMP.Init();
-                ShopInventoryTEMP := _ShopInventory;
-                ShopInventoryTEMP.insert(false);
+                ShpfyShopInventory.setrange("Shop Code", _ShopInventory."Shop Code");
+                ShpfyShopInventory.setrange("Product Id", _ShopInventory."Product Id");
+                ShpfyShopInventory.setrange("Variant Id", _ShopInventory."Variant Id");
+                ShpfyShopInventory.setrange("Location Id", _ShopInventory."Location Id");
+                if ShpfyShopInventory.findfirst() then begin
+                    MarkedShpfyShopInventory.GetBySystemId(ShpfyShopInventory.SystemId);
+                    MarkedShpfyShopInventory.mark(true);
+                end;
             until _ShopInventory.Next() = 0;
-        InventoryApi.ExportStock(ShopInventoryTEMP);
+        MarkedShpfyShopInventory.MarkedOnly(true);
+        InventoryApi.ExportStock(MarkedShpfyShopInventory);
     end;
 }
