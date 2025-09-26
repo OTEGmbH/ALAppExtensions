@@ -23,6 +23,11 @@
     "id": "d0db3ba9-6d76-43b2-a68a-7da79247318e",
     "name": "vitaform Shopify",
     "publisher": "OTE GmbH"
+  },
+   {
+    "id": "a4a2c451-a412-4023-a06d-5fde40178dc7",
+    "name": "OTE Shopify Connector Extender",
+    "publisher": "OTE GmbH"
   }
 ],
   "resourceExposurePolicy": {
