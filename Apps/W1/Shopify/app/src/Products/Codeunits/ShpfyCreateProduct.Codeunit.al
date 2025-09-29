@@ -27,6 +27,8 @@ codeunit 88268 "Shpfy Create Product"
         Getlocations: Boolean;
         ProductId: BigInteger;
         ItemVariantIsBlockedLbl: Label 'Item variant is blocked or sales blocked.';
+        G_ShpfyOTEItemBuffer: Record "Shpfy OTE Item Buffer";
+        GroupByBufferTable: boolean;
 
     trigger OnRun()
     var
@@ -37,10 +39,27 @@ codeunit 88268 "Shpfy Create Product"
             Commit();
             Getlocations := false;
         end;
-        ShopifyProduct.SetRange("Shop Code", Shop.Code);
-        ShopifyProduct.SetRange("Item SystemId", Rec.SystemId);
-        if ShopifyProduct.IsEmpty then
-            CreateProduct(Rec);
+
+        //OTE JR 26.09.2025 JR START
+        if GroupByBufferTable then begin
+            ShopifyProduct.SetRange("Shop Code", Shop.Code);
+            ShopifyProduct.SetRange("Item SystemId", Rec.SystemId);
+            ShopifyProduct.SetRange("Group Code 1", G_ShpfyOTEItemBuffer."Group Code 1");
+            ShopifyProduct.SetRange("Group Code 2", G_ShpfyOTEItemBuffer."Group Code 2");
+            ShopifyProduct.SetRange("Group Code 3", G_ShpfyOTEItemBuffer."Group Code 3");
+            if ShopifyProduct.IsEmpty then
+                CreateProduct(Rec);
+        end else begin
+            ShopifyProduct.SetRange("Shop Code", Shop.Code);
+            ShopifyProduct.SetRange("Item SystemId", Rec.SystemId);
+            if ShopifyProduct.IsEmpty then
+                CreateProduct(Rec);
+        end;
+        // ShopifyProduct.SetRange("Shop Code", Shop.Code);
+        //     ShopifyProduct.SetRange("Item SystemId", Rec.SystemId);
+        //     if ShopifyProduct.IsEmpty then
+        //         CreateProduct(Rec); 
+        //OTE JR 26.09.2025 JR STOP 
     end;
 
     /// <summary> 
@@ -75,21 +94,36 @@ codeunit 88268 "Shpfy Create Product"
         ItemUnitofMeasure: Record "Item Unit of Measure";
         ItemVariant: Record "Item Variant";
         SkippedRecord: Codeunit "Shpfy Skipped Record";
+        Skip: boolean;
         Id: Integer;
         ICreateProductStatus: Interface "Shpfy ICreateProductStatusValue";
     begin
         Clear(TempShopifyProduct);
         TempShopifyProduct."Shop Code" := Shop.Code;
         TempShopifyProduct."Item SystemId" := Item.SystemId;
+        //OTE Grouping 26.09.2025 JR START
+        TempShopifyProduct."Group Code 1" := G_ShpfyOTEItemBuffer."Group Code 1";
+        TempShopifyProduct."Group Code 2" := G_ShpfyOTEItemBuffer."Group Code 2";
+        TempShopifyProduct."Group Code 3" := G_ShpfyOTEItemBuffer."Group Code 3";
+        TempShopifyProduct."Group Description 1" := G_ShpfyOTEItemBuffer."Group Description 1";
+        TempShopifyProduct."Group Description 2" := G_ShpfyOTEItemBuffer."Group Description 2";
+        TempShopifyProduct."Group Description 3" := G_ShpfyOTEItemBuffer."Group Description 3";
+        //OTE Grouping 26.09.2025 JR STOP 
         ProductExport.FillInProductFields(Item, TempShopifyProduct);
         ICreateProductStatus := Shop."Status for Created Products";
         TempShopifyProduct.Status := ICreateProductStatus.GetStatus(Item);
         ItemVariant.SetRange("Item No.", Item."No.");
+        //OTE Grouping 26.09.2025 JR START
+        OnBeforeLoopItemVariant(ItemVariant, TempShopifyProduct, Shop);
+        //OTE Grouping 26.09.2025 JR STOP 
         if ItemVariant.FindSet(false) then
             repeat
                 //OTE Skip other variants 08.07.2025 JR START
-                OnBeforeProcessItemVariant(ItemVariant, TempShopifyProduct, Shop);
+                skip := false;
+                OnBeforeProcessItemVariant(ItemVariant, TempShopifyProduct, Shop, Skip);
                 //OTE Skip other variants 08.07.2025 JR STOP 
+                if Skip then
+                    continue;
                 if ItemVariant.Blocked or ItemVariant."Sales Blocked" then
                     SkippedRecord.LogSkippedRecord(ItemVariant.RecordId, ItemVariantIsBlockedLbl, Shop)
                 else begin
@@ -299,9 +333,25 @@ codeunit 88268 "Shpfy Create Product"
         end;
     end;
 
+    /*
+
+      #######  ######## ######## 
+     ##     ##    ##    ##       
+     ##     ##    ##    ##       
+     ##     ##    ##    ######   
+     ##     ##    ##    ##       
+     ##     ##    ##    ##       
+      #######     ##    ######## 
+
+    */
     //OTE BC 08.07.2025 JR START
     [BusinessEvent(false)]
-    local procedure OnBeforeProcessItemVariant(var ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop")
+    local procedure OnBeforeProcessItemVariant(var ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop"; var Skip: boolean)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnBeforeLoopItemVariant(var ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop")
     begin
     end;
 
@@ -315,4 +365,11 @@ codeunit 88268 "Shpfy Create Product"
     begin
     end;
     //OTE BC 08.07.2025 JR STOP 
+
+    //This method is needed to group shopify items not only by the item number / item systemid
+    procedure SetItemBufferEntry(var _ShpfyOTEItemBuffer: Record "Shpfy OTE Item Buffer")
+    begin
+        G_ShpfyOTEItemBuffer := _ShpfyOTEItemBuffer;
+        GroupByBufferTable := true;
+    end;
 }

@@ -139,6 +139,37 @@ table 88049 "Shpfy Product"
             DataClassification = SystemMetadata;
             Editable = false;
         }
+        field(88000; "Group Code 1"; code[50])
+        {
+            Caption = 'Group Code 1';
+            DataClassification = CustomerContent;
+        }
+        field(88001; "Group Code 2"; code[50])
+        {
+            Caption = 'Group Code 2';
+            DataClassification = CustomerContent;
+        }
+        field(88002; "Group Code 3"; code[50])
+        {
+            Caption = 'Group Code 3';
+            DataClassification = CustomerContent;
+        }
+
+        field(88010; "Group Description 1"; text[100])
+        {
+            Caption = 'Group Description 1';
+            DataClassification = CustomerContent;
+        }
+        field(88011; "Group Description 2"; text[100])
+        {
+            Caption = 'Group Description 2';
+            DataClassification = CustomerContent;
+        }
+        field(88012; "Group Description 3"; text[100])
+        {
+            Caption = 'Group Description 3';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

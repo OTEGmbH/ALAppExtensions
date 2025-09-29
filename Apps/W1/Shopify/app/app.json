@@ -28,6 +28,11 @@
     "id": "a4a2c451-a412-4023-a06d-5fde40178dc7",
     "name": "OTE Shopify Connector Extender",
     "publisher": "OTE GmbH"
+  },
+   {
+    "id": "535ef58a-eed0-4eb7-b6de-8e1d4b668ea3",
+    "name": "Nikin-Shopify",
+    "publisher": "OTE GmbH"
   }
 ],
   "resourceExposurePolicy": {
