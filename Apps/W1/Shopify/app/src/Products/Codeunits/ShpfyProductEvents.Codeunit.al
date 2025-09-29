@@ -408,6 +408,11 @@ codeunit 88271 "Shpfy Product Events"
     internal procedure OnBeforeFillInProductFields(var ShopifyProduct: Record "Shpfy Product"; Item: Record Item)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeLoopItemVariant(var ItemVariant: Record "Item Variant"; Shop: Record "Shpfy Shop"; var ShopifyProduct: Record "Shpfy Product")
+    begin
+    end;
     //OTE OTE 19.09.2025 JR STOP 
 
 

@@ -652,6 +652,9 @@ codeunit 88272 "Shpfy Product Export"
                         end;
                 until ShopifyVariant.Next() = 0;
             ItemVariant.SetRange("Item No.", Item."No.");
+            //OTE JR 29.09.2025 JR START
+            ProductEvents.OnBeforeLoopItemVariant(ItemVariant, Shop, ShopifyProduct);
+            //OTE JR 29.09.2025 JR STOP
             ItemUnitofMeasure.SetRange("Item No.", Item."No.");
             if ItemVariant.FindSet(false) then
                 repeat
@@ -888,5 +891,7 @@ codeunit 88272 "Shpfy Product Export"
                 ICreateTranslation.CreateTranslation(RecVariant, ShopifyLanguage, TempTranslation, Digests);
             until ShopifyLanguage.Next() = 0;
     end;
+
+
     #endregion
 }
