@@ -34,6 +34,8 @@ codeunit 88045 "Shpfy Sync Customers"
         CustomerExport: Codeunit "Shpfy Customer Export";
         CustomerImport: Codeunit "Shpfy Customer Import";
         ErrMsg: Text;
+        G_Customer: Record Customer;
+        G_CustomerSet: boolean;
 
     /// <summary> 
     /// Sync Customers To Shopify.
@@ -43,7 +45,12 @@ codeunit 88045 "Shpfy Sync Customers"
         Customer: Record Customer;
     begin
         CustomerExport.SetCreateCustomers(false);
-        CustomerExport.Run(Customer);
+        //OTE Customer sync 07.10.2025 JR START
+        if G_CustomerSet then
+            CustomerExport.Run(G_Customer)
+        else
+            //OTE Customer sync 07.10.2025 JR STOP 
+            CustomerExport.Run(Customer);
     end;
 
     /// <summary> 
@@ -97,4 +104,13 @@ codeunit 88045 "Shpfy Sync Customers"
         CustomerImport.SetShop(Shop);
         CustomerExport.SetShop(Shop);
     end;
+
+
+    //OTE Customer Sync 07.10.2025 JR START
+    procedure SetCustomer(var _Customer: Record Customer)
+    begin
+        G_Customer.copy(_Customer);
+        G_CustomerSet := true;
+    end;
+    //OTE Customer Sync 07.10.2025 JR(Customer: Record Customer 
 }

@@ -1,5 +1,6 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
 using Microsoft.Sales.Customer;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Address;
@@ -20,7 +21,10 @@ codeunit 88037 "Shpfy Customer Export"
         CustomerId: BigInteger;
     begin
         CustomerAPI.FillInMissingShopIds();
-        Customer.CopyFilters(Rec);
+        //OTE Customer sync 07.10.2025 JR START
+        //  Customer.CopyFilters(Rec); 
+        Customer.Copy(Rec);
+        //OTE Customer sync 07.10.2025 JR STOP 
         if Customer.FindSet(false) then begin
             CustomerMapping.SetShop(Shop);
             repeat
@@ -60,11 +64,17 @@ codeunit 88037 "Shpfy Customer Export"
     var
         ShopifyCustomer: Record "Shpfy Customer";
         CustomerAddress: Record "Shpfy Customer Address";
+        ShpfyCustomerEvents: Codeunit "Shpfy Customer Events";
+        isHandled: boolean;
     begin
-        if Customer."E-Mail" = '' then begin
-            SkippedRecord.LogSkippedRecord(Customer.RecordId, EmptyEmailAddressLbl, Shop);
-            exit;
-        end;
+        //OTE Customer sync 07.10.2025 JR START
+        ShpfyCustomerEvents.OnBeforeSkipCustomerCreation(Customer, Shop, SkippedRecord, isHandled);
+        if not isHandled then
+            //OTE Customer sync 07.10.2025 JR STOP 
+            if Customer."E-Mail" = '' then begin
+                SkippedRecord.LogSkippedRecord(Customer.RecordId, EmptyEmailAddressLbl, Shop);
+                exit;
+            end;
 
         Clear(ShopifyCustomer);
         Clear(CustomerAddress);
