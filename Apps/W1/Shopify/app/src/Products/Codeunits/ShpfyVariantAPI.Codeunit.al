@@ -1,5 +1,7 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
+
 /// <summary>
 /// Codeunit Shpfy Variant API (ID 30189).
 /// </summary>
@@ -556,6 +558,7 @@ codeunit 88285 "Shpfy Variant API"
     internal procedure UpdateProductPrice(ShopifyVariant: Record "Shpfy Variant"; xShopifyVariant: Record "Shpfy Variant"; var BulkOperationInput: TextBuilder; var GraphQueryList: Dictionary of [BigInteger, TextBuilder]; RecordCount: Integer; var JRequestData: JsonArray)
     var
         BulkOperationMgt: Codeunit "Shpfy Bulk Operation Mgt.";
+        ShpfyProductEvents: Codeunit "Shpfy Product Events";
         BulkOperationType: Enum "Shpfy Bulk Operation Type";
         IBulkOperation: Interface "Shpfy IBulk Operation";
         HasChange: Boolean;
@@ -623,6 +626,9 @@ codeunit 88285 "Shpfy Variant API"
                         ShopifyVariant."Updated At" := JsonHelper.GetValueAsDateTime(JVariant, 'updatedAt');
                         if ShopifyVariant."Updated At" > 0DT then
                             ShopifyVariant.Modify();
+                        //OTE Price Push 08.10.2025 JR START
+                        ShpfyProductEvents.OnAfterPushShopifyVariantPrice(Shop, ShopifyVariant, xShopifyVariant);
+                        //OTE Price Push 08.10.2025 JR STOP 
                     end;
             end;
     end;

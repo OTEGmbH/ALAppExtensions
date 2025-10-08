@@ -18,6 +18,8 @@ codeunit 88271 "Shpfy Product Events"
     begin
     end;
 
+
+
     /// <summary> 
     /// Raised After Create Item.
     /// </summary>
@@ -400,9 +402,6 @@ codeunit 88271 "Shpfy Product Events"
     internal procedure OnAfterProductsToSynchronizeFiltersSet(var ShopifyProduct: Record "Shpfy Product"; Shop: Record "Shpfy Shop"; OnlyUpdatePrice: Boolean)
     begin
     end;
-
-
-
     //OTE OTE 19.09.2025 JR START
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeFillInProductFields(var ShopifyProduct: Record "Shpfy Product"; Item: Record Item)
@@ -411,6 +410,11 @@ codeunit 88271 "Shpfy Product Events"
 
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeLoopItemVariant(var ItemVariant: Record "Item Variant"; Shop: Record "Shpfy Shop"; var ShopifyProduct: Record "Shpfy Product")
+    begin
+    end;
+
+    [InternalEvent(false)]
+    internal procedure OnAfterPushShopifyVariantPrice(Shop: Record "Shpfy Shop"; var ShopifyVariant: Record "Shpfy Variant"; xShopifyVariant: Record "Shpfy Variant")
     begin
     end;
     //OTE OTE 19.09.2025 JR STOP 

@@ -30,8 +30,10 @@ codeunit 88037 "Shpfy Customer Export"
             repeat
                 CustomerId := CustomerMapping.FindMapping(Customer, CreateCustomers);
                 if CustomerId = 0 then begin
-                    if CreateCustomers then
-                        CreateShopifyCustomer(Customer);
+                    //OTE Force Customer Creation 08.10.2025 JR START
+                    // if CreateCustomers then 
+                    //OTE Force Customer Creation 08.10.2025 JR STOP 
+                    CreateShopifyCustomer(Customer);
                 end else begin
                     ShopifyCustomer.Get(CustomerId);
                     if ShopifyCustomer."Customer SystemId" <> Customer.SystemId then
