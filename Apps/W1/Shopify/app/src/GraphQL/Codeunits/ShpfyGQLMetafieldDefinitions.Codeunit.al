@@ -13,7 +13,7 @@ codeunit 88114 "Shpfy GQL MetafieldDefinitions" implements "Shpfy IGraphQL"
     /// <returns>Return value of type Text.</returns>
     procedure GetGraphQL(): Text
     begin
-        exit('{"query":"{ metafieldDefinitions(ownerType: {{OwnerType}}, first: 50) { edges { node { namespace key type { name } } } } }"}');
+        exit('{"query":"{ metafieldDefinitions(ownerType: {{OwnerType}}, first: 100) { edges { node { id namespace key type { name }  validations {name value } } } } }"}');
     end;
 
     /// <summary>

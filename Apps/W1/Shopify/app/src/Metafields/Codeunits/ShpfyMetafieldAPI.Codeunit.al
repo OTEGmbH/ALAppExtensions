@@ -231,15 +231,21 @@ codeunit 88238 "Shpfy Metafield API"
                 JsonHelper.GetJsonObject(JMetafield.AsObject(), JNode, 'node');
                 CreateMetafieldDefinition(ParentTableNo, OwnerId, JNode);
             end;
+
+
     end;
 
     local procedure CreateMetafieldDefinition(ParentTableNo: Integer; OwnerId: BigInteger; JNode: JsonObject)
     var
         Metafield: Record "Shpfy Metafield";
         Type: Enum "Shpfy Metafield Type";
+        ShpfyOTESetup: Record "Shpfy OTE Setup";
         Namespace: Text;
         Name: Text;
         TypeText: Text;
+        JValidations: JsonArray;
+        JValidation: JsonToken;
+    // JResponse: JsonToken;
     begin
         Namespace := JsonHelper.GetValueAsText(JNode, 'namespace');
         Name := JsonHelper.GetValueAsText(JNode, 'key');
@@ -254,19 +260,74 @@ codeunit 88238 "Shpfy Metafield API"
         Metafield.SetRange(Namespace, Namespace);
         Metafield.SetRange(Name, Name);
         Metafield.SetRange(Type, Type);
-        if not Metafield.IsEmpty() then
-            exit;
+        if not Metafield.findfirst() then begin
+            // exit;
 
-        Metafield.Validate("Parent Table No.", ParentTableNo);
-        Metafield."Owner Id" := OwnerId;
-        Metafield.Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
-        Metafield.Type := Type;
+            Metafield.Validate("Parent Table No.", ParentTableNo);
+            Metafield."Owner Id" := OwnerId;
+            Metafield.Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
+            Metafield.Type := Type;
 #pragma warning disable AA0139
-        Metafield."Namespace" := Namespace;
-        Metafield.Name := Name;
+            Metafield."Namespace" := Namespace;
+            Metafield.Name := Name;
 #pragma warning restore AA0139
-        Metafield.Insert(true);
+            Metafield.Insert(true);
+        end;
+        //OTE Metafield 09.10.2025 JR START
+        if ShpfyOTESetup.get() then
+            if ShpfyOTESetup."Get Metafield Values" then
+                if JsonHelper.GetJsonArray(JNode, JValidations, 'validations') then
+                    foreach JValidation in JValidations do begin
+                        // Process each validation
+                        CreateOrUpdateMetafieldValues(JValidation, Metafield);
+                    end;
+        //OTE Metafield 09.10.2025 JR STOP 
+
     end;
+
+    //OTE Metafield 09.10.2025 JR START
+    local procedure CreateOrUpdateMetafieldValues(jValidation: JsonToken; _ShpfyMetafield: Record "Shpfy Metafield")
+    var
+        ShpfyMetafieldValue: Record "Shpfy Metafield Value";
+        jObject: JsonObject;
+        jArray: JsonArray;
+        jValue: JsonToken;
+        valuetext: text;
+        ValueString: text;
+    begin
+        jObject := jValidation.AsObject();
+        ValueString := JsonHelper.GetValueAsText(jObject, 'value');
+
+        // Parse the string as JSON array
+        if jArray.ReadFrom(ValueString) then begin
+            // Now iterate through each item in the array
+            foreach jValue in jArray do begin
+                // Convert each array item to text
+                ValueText := jValue.AsValue().AsText();
+
+                // Check if this value already exists
+                ShpfyMetafieldValue.Reset();
+                ShpfyMetafieldValue.SetRange("Parent Table No.", _ShpfyMetafield."Parent Table No.");
+                ShpfyMetafieldValue.SetRange(Namespace, _ShpfyMetafield.Namespace);
+                ShpfyMetafieldValue.SetRange(Name, _ShpfyMetafield.Name);
+                ShpfyMetafieldValue.SetRange(Type, _ShpfyMetafield.Type);
+                ShpfyMetafieldValue.SetRange(Value, ValueText);
+
+                if ShpfyMetafieldValue.IsEmpty() then begin
+                    // Create new metafield value record
+                    ShpfyMetafieldValue.Init();
+                    ShpfyMetafieldValue."Entry No." := 0;
+                    ShpfyMetafieldValue."Parent Table No." := _ShpfyMetafield."Parent Table No.";
+                    ShpfyMetafieldValue.Namespace := _ShpfyMetafield.Namespace;
+                    ShpfyMetafieldValue.Name := _ShpfyMetafield.Name;
+                    ShpfyMetafieldValue.Type := _ShpfyMetafield.Type;
+                    ShpfyMetafieldValue.Value := ValueText;
+                    ShpfyMetafieldValue.Insert(true);
+                end;
+            end;
+        end;
+    end;
+    //OTE Metafield 09.10.2025 JR STOP 
 
     local procedure UpdateMetadataField(ParentTableNo: Integer; OwnerId: BigInteger; JNode: JsonObject): BigInteger
     var
