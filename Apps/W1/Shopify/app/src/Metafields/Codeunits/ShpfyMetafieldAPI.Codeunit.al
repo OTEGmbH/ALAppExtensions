@@ -39,8 +39,7 @@ codeunit 88238 "Shpfy Metafield API"
         GraphQuery: TextBuilder;
     begin
         //OTE Update marked Metafields 28.08.2025 JR START
-        if (ParentTableId <> database::"Shpfy Product") and (parenttableid <> database::"Shpfy Variant") then
-            exit;
+
         if (G_MetafieldViewSet) and (G_ShpfyMetafield.GetFilters <> '') then begin
             if G_ShpfyMetafield.findset(false) then
                 repeat
