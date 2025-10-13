@@ -40,6 +40,7 @@ page 88031 "Shpfy Metafields"
 
                     trigger OnAssistEdit()
                     var
+                        ShpfyMetafieldValue: Record "Shpfy Metafield Value";
                         IMetafieldType: Interface "Shpfy IMetafield Type";
                     begin
                         if not IsPageEditable then
@@ -47,10 +48,28 @@ page 88031 "Shpfy Metafields"
 
                         IMetafieldType := Rec.Type;
 
-                        if IMetafieldType.HasAssistEdit() then
+                        if IMetafieldType.HasAssistEdit() then begin
                             if IMetafieldType.AssistEdit(Rec.Value) then
                                 Rec.Validate(Value);
+                        end else begin
+                            // case Rec.Type of
+                            //     rec.type::metaobject_reference:
+                            //         begin
+                            ShpfyMetafieldValue.SelectValues(Rec);
+                            // end;
+
+                            // end;
+                        end;
                     end;
+                }
+                field("Metafield Values"; Rec."Metafield Values")
+                {
+                    editable = false;
+                    ToolTip = 'Specifies the value of the Metafield Values field.';
+                }
+                field("List Metafield"; Rec."List Metafield")
+                {
+                    ToolTip = 'Specifies the value of the List Metafield field.';
                 }
             }
         }

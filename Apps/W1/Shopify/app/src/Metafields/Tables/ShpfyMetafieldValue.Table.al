@@ -95,4 +95,54 @@ table 88063 "Shpfy Metafield Value"
                 exit("Owner Type"::Company);
         end;
     end;
+
+
+    procedure SelectValues(var _ShpfyMetafield: Record "Shpfy Metafield")
+    var
+
+        ShpfyMetafieldValue: Record "Shpfy Metafield Value";
+        ShpfyMetafieldValues: Page "Shpfy Metafield Values";
+        idValues: TextBuilder;
+        textValues: TextBuilder;
+        morethanone: boolean;
+    begin
+        ShpfyMetafieldValue.setrange("Parent Table No.", _ShpfyMetafield."Parent Table No.");
+        ShpfyMetafieldValue.setrange(Namespace, _ShpfyMetafield.Namespace);
+        ShpfyMetafieldValue.setrange(Name, _ShpfyMetafield.Name);
+        if ShpfyMetafieldValue.IsEmpty() then
+            exit;
+
+        ShpfyMetafieldValues.LookupMode(true);
+        ShpfyMetafieldValues.SetTableView(ShpfyMetafieldValue);
+        if ShpfyMetafieldValues.RunModal() <> action::LookupOK then
+            exit;
+        if _ShpfyMetafield."List Metafield" then begin
+            ShpfyMetafieldValues.GetSelectionFilter(ShpfyMetafieldValue);
+            morethanone := ShpfyMetafieldValue.count > 1;
+            if morethanone then
+                idValues.Append('[');
+            if ShpfyMetafieldValue.findset(false) then
+                repeat
+                    if idValues.Length > 2 then
+                        idValues.Append(',');
+                    if shpfyMetafieldValue."Metafield ID" <> '' then
+                        idValues.Append('\"' + ShpfyMetafieldValue."Metafield ID" + '\"')
+                    else
+                        idValues.append('\"' + ShpfyMetafieldValue.Value + '\"');
+                    if textValues.Length > 0 then
+                        textValues.Append(',');
+                    textValues.Append(ShpfyMetafieldValue.Value);
+                until shpfyMetafieldValue.next() = 0;
+            if morethanone then
+                idValues.Append(']');
+            _ShpfyMetafield.Value := idValues.ToText();
+            _ShpfyMetafield."Metafield Values" := textValues.ToText();
+            _ShpfyMetafield.modify(false);
+        end else begin
+            ShpfyMetafieldValues.GetRecord(ShpfyMetafieldValue);
+            _ShpfyMetafield.Value := ShpfyMetafieldValue.Value;
+            _ShpfyMetafield."Metafield Values" := ShpfyMetafieldValue.Value;
+            _ShpfyMetafield.modify(false);
+        end;
+    end;
 }

@@ -57,4 +57,9 @@ page 88071 "Shpfy Metafield Values"
             }
         }
     }
+
+    procedure GetSelectionFilter(var ShpfyMetafieldValue: Record "Shpfy Metafield Value")
+    begin
+        CurrPage.SetSelectionFilter(ShpfyMetafieldValue);
+    end;
 }

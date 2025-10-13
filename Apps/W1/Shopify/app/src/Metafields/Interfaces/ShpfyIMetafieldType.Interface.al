@@ -32,4 +32,6 @@ interface "Shpfy IMetafield Type"
     /// </summary>
     /// <returns>Example value.</returns>
     procedure GetExampleValue(): Text
+
+
 }

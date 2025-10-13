@@ -152,6 +152,19 @@ table 88025 "Shpfy Metafield"
                 "Owner Type" := GetOwnerType("Parent Table No.");
             end;
         }
+        //OTE Metafield 13.10.2025 JR START
+        field(88000; "Metafield Values"; text[1024])
+        {
+
+        }
+        field(88001; "List Metafield"; boolean)
+        {
+            Caption = 'List Metafield';
+            DataClassification = CustomerContent;
+            Editable = false;
+            InitValue = false;
+        }
+        //OTE Metafield 13.10.2025 JR STOP 
     }
 
     keys

@@ -158,7 +158,10 @@ codeunit 88238 "Shpfy Metafield API"
         GraphQuery.Append(EscapeGrapQLData(MetafieldSet.Value));
         GraphQuery.Append('\",');
         GraphQuery.Append('type: \"');
-        GraphQuery.Append(GetTypeName(MetafieldSet.Type));
+        if MetafieldSet."List Metafield" then
+            GraphQuery.Append('list.' + GetTypeName(MetafieldSet.Type))
+        else
+            GraphQuery.Append(GetTypeName(MetafieldSet.Type));
         GraphQuery.Append('\"');
         GraphQuery.Append('},');
     end;
@@ -265,6 +268,9 @@ codeunit 88238 "Shpfy Metafield API"
 
             Metafield.Validate("Parent Table No.", ParentTableNo);
             Metafield."Owner Id" := OwnerId;
+            //OTE Metafield 13.10.2025 JR START
+            Metafield."List Metafield" := TypeText.Contains('list');
+            //OTE Metafield 13.10.2025 JR STOP 
             Metafield.Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
             Metafield.Type := Type;
 #pragma warning disable AA0139
@@ -272,6 +278,11 @@ codeunit 88238 "Shpfy Metafield API"
             Metafield.Name := Name;
 #pragma warning restore AA0139
             Metafield.Insert(true);
+        end else begin
+            if Metafield."List Metafield" <> TypeText.Contains('list') then begin
+                Metafield."List Metafield" := TypeText.Contains('list');
+                Metafield.Modify(true);
+            end;
         end;
         //OTE Metafield 09.10.2025 JR START
         if ShpfyOTESetup.get() then
@@ -401,6 +412,7 @@ codeunit 88238 "Shpfy Metafield API"
     var
         Metafield: Record "Shpfy Metafield";
         ValueText: Text;
+        TypeText: text;
         Type: Enum "Shpfy Metafield Type";
     begin
         // Shopify has no limit on the length of the value, but Business Central has a limit of 2048 characters.
@@ -409,14 +421,21 @@ codeunit 88238 "Shpfy Metafield API"
         if StrLen(ValueText) > MaxStrLen(Metafield.Value) then
             exit(0);
 
+        //OTE Metafield 13.10.2025 JR START
+        TypeText := JsonHelper.GetValueAsText(JNode, 'type');
+        //OTE Metafield 13.10.2025 JR STOP 
+
         // Some metafield types are unsupported in Business Central (i.e. Rating)
-        if not ConvertToMetafieldType(JsonHelper.GetValueAsText(JNode, 'type'), Type) then
+        if not ConvertToMetafieldType(TypeText, Type) then
             exit(0);
 
         Metafield.Validate("Parent Table No.", ParentTableNo);
         Metafield."Owner Id" := OwnerId;
         Metafield.Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
         Metafield.Type := Type;
+        //OTE Metafield 13.10.2025 JR START
+        Metafield."List Metafield" := TypeText.Contains('list');
+        //OTE Metafield 13.10.2025 JR STOP 
 #pragma warning disable AA0139
         Metafield."Namespace" := JsonHelper.GetValueAsText(JNode, 'namespace');
         Metafield.Name := JsonHelper.GetValueAsText(JNode, 'key');
@@ -433,6 +452,11 @@ codeunit 88238 "Shpfy Metafield API"
         EnumOrdinal: Integer;
     begin
         // Some metafield types are unsupported in Business Central (i.e. Rating)
+        //OTE Metafield 13.10.2025 JR START
+        if value.Contains('list') then
+            Value := Value.Replace('list.', '');
+        //OTE Metafield 13.10.2025 JR STOP 
+
         if not Enum::"Shpfy Metafield Type".Ordinals().Get(Enum::"Shpfy Metafield Type".Names().IndexOf(Value), EnumOrdinal) then
             exit(false);
 
