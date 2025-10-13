@@ -289,42 +289,110 @@ codeunit 88238 "Shpfy Metafield API"
     local procedure CreateOrUpdateMetafieldValues(jValidation: JsonToken; _ShpfyMetafield: Record "Shpfy Metafield")
     var
         ShpfyMetafieldValue: Record "Shpfy Metafield Value";
+        ShpfyCommunicationMgt: Codeunit "Shpfy Communication Mgt.";
         jObject: JsonObject;
         jArray: JsonArray;
         jValue: JsonToken;
         valuetext: text;
         ValueString: text;
+        tb: TextBuilder;
     begin
         jObject := jValidation.AsObject();
         ValueString := JsonHelper.GetValueAsText(jObject, 'value');
-
-        // Parse the string as JSON array
+        if ValueString.ToLower().Contains('metaobjectdefinition') then begin
+            //Build Metafield definition query
+            tb.AppendLine('{');
+            tb.append(StrSubstNo(' "query": "query { metaobjectDefinition(id: \"%1\")', ValueString));
+            tb.append('{ id name type metaobjects(first: 50) { edges { node { id handle displayName fields { key value type } } } } } }" }');
+            jValidation := ShpfyCommunicationMgt.ExecuteGraphQL(tb.ToText());
+            // edges := JsonHelper.GetJsonArray(jValidation, 'data.metaobjectDefinition.metaobjects.edges');
+            ProcessMetaobjectDefinition(jValidation, _ShpfyMetafield);
+            exit;
+        end;
+        // Handle regular array values (your existing logic)
         if jArray.ReadFrom(ValueString) then begin
-            // Now iterate through each item in the array
             foreach jValue in jArray do begin
-                // Convert each array item to text
                 ValueText := jValue.AsValue().AsText();
+                CreateSingleMetafieldValue(_ShpfyMetafield, ValueText, '', '', '');
+            end;
+        end;
+    end;
 
-                // Check if this value already exists
-                ShpfyMetafieldValue.Reset();
-                ShpfyMetafieldValue.SetRange("Parent Table No.", _ShpfyMetafield."Parent Table No.");
-                ShpfyMetafieldValue.SetRange(Namespace, _ShpfyMetafield.Namespace);
-                ShpfyMetafieldValue.SetRange(Name, _ShpfyMetafield.Name);
-                ShpfyMetafieldValue.SetRange(Type, _ShpfyMetafield.Type);
-                ShpfyMetafieldValue.SetRange(Value, ValueText);
+    local procedure ProcessMetaobjectDefinition(JResponse: JsonToken; _ShpfyMetafield: Record "Shpfy Metafield")
+    var
+        JEdges: JsonArray;
+        JEdge: JsonToken;
+        JNode: JsonObject;
+        JFields: JsonArray;
+        JField: JsonToken;
+        NodeId: Text;
+        Handle: Text;
+        DisplayName: Text;
+        FieldKey: Text;
+        FieldValue: Text;
+        FieldType: Text;
+    begin
+        // Get the edges array
+        if JsonHelper.GetJsonArray(JResponse, JEdges, 'data.metaobjectDefinition.metaobjects.edges') then begin
+            foreach JEdge in JEdges do begin
+                // Get the node object
+                if JsonHelper.GetJsonObject(JEdge.AsObject(), JNode, 'node') then begin
+                    // Extract node properties
+                    NodeId := JsonHelper.GetValueAsText(JNode, 'id');
+                    Handle := JsonHelper.GetValueAsText(JNode, 'handle');
+                    DisplayName := JsonHelper.GetValueAsText(JNode, 'displayName');
 
-                if ShpfyMetafieldValue.IsEmpty() then begin
-                    // Create new metafield value record
-                    ShpfyMetafieldValue.Init();
-                    ShpfyMetafieldValue."Entry No." := 0;
-                    ShpfyMetafieldValue."Parent Table No." := _ShpfyMetafield."Parent Table No.";
-                    ShpfyMetafieldValue.Namespace := _ShpfyMetafield.Namespace;
-                    ShpfyMetafieldValue.Name := _ShpfyMetafield.Name;
-                    ShpfyMetafieldValue.Type := _ShpfyMetafield.Type;
-                    ShpfyMetafieldValue.Value := ValueText;
-                    ShpfyMetafieldValue.Insert(true);
+                    // Get fields array
+                    if JsonHelper.GetJsonArray(JNode, JFields, 'fields') then begin
+                        foreach JField in JFields do begin
+                            // Extract field properties
+                            FieldKey := JsonHelper.GetValueAsText(JField.AsObject(), 'key');
+                            FieldValue := JsonHelper.GetValueAsText(JField.AsObject(), 'value');
+                            FieldType := JsonHelper.GetValueAsText(JField.AsObject(), 'type');
+
+                            // Create metafield value record with all extracted data
+                            CreateSingleMetafieldValue(_ShpfyMetafield, FieldValue, NodeId, Handle, DisplayName);
+                        end;
+                    end else begin
+                        // If no fields, create entry with just the node data
+                        CreateSingleMetafieldValue(_ShpfyMetafield, DisplayName, NodeId, Handle, DisplayName);
+                    end;
                 end;
             end;
+        end;
+    end;
+
+    local procedure CreateSingleMetafieldValue(_ShpfyMetafield: Record "Shpfy Metafield"; ValueText: Text; NodeId: Text; Handle: Text; DisplayName: Text)
+    var
+        ShpfyMetafieldValue: Record "Shpfy Metafield Value";
+    begin
+        // Check if this value already exists
+        ShpfyMetafieldValue.Reset();
+        ShpfyMetafieldValue.SetRange("Parent Table No.", _ShpfyMetafield."Parent Table No.");
+        ShpfyMetafieldValue.SetRange(Namespace, _ShpfyMetafield.Namespace);
+        ShpfyMetafieldValue.SetRange(Name, _ShpfyMetafield.Name);
+        ShpfyMetafieldValue.SetRange(Type, _ShpfyMetafield.Type);
+        ShpfyMetafieldValue.SetRange(Value, ValueText);
+
+        if ShpfyMetafieldValue.IsEmpty() then begin
+            // Create new metafield value record
+            ShpfyMetafieldValue.Init();
+            ShpfyMetafieldValue."Entry No." := 0;
+            ShpfyMetafieldValue."Parent Table No." := _ShpfyMetafield."Parent Table No.";
+            ShpfyMetafieldValue.Namespace := _ShpfyMetafield.Namespace;
+            ShpfyMetafieldValue.Name := _ShpfyMetafield.Name;
+            ShpfyMetafieldValue.Type := _ShpfyMetafield.Type;
+            ShpfyMetafieldValue.Value := ValueText;
+
+            // Store additional metaobject data if available
+            if NodeId <> '' then
+                ShpfyMetafieldValue."Metafield ID" := NodeId;
+            if Handle <> '' then
+                ShpfyMetafieldValue."Metafield Handle" := Handle;
+            if DisplayName <> '' then
+                ShpfyMetafieldValue."Metafield Display Name" := DisplayName;
+
+            ShpfyMetafieldValue.Insert(true);
         end;
     end;
     //OTE Metafield 09.10.2025 JR STOP 

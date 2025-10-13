@@ -42,6 +42,18 @@ page 88071 "Shpfy Metafield Values"
                 {
                     ToolTip = 'Specifies the value of the Parent Table No. field.';
                 }
+                field("Metafield ID"; Rec."Metafield ID")
+                {
+                    ToolTip = 'Specifies the value of the Metafield ID field.';
+                }
+                field("Metafield Handle"; Rec."Metafield Handle")
+                {
+                    ToolTip = 'Specifies the value of the Metafield Handle field.';
+                }
+                field("Metafield Display Name"; Rec."Metafield Display Name")
+                {
+                    ToolTip = 'Specifies the value of the Metafield Display Name field.';
+                }
             }
         }
     }

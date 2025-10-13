@@ -56,6 +56,20 @@ table 88063 "Shpfy Metafield Value"
                 "Owner Type" := GetOwnerType("Parent Table No.");
             end;
         }
+        field(200; "Metafield ID"; text[150])
+        {
+            Caption = 'Metafield ID';
+            DataClassification = SystemMetadata;
+        }
+        field(201; "Metafield Handle"; text[250])
+        {
+
+        }
+        field(202; "Metafield Display Name"; text[250])
+        {
+            Caption = 'Metafield Display Name';
+            DataClassification = SystemMetadata;
+        }
     }
     keys
     {
