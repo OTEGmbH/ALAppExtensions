@@ -249,7 +249,15 @@ codeunit 88272 "Shpfy Product Export"
     local procedure CreateProductVariant(ProductId: BigInteger; Item: Record Item; ItemVariant: Record "Item Variant")
     var
         TempShopifyVariant: Record "Shpfy Variant" temporary;
+        ShpfyProductEvents: Codeunit "Shpfy Product Events";
+        Skip: boolean;
     begin
+        //OTE Skip other variants 08.07.2025 JR START
+        Skip := false;
+        ShpfyProductEvents.OnBeforeUpdateProductCreateProductVariant(ItemVariant, ProductId, Shop, Item, Skip);
+        if skip then
+            exit;
+        //OTE Skip other variants 08.07.2025 JR STOP 
         if ItemVariant.Blocked or ItemVariant."Sales Blocked" then begin
             SkippedRecord.LogSkippedRecord(ItemVariant.RecordId, ItemVariantIsBlockedLbl, Shop);
             exit;
@@ -589,6 +597,7 @@ codeunit 88272 "Shpfy Product Export"
         ItemUnitofMeasure: Record "Item Unit of Measure";
         ItemVariant: Record "Item Variant";
         ShopifyProduct: Record "Shpfy Product";
+        ShpfyProductEvents: Codeunit "Shpfy Product Events";
         TempShopifyProduct: Record "Shpfy Product" temporary;
         ShopifyVariant: Record "Shpfy Variant";
         RecordRef1: RecordRef;
@@ -625,6 +634,9 @@ codeunit 88272 "Shpfy Product Export"
                 ProductApi.UpdateProduct(ShopifyProduct, TempShopifyProduct);
                 ShopifyProduct.Modify();
             end;
+            //OTE ProductSet Color+Size Values 21.10.25 JR START
+            ShpfyProductEvents.OnAfterUpdateProduct(ShopifyProduct, Shop);
+            //OTE ProductSet Color+Size Values 21.10.25 JR START
             ShopifyVariant.SetRange("Product Id", ProductId);
             if ShopifyVariant.FindSet(false) then
                 repeat

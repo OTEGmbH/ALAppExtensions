@@ -413,6 +413,16 @@ codeunit 88271 "Shpfy Product Events"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeUpdateProductCreateProductVariant(var ItemVariant: Record "Item Variant"; ProductId: BigInteger; Shop: Record "Shpfy Shop"; Item: Record Item; var Skip: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterUpdateProduct(var ShopifyProduct: Record "Shpfy Product"; Shop: Record "Shpfy Shop")
+    begin
+    end;
+
     [InternalEvent(false)]
     internal procedure OnAfterPushShopifyVariantPrice(Shop: Record "Shpfy Shop"; var ShopifyVariant: Record "Shpfy Variant"; xShopifyVariant: Record "Shpfy Variant")
     begin
