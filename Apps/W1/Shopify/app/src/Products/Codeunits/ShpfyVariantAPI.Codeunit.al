@@ -66,6 +66,8 @@ codeunit 88285 "Shpfy Variant API"
         JVariants: JsonArray;
         JVariant: JsonToken;
     begin
+        //#TODO hier muss ProductSet geprüft werden
+
         InventoryQuantities := GetInventoryQuantities();
         GraphQuery.Append('{"query":"mutation { productVariantsBulkCreate(productId: \"gid://shopify/Product/');
         GraphQuery.Append(Format(ProductId));
