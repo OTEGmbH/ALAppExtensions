@@ -634,9 +634,7 @@ codeunit 88272 "Shpfy Product Export"
                 ProductApi.UpdateProduct(ShopifyProduct, TempShopifyProduct);
                 ShopifyProduct.Modify();
             end;
-            //OTE ProductSet Color+Size Values 21.10.25 JR START
-            ShpfyProductEvents.OnAfterUpdateProduct(ShopifyProduct, Shop);
-            //OTE ProductSet Color+Size Values 21.10.25 JR START
+
             ShopifyVariant.SetRange("Product Id", ProductId);
             if ShopifyVariant.FindSet(false) then
                 repeat
@@ -770,6 +768,10 @@ codeunit 88272 "Shpfy Product Export"
 
             if Shop."Product Metafields To Shopify" then
                 UpdateMetafields(ShopifyProduct.Id);
+
+            //OTE ProductSet Color+Size Values 21.10.25 JR START
+            ShpfyProductEvents.OnAfterUpdateProduct(ShopifyProduct, Shop);
+            //OTE ProductSet Color+Size Values 21.10.25 JR START
             UpdateProductTranslations(ShopifyProduct.Id, Item)
         end;
     end;
