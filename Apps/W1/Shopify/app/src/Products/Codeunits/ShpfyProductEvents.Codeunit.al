@@ -423,6 +423,11 @@ codeunit 88271 "Shpfy Product Events"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeAddMetafieldValueToGraphQL(MetafieldSet: Record "Shpfy Metafield"; var GraphQuery: TextBuilder; var isHandled: Boolean)
+    begin
+    end;
+
     [InternalEvent(false)]
     internal procedure OnAfterPushShopifyVariantPrice(Shop: Record "Shpfy Shop"; var ShopifyVariant: Record "Shpfy Variant"; xShopifyVariant: Record "Shpfy Variant")
     begin
