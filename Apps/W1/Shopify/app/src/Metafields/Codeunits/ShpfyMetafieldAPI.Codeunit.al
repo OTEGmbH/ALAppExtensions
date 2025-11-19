@@ -198,9 +198,10 @@ codeunit 88238 "Shpfy Metafield API"
         CollectMetafieldIds(ParentTableNo, OwnerId, MetafieldIds);
 
         foreach JItem in JMetafields do begin
-            JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node');
-            MetafieldId := UpdateMetadataField(ParentTableNo, OwnerId, JNode);
-            MetafieldIds.Remove(MetafieldId);
+            if JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node') then begin
+                MetafieldId := UpdateMetadataField(ParentTableNo, OwnerId, JNode);
+                MetafieldIds.Remove(MetafieldId);
+            end;
         end;
 
         DeleteUnusedMetafields(MetafieldIds);
@@ -231,8 +232,8 @@ codeunit 88238 "Shpfy Metafield API"
 
         if JsonHelper.GetJsonArray(JResponse, JMetafields, 'data.metafieldDefinitions.edges') then
             foreach JMetafield in JMetafields do begin
-                JsonHelper.GetJsonObject(JMetafield.AsObject(), JNode, 'node');
-                CreateMetafieldDefinition(ParentTableNo, OwnerId, JNode);
+                if JsonHelper.GetJsonObject(JMetafield.AsObject(), JNode, 'node') then
+                    CreateMetafieldDefinition(ParentTableNo, OwnerId, JNode);
             end;
 
 
