@@ -141,6 +141,9 @@ codeunit 88238 "Shpfy Metafield API"
     /// <param name="MetafieldSet">Metafield record to create the query for.</param>
     /// <param name="GraphQuery">Return value: TextBuilder to append the query to.</param>
     internal procedure CreateMetafieldQuery(MetafieldSet: Record "Shpfy Metafield"; GraphQuery: TextBuilder)
+    var
+        ShpfyProductEvents: Codeunit "Shpfy Product Events";
+        ishandled: boolean;
     begin
         GraphQuery.Append('{');
         GraphQuery.Append('key: \"');
@@ -154,9 +157,14 @@ codeunit 88238 "Shpfy Metafield API"
         GraphQuery.Append('/');
         GraphQuery.Append(Format(MetafieldSet."Owner Id"));
         GraphQuery.Append('\",');
-        GraphQuery.Append('value: \"');
-        GraphQuery.Append(EscapeGrapQLData(MetafieldSet.Value));
-        GraphQuery.Append('\",');
+        //OTE Metafield Formatting 28.10.2025 JR START
+        ShpfyProductEvents.OnBeforeAddMetafieldValueToGraphQL(MetafieldSet, GraphQuery, isHandled);
+        //OTE Metafield Formatting 28.10.2025 JR STOP
+        if not ishandled then begin
+            GraphQuery.Append('value: \"');
+            GraphQuery.Append(EscapeGrapQLData(MetafieldSet.Value));
+            GraphQuery.Append('\",');
+        end;
         GraphQuery.Append('type: \"');
         if MetafieldSet."List Metafield" then
             GraphQuery.Append('list.' + GetTypeName(MetafieldSet.Type))

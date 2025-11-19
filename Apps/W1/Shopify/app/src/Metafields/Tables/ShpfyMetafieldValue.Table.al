@@ -140,7 +140,10 @@ table 88063 "Shpfy Metafield Value"
             _ShpfyMetafield.modify(false);
         end else begin
             ShpfyMetafieldValues.GetRecord(ShpfyMetafieldValue);
-            _ShpfyMetafield.Value := ShpfyMetafieldValue.Value;
+            if ShpfyMetafieldValue."Metafield ID" <> '' then
+                _ShpfyMetafield.Value := ShpfyMetafieldValue."Metafield ID"
+            else
+                _ShpfyMetafield.Value := ShpfyMetafieldValue."Value";
             _ShpfyMetafield."Metafield Values" := ShpfyMetafieldValue.Value;
             _ShpfyMetafield.modify(false);
         end;

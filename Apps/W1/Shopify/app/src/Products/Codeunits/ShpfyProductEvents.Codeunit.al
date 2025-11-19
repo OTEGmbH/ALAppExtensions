@@ -343,7 +343,7 @@ codeunit 88271 "Shpfy Product Events"
     /// <param name="ShopifyVariant">Parameter of type Record "Shopify Variant".</param>
     /// <param name="xShopifyVariant">Parameter of type Record "Shopify Variant".</param>
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeSendUpdateShopifyProductVariant(ShopifyShop: Record "Shpfy Shop"; var ShopifyVariant: Record "Shpfy Variant"; xShopifyVariant: Record "Shpfy Variant")
+    internal procedure OnBeforeSendUpdateShopifyProductVariant(ShopifyShop: Record "Shpfy Shop"; var ShopifyVariant: Record "Shpfy Variant"; var xShopifyVariant: Record "Shpfy Variant")
     begin
     end;
 
@@ -420,6 +420,11 @@ codeunit 88271 "Shpfy Product Events"
 
     [IntegrationEvent(false, false)]
     internal procedure OnAfterUpdateProduct(var ShopifyProduct: Record "Shpfy Product"; Shop: Record "Shpfy Shop")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeAddMetafieldValueToGraphQL(MetafieldSet: Record "Shpfy Metafield"; var GraphQuery: TextBuilder; var isHandled: Boolean)
     begin
     end;
 

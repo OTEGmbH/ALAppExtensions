@@ -47,6 +47,11 @@ codeunit 88022 "Shpfy Comp. By Email/Phone" implements "Shpfy ICompany Mapping",
 
             if TempShopifyCustomer."Phone No." <> '' then
                 exit(FindByPhoneNo(ShopifyCompany, TempShopifyCustomer));
+
+            //OTE B2B 06.11.2025 JR START
+            if ShopifyCompany.Name <> '' then
+                exit(FindByName(ShopifyCompany, TempShopifyCustomer));
+            //OTE B2B 06.11.2025 JR STOP 
         end;
     end;
 
@@ -115,6 +120,29 @@ codeunit 88022 "Shpfy Comp. By Email/Phone" implements "Shpfy ICompany Mapping",
                 ShopifyCompany.Modify(true);
                 exit(true);
             end;
+        end;
+    end;
+
+    local procedure FindByName(var ShopifyCompany: Record "Shpfy Company"; TempShopifyCustomer: Record "Shpfy Customer" temporary): Boolean
+    var
+        Customer: Record Customer;
+        ShopifyCustomer: Record "Shpfy Customer";
+        CustomerMapping: Codeunit "Shpfy Customer Mapping";
+        PhoneFilter: Text;
+    begin
+        Clear(Customer);
+        Customer.SetFilter(Name, '@*' + ShopifyCompany.Name + '*');
+        if Customer.FindFirst() then begin
+            ShopifyCompany."Customer SystemId" := Customer.SystemId;
+            if not ShopifyCustomer.Get(TempShopifyCustomer.Id) then begin
+                ShopifyCustomer.Copy(TempShopifyCustomer);
+                ShopifyCustomer."Customer SystemId" := Customer.SystemId;
+                ShopifyCustomer.Insert(true);
+            end;
+
+            ShopifyCompany."Main Contact Customer Id" := ShopifyCustomer.Id;
+            ShopifyCompany.Modify(true);
+            exit(true);
         end;
     end;
 }

@@ -102,6 +102,16 @@ page 88031 "Shpfy Metafields"
                     MetafieldAPI.GetMetafieldDefinitions(ParentTableNo, OwnerId);
                 end;
             }
+            action("Send Metafield To Shopify")
+            {
+                Image = Action;
+                Caption = 'Send Metafield to Shopify';
+                ApplicationArea = All;
+                trigger OnAction()
+                begin
+                    Rec.Rename(SendMetafieldToShopify());
+                end;
+            }
         }
     }
 

@@ -317,10 +317,15 @@ codeunit 88017 "Shpfy Company API"
         Parameters.Add('CompanyId', Format(ShopifyCompany.Id));
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType::GetCompany, Parameters);
 
-        if not JsonHelper.GetJsonObject(JResponse, JCustomer, 'data.company.mainContact') then
-            exit(false)
-        else
+        //OTE B2B 06.11.2025 JR START
+        if JsonHelper.GetJsonObject(JResponse, JCustomer, 'data.company.mainContact') then
             UpdateShopifyCustomerFields(TempShopifyCustomer, JCustomer);
+
+        // if not JsonHelper.GetJsonObject(JResponse, JCustomer, 'data.company.mainContact') then
+        //     exit(false)
+        // else
+        //     UpdateShopifyCustomerFields(TempShopifyCustomer, JCustomer);
+        //OTE B2B 06.11.2025 JR STOP 
 
         if JsonHelper.GetJsonObject(JResponse, JCompany, 'data.company') then
             exit(UpdateShopifyCompanyFields(ShopifyCompany, JCompany));

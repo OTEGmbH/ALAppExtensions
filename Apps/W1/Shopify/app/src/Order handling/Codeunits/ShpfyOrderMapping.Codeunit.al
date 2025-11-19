@@ -185,9 +185,11 @@ codeunit 88243 "Shpfy Order Mapping"
         ProductImport: Codeunit "Shpfy Product Import";
     begin
         if not ShopifyVariant.Get(ShopifyOrderLine."Shopify Variant Id") or IsNullGuid(ShopifyVariant."Item SystemId") then begin
-            ProductImport.SetShop(Shop);
-            ProductImport.SetProduct(ShopifyOrderLine."Shopify Product Id");
-            ProductImport.Run();
+            if SHop."Sync Item" = shop."Sync Item"::"From Shopify" then begin
+                ProductImport.SetShop(Shop);
+                ProductImport.SetProduct(ShopifyOrderLine."Shopify Product Id");
+                ProductImport.Run();
+            end;
         end;
 
         if ShopifyVariant.Get(ShopifyOrderLine."Shopify Variant Id") then begin
