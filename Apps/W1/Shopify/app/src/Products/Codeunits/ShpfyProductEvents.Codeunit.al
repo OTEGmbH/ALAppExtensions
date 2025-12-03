@@ -432,6 +432,11 @@ codeunit 88271 "Shpfy Product Events"
     internal procedure OnAfterPushShopifyVariantPrice(Shop: Record "Shpfy Shop"; var ShopifyVariant: Record "Shpfy Variant"; xShopifyVariant: Record "Shpfy Variant")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeModifyOrderLineAfterMapVariant(var ShopifyOrderLine: Record "Shpfy Order Line"; SHop: Record "Shpfy Shop")
+    begin
+    end;
     //OTE OTE 19.09.2025 JR STOP 
 
 

@@ -215,6 +215,9 @@ codeunit 88243 "Shpfy Order Mapping"
         if (ShopifyOrderLine."Unit of Measure Code" = '') and (ShopifyOrderLine."Item No." <> '') then
             if Item.Get(ShopifyOrderLine."Item No.") then
                 ShopifyOrderLine."Unit of Measure Code" := Item."Sales Unit of Measure";
+        //OTE VariantMapping 03.12.2025 JR START
+
+        //OTE VariantMapping 03.12.2025 JR STOP 
         ShopifyOrderLine.Modify();
         exit(ShopifyOrderLine."Item No." <> '');
     end;
