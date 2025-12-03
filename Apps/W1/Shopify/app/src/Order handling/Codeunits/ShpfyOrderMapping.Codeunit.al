@@ -1,5 +1,6 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
 using Microsoft.Inventory.Item;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.BusinessRelation;
@@ -183,6 +184,7 @@ codeunit 88243 "Shpfy Order Mapping"
         IsHandled: boolean;
         ShopifyVariant: Record "Shpfy Variant";
         ProductImport: Codeunit "Shpfy Product Import";
+        ShpfyProductEvents: Codeunit "Shpfy Product Events";
     begin
         if not ShopifyVariant.Get(ShopifyOrderLine."Shopify Variant Id") or IsNullGuid(ShopifyVariant."Item SystemId") then begin
             if SHop."Sync Item" = shop."Sync Item"::"From Shopify" then begin
@@ -216,7 +218,7 @@ codeunit 88243 "Shpfy Order Mapping"
             if Item.Get(ShopifyOrderLine."Item No.") then
                 ShopifyOrderLine."Unit of Measure Code" := Item."Sales Unit of Measure";
         //OTE VariantMapping 03.12.2025 JR START
-
+        ShpfyProductEvents.OnBeforeModifyOrderLineAfterMapVariant(ShopifyOrderLine, SHop);
         //OTE VariantMapping 03.12.2025 JR STOP 
         ShopifyOrderLine.Modify();
         exit(ShopifyOrderLine."Item No." <> '');
