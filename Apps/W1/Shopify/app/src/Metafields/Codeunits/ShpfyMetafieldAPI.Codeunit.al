@@ -386,6 +386,8 @@ codeunit 88238 "Shpfy Metafield API"
     var
         ShpfyMetafieldValue: Record "Shpfy Metafield Value";
     begin
+        if _ShpfyMetafield.Type = _ShpfyMetafield.Type::metaobject_reference then
+            exit;
         // Check if this value already exists
         ShpfyMetafieldValue.Reset();
         ShpfyMetafieldValue.SetRange("Parent Table No.", _ShpfyMetafield."Parent Table No.");
@@ -402,7 +404,7 @@ codeunit 88238 "Shpfy Metafield API"
             ShpfyMetafieldValue.Namespace := _ShpfyMetafield.Namespace;
             ShpfyMetafieldValue.Name := _ShpfyMetafield.Name;
             ShpfyMetafieldValue.Type := _ShpfyMetafield.Type;
-            ShpfyMetafieldValue.Value := ValueText;
+            ShpfyMetafieldValue.Value := copystr(ValueText, 1, MaxStrLen(ShpfyMetafieldValue.Value));
 
             // Store additional metaobject data if available
             if NodeId <> '' then
@@ -412,7 +414,10 @@ codeunit 88238 "Shpfy Metafield API"
             if DisplayName <> '' then
                 ShpfyMetafieldValue."Metafield Display Name" := DisplayName;
 
+            // commit();
             ShpfyMetafieldValue.Insert(true);
+            // commit();
+
         end;
     end;
     //OTE Metafield 09.10.2025 JR STOP 
