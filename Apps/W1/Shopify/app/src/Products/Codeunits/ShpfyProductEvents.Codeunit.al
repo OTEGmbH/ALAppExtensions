@@ -439,5 +439,13 @@ codeunit 88271 "Shpfy Product Events"
     end;
     //OTE OTE 19.09.2025 JR STOP 
 
+    //OTE Channel on Item "Layer" 26.01.2026 JR START
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforePublishProduct(ShopifyProduct: Record "Shpfy Product"; var SalesChannel: Record "Shpfy Sales Channel"; var isHandled: Boolean)
+    begin
+    end;
+    //OTE Channel on Item "Layer" 26.01.2026 JR STOP
+
+
 
 }

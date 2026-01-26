@@ -1,5 +1,6 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
 using Microsoft.Inventory.Item;
 using System.Environment;
 
@@ -592,11 +593,17 @@ codeunit 88270 "Shpfy Product API"
     internal procedure PublishProduct(ShopifyProduct: Record "Shpfy Product")
     var
         SalesChannel: Record "Shpfy Sales Channel";
+        ShpfyProductEvents: Codeunit "Shpfy Product Events";
         GraphQuery: Text;
         JResponse: JsonToken;
+        isHandled: boolean;
     begin
-        if not FilterSalesChannelsToPublishTo(SalesChannel, ShopifyProduct."Shop Code") then
-            exit;
+        //OTE Channel on Item "Layer" 26.01.2026 JR START
+        ShpfyProductEvents.OnBeforePublishProduct(ShopifyProduct, SalesChannel, isHandled);
+        //OTE Channel on Item "Layer" 26.01.2026 JR STOP 
+        if not isHandled then
+            if not FilterSalesChannelsToPublishTo(SalesChannel, ShopifyProduct."Shop Code") then
+                exit;
 
         GraphQuery := CreateProductPublishGraphQuery(ShopifyProduct, SalesChannel);
 
