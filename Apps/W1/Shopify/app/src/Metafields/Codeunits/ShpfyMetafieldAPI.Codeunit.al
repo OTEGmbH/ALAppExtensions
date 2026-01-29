@@ -393,11 +393,8 @@ codeunit 88238 "Shpfy Metafield API"
     var
         ShpfyMetafieldValue: Record "Shpfy Metafield Value";
     begin
-        if _ShpfyMetafield.Type = _ShpfyMetafield.Type::metaobject_reference then
-            exit;
-
-
-
+        // if _ShpfyMetafield.Type = _ShpfyMetafield.Type::metaobject_reference then
+        //     exit;
         // Check if this value already exists
         ShpfyMetafieldValue.Reset();
         ShpfyMetafieldValue.SetRange("Parent Table No.", _ShpfyMetafield."Parent Table No.");
