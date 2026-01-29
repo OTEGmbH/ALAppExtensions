@@ -446,6 +446,11 @@ codeunit 88271 "Shpfy Product Events"
     end;
     //OTE Channel on Item "Layer" 26.01.2026 JR STOP
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeAddSingleMetafieldValue(_ShpfyMetafield: Record "Shpfy Metafield"; FieldKey: Text; FieldValue: Text; FieldType: Text; NodeId: Text; Handle: Text; DisplayName: Text; var isHandled: boolean)
+    begin
+    end;
+
 
 
 }

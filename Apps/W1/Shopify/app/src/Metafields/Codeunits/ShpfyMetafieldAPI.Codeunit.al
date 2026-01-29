@@ -351,6 +351,8 @@ codeunit 88238 "Shpfy Metafield API"
         FieldKey: Text;
         FieldValue: Text;
         FieldType: Text;
+        ShpfyProductEvents: Codeunit "Shpfy Product Events";
+        IsHandled: boolean;
     begin
         // Get the edges array
         if JsonHelper.GetJsonArray(JResponse, JEdges, 'data.metaobjectDefinition.metaobjects.edges') then begin
@@ -370,8 +372,13 @@ codeunit 88238 "Shpfy Metafield API"
                             FieldValue := JsonHelper.GetValueAsText(JField.AsObject(), 'value');
                             FieldType := JsonHelper.GetValueAsText(JField.AsObject(), 'type');
 
+                            //OTE Metafield 29.01.2026 JR START
+                            IsHandled := false;
+                            ShpfyProductEvents.OnBeforeAddSingleMetafieldValue(_ShpfyMetafield, FieldKey, FieldValue, FieldType, NodeId, Handle, DisplayName, IsHandled);
+                            //OTE Metafield 29.01.2026 JR STOP 
                             // Create metafield value record with all extracted data
-                            CreateSingleMetafieldValue(_ShpfyMetafield, FieldValue, NodeId, Handle, DisplayName);
+                            if not IsHandled then
+                                CreateSingleMetafieldValue(_ShpfyMetafield, FieldValue, NodeId, Handle, DisplayName);
                         end;
                     end else begin
                         // If no fields, create entry with just the node data
@@ -388,6 +395,9 @@ codeunit 88238 "Shpfy Metafield API"
     begin
         if _ShpfyMetafield.Type = _ShpfyMetafield.Type::metaobject_reference then
             exit;
+
+
+
         // Check if this value already exists
         ShpfyMetafieldValue.Reset();
         ShpfyMetafieldValue.SetRange("Parent Table No.", _ShpfyMetafield."Parent Table No.");
@@ -508,4 +518,6 @@ codeunit 88238 "Shpfy Metafield API"
     local procedure OnAfterRetrieveMetafieldsFromShopify(ParentTableId: Integer; OwnerId: BigInteger; MetafieldIds: Dictionary of [BigInteger, DateTime])
     begin
     end;
+
+
 }
