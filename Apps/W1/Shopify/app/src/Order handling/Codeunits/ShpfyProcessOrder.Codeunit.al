@@ -217,6 +217,9 @@ codeunit 88246 "Shpfy Process Order"
         if ShopifyOrderLine.FindSet() then
             repeat
                 OrderEvents.OnBeforeCreateItemSalesLine(ShopifyOrderHeader, ShopifyOrderLine, SalesHeader, SalesLine, IsHandled);
+                //OTE As Var 31.03.2026 JR START
+                OrderEvents.OnBeforeCreateItemSalesLineAsVar(ShopifyOrderHeader, ShopifyOrderLine, SalesHeader, SalesLine, IsHandled);
+                //OTE As Var 31.03.2026 JR STOP 
                 if not IsHandled then begin
                     SalesLine.Init();
                     SalesLine.SetHideValidationDialog(true);

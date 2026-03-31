@@ -186,9 +186,19 @@ codeunit 88242 "Shpfy Order Events"
     /// <param name="SalesHeader">Parameter of type Record "Sales Header".</param>
     /// <param name="SalesLine">Parameter of type Record "Sales Line".</param>
     /// <param name="Handled">Parameter of type Boolean.</param>
+
     internal procedure OnBeforeCreateItemSalesLine(ShopifyOrderHeader: Record "Shpfy Order Header"; ShopifyOrderLine: Record "Shpfy Order Line"; SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var Handled: Boolean)
     begin
     end;
+
+    //OTE As Var 31.03.2026 JR START
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCreateItemSalesLineAsVar(ShopifyOrderHeader: Record "Shpfy Order Header"; var ShopifyOrderLine: Record "Shpfy Order Line"; SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var Handled: Boolean)
+    begin
+    end;
+    //OTE As Var 31.03.2026 JR STOP 
+
+
 
     [InternalEvent(false)]
     internal procedure OnBeforeTranslateCurrencyCode(ShopifyCurrencyCode: Text; var CurrencyCode: Code[10]; var IsHandled: Boolean)
