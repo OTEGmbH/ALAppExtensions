@@ -221,7 +221,9 @@ codeunit 88243 "Shpfy Order Mapping"
         ShpfyProductEvents.OnBeforeModifyOrderLineAfterMapVariant(ShopifyOrderLine, SHop);
         //OTE VariantMapping 03.12.2025 JR STOP 
         ShopifyOrderLine.Modify();
-        exit(ShopifyOrderLine."Item No." <> '');
+
+        //Skip Item Mapping makes it possible to skip if its for example a g/l account or any other type etc.
+        exit((ShopifyOrderLine."Item No." <> '') or (ShopifyOrderLine."Skip Item Mapping"));
     end;
 
     local procedure FindContactNo(ContactName: Text[100]; CustomerNo: Code[20]): Code[20]
