@@ -766,7 +766,9 @@ codeunit 88272 "Shpfy Product Export"
                         until ItemUnitofMeasure.Next() = 0;
             end;
 
-            if Shop."Product Metafields To Shopify" then
+
+            //if (Shop."Product Metafields To Shopify")
+            if (Shop."Product Metafields To Shopify") and (not ShopifyProduct."Skip Metafields") then
                 UpdateMetafields(ShopifyProduct.Id);
 
             //OTE ProductSet Color+Size Values 21.10.25 JR START

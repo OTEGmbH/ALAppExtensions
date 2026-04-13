@@ -131,6 +131,10 @@ page 88059 "Shpfy Products"
                         CurrPage.SaveRecord();
                     end;
                 }
+                field("Skip Metafields"; Rec."Skip Metafields")
+                {
+                    ApplicationArea = All;
+                }
                 field(CreatedAt; Rec."Created At")
                 {
                     ApplicationArea = All;

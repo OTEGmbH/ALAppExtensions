@@ -170,6 +170,11 @@ table 88049 "Shpfy Product"
             Caption = 'Group Description 3';
             DataClassification = CustomerContent;
         }
+        field(88013; "Skip Metafields"; boolean)
+        {
+            Caption = 'Skip Metafields';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
