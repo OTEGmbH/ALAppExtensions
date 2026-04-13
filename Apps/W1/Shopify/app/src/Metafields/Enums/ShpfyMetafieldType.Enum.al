@@ -167,4 +167,10 @@ enum 88027 "Shpfy Metafield Type" implements "Shpfy IMetafield Type"
         Caption = 'Company';
         Implementation = "Shpfy IMetafield Type" = "Shpfy Mtfld Type Company Ref";
     }
+
+    value(27; rich_text_field)
+    {
+        Caption = 'Rich text';
+        Implementation = "Shpfy IMetafield Type" = "Shpfy Mtfld Type Multi Text";
+    }
 }

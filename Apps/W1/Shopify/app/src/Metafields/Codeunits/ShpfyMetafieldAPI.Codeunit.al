@@ -401,7 +401,7 @@ codeunit 88238 "Shpfy Metafield API"
         ShpfyMetafieldValue.SetRange(Namespace, _ShpfyMetafield.Namespace);
         ShpfyMetafieldValue.SetRange(Name, _ShpfyMetafield.Name);
         ShpfyMetafieldValue.SetRange(Type, _ShpfyMetafield.Type);
-        ShpfyMetafieldValue.SetRange(Value, ValueText);
+        ShpfyMetafieldValue.SetRange(Value, copystr(ValueText, 1, MaxStrLen(ShpfyMetafieldValue.Value)));
 
         if ShpfyMetafieldValue.IsEmpty() then begin
             // Create new metafield value record
@@ -421,7 +421,7 @@ codeunit 88238 "Shpfy Metafield API"
             if DisplayName <> '' then
                 ShpfyMetafieldValue."Metafield Display Name" := DisplayName;
 
-            // commit();
+            commit();
             ShpfyMetafieldValue.Insert(true);
             // commit();
 
