@@ -165,6 +165,14 @@ table 88033 "Shpfy Order Line"
                     ErrorIfSalesOrderExists();
             end;
         }
+
+        //OTE New Field for skipping mapping 02.04.2026 JR START
+        field(88000; "Skip Item Mapping"; boolean)
+        {
+            Caption = 'Skip Item Mapping';
+            DataClassification = ToBeClassified;
+        }
+        //OTE New Field for skipping mapping 02.04.2026 JR STOP 
     }
 
     keys

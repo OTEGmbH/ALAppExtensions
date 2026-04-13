@@ -1,4 +1,5 @@
 namespace OTE.Shopify;
+using app.app;
 
 /// <summary>
 /// Page Shpfy Catalogs (ID 30159).
@@ -179,6 +180,27 @@ page 88009 "Shpfy Catalogs"
                         SyncCatalogsPrices.Run();
                     end;
                 end;
+            }
+            group("Catalog without Customer")
+            {
+                action(GetCatalogsWithoutCustomer)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Get Catalogs without Company';
+                    Image = Import;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    ToolTip = 'Get catalogs from Shopify.';
+
+                    trigger OnAction()
+                    var
+                        ShopifyCompany: Record "Shpfy Company";
+                        SyncCatalogs: Report "Shpfy Sync Catalog w.o Company";
+                    begin
+                        SyncCatalogs.Run();
+                    end;
+                }
             }
         }
     }

@@ -60,6 +60,11 @@ page 88044 "Shpfy Order Subform"
                     Editable = false;
                     ToolTip = 'Specifies the description of the variant to be sold.';
                 }
+                field("Skip Item Mapping"; Rec."Skip Item Mapping")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Skip Item Mapping field.';
+                }
                 field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
