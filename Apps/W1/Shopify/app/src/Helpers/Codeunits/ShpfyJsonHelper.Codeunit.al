@@ -175,12 +175,13 @@ codeunit 88191 "Shpfy Json Helper"
 
         TokenPaths := TokenPath.Split('.');
         foreach TokenPath in TokenPaths do
-            if JToken.AsObject().Get(TokenPath, JToken) then
+            if JToken.AsObject().Get(TokenPath, JToken) then begin
                 if TokenPaths.IndexOf(TokenPath) = TokenPaths.Count then
                     if JToken.IsArray then begin
                         JResult := JToken.AsArray();
                         exit(true);
                     end;
+            end;
     end;
 
     /// <summary> 
@@ -193,6 +194,52 @@ codeunit 88191 "Shpfy Json Helper"
     internal procedure GetJsonArray(JObject: JsonObject; var JResult: JsonArray; TokenPath: text): Boolean
     begin
         exit(GetJsonArray(JObject.AsToken(), JResult, TokenPath));
+    end;
+
+    /// <summary> 
+    /// Get Json Array, safely handling null/value tokens anywhere in the path.
+    /// Use instead of GetJsonArray when the JSON response may contain null objects along the path.
+    /// </summary>
+    /// <param name="JToken">Parameter of type JsonToken.</param>
+    /// <param name="JResult">Parameter of type JsonArray.</param>
+    /// <param name="TokenPath">Parameter of type Text contains the path members combined with the .-char.</param>
+    /// <returns>Return value of type Boolean.</returns>
+    internal procedure GetJsonArraySafe(JToken: JsonToken; var JResult: JsonArray; TokenPath: Text): Boolean
+    var
+        TokenPaths: List of [Text];
+    begin
+        if JToken.IsValue then
+            exit(false);
+
+        Clear(JResult);
+        if JToken.IsArray and (TokenPath = '') then begin
+            JResult := JToken.AsArray();
+            exit(true);
+        end;
+
+        TokenPaths := TokenPath.Split('.');
+        foreach TokenPath in TokenPaths do begin
+            if not JToken.IsValue then
+                if JToken.AsObject().Get(TokenPath, JToken) then begin
+                    if TokenPaths.IndexOf(TokenPath) = TokenPaths.Count then
+                        if JToken.IsArray then begin
+                            JResult := JToken.AsArray();
+                            exit(true);
+                        end;
+                end;
+        end;
+    end;
+
+    /// <summary> 
+    /// Get Json Array, safely handling null/value tokens anywhere in the path.
+    /// </summary>
+    /// <param name="JObject">Parameter of type JsonObject.</param>
+    /// <param name="JResult">Parameter of type JsonArray.</param>
+    /// <param name="TokenPath">Parameter of type Text contains the path members combined with the .-char.</param>
+    /// <returns>Return value of type Boolean.</returns>
+    internal procedure GetJsonArraySafe(JObject: JsonObject; var JResult: JsonArray; TokenPath: Text): Boolean
+    begin
+        exit(GetJsonArraySafe(JObject.AsToken(), JResult, TokenPath));
     end;
     #endregion GetJsonArray
 

@@ -121,8 +121,8 @@ codeunit 88015 "Shpfy Catalog API"
                     break;
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.catalog.priceList.prices.pageInfo.hasNextPage');
 
-        // If priceList is null, ExtractShopifyCatalogPrices will fail and HasPriceList remains false
-        if not HasPriceList then
+        // If priceList is null or empty (no custom prices set yet), fall back to default variant prices
+        if (not HasPriceList) or TempCatalogPrice.IsEmpty() then
             GetCatalogDefaultPrices(Catalog, TempCatalogPrice);
     end;
 
@@ -184,7 +184,7 @@ codeunit 88015 "Shpfy Catalog API"
         JEdge: JsonToken;
         JNode: JsonObject;
     begin
-        if JsonHelper.GetJsonArray(JResponse, JCatalogs, 'data.catalog.priceList.prices.edges') then begin
+        if JsonHelper.GetJsonArraySafe(JResponse, JCatalogs, 'data.catalog.priceList.prices.edges') then begin
             foreach JEdge in JCatalogs do begin
                 Cursor := JsonHelper.GetValueAsText(JEdge.AsObject(), 'cursor');
                 if JsonHelper.GetJsonObject(JEdge.AsObject(), JNode, 'node') then
