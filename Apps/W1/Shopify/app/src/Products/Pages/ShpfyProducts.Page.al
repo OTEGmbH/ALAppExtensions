@@ -319,6 +319,61 @@ page 88059 "Shpfy Products"
                     Tags.RunModal();
                 end;
             }
+            action(UpdateTagsToShopify)
+            {
+                ApplicationArea = All;
+                Caption = 'Update Tags to Shopify';
+                Image = UpdateUnitCost;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                ToolTip = 'Push the current tags from Business Central to Shopify for the selected products. This overwrites any tags on Shopify with the local tags. If no tags exist locally, the tags on Shopify will be cleared.';
+
+                trigger OnAction()
+                var
+                    ShopifyProduct: Record "Shpfy Product";
+                    ProductApi: Codeunit "Shpfy Product API";
+                begin
+                    CurrPage.SetSelectionFilter(ShopifyProduct);
+                    if ShopifyProduct.FindSet() then begin
+                        ProductApi.SetShop(ShopifyProduct."Shop Code");
+                        repeat
+                            ProductApi.UpdateProductTags(ShopifyProduct);
+                        until ShopifyProduct.Next() = 0;
+                    end;
+                end;
+            }
+            action(ClearTagsOnShopify)
+            {
+                ApplicationArea = All;
+                Caption = 'Clear Tags on Shopify';
+                Image = Delete;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                ToolTip = 'Remove all tags from the selected products directly on Shopify. Local tags in Business Central are not deleted.';
+
+                trigger OnAction()
+                var
+                    ShopifyProduct: Record "Shpfy Product";
+                    ProductApi: Codeunit "Shpfy Product API";
+                    ConfirmQst: Label 'Do you want to clear all tags on Shopify for the selected %1 product(s)?', Comment = '%1 = number of selected products';
+                begin
+                    CurrPage.SetSelectionFilter(ShopifyProduct);
+                    if ShopifyProduct.IsEmpty() then
+                        exit;
+                    if not Confirm(ConfirmQst, false, ShopifyProduct.Count()) then
+                        exit;
+                    if ShopifyProduct.FindSet() then begin
+                        ProductApi.SetShop(ShopifyProduct."Shop Code");
+                        repeat
+                            ProductApi.ClearProductTags(ShopifyProduct);
+                        until ShopifyProduct.Next() = 0;
+                    end;
+                end;
+            }
             action(Metafields)
             {
                 ApplicationArea = All;

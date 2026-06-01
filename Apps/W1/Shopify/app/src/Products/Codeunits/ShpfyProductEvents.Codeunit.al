@@ -451,6 +451,13 @@ codeunit 88271 "Shpfy Product Events"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeUpdateProductTags(Shop: Record "Shpfy Shop"; var ShopifyProduct: Record "Shpfy Product")
+    begin
+    end;
+
+
+
 
 
 }

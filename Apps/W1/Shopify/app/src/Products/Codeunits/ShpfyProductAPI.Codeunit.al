@@ -510,6 +510,50 @@ codeunit 88270 "Shpfy Product API"
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQuery.ToText());
     end;
 
+    /// <summary>
+    /// Clears all tags of a Shopify product by sending an empty tags value via productUpdate.
+    /// </summary>
+    /// <param name="ShopifyProduct">The Shopify product whose tags should be cleared.</param>
+    internal procedure ClearProductTags(ShopifyProduct: Record "Shpfy Product")
+    var
+        JResponse: JsonToken;
+        GraphQuery: TextBuilder;
+    begin
+        GraphQuery.Append('{"query":"mutation {productUpdate(product: {id: \"gid://shopify/Product/');
+        GraphQuery.Append(Format(ShopifyProduct.Id));
+        GraphQuery.Append('\", tags: \"\"}) ');
+        GraphQuery.Append('{product {id, updatedAt}, userErrors {field, message}}');
+        GraphQuery.Append('}"}');
+
+        JResponse := CommunicationMgt.ExecuteGraphQL(GraphQuery.ToText());
+    end;
+
+    /// <summary>
+    /// Updates the tags of a Shopify product from the local Shpfy Tag table.
+    /// Sends all current tags (or an empty string to clear) to Shopify via productUpdate.
+    /// </summary>
+    /// <param name="ShopifyProduct">The Shopify product whose tags should be updated.</param>
+    internal procedure UpdateProductTags(var ShopifyProduct: Record "Shpfy Product")
+    var
+        JResponse: JsonToken;
+        Data: Text;
+        GraphQuery: TextBuilder;
+        ShpfyProductEvents: Codeunit "Shpfy Product Events";
+    begin
+        ShpfyProductEvents.OnBeforeUpdateProductTags(Shop, ShopifyProduct);
+        Data := ShopifyProduct.GetCommaSeparatedTags();
+        GraphQuery.Append('{"query":"mutation {productUpdate(product: {id: \"gid://shopify/Product/');
+        GraphQuery.Append(Format(ShopifyProduct.Id));
+        GraphQuery.Append('\", tags: \"');
+        GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(Data));
+        GraphQuery.Append('\"}) ');
+        GraphQuery.Append('{product {id, updatedAt}, userErrors {field, message}}');
+        GraphQuery.Append('}"}');
+
+        JResponse := CommunicationMgt.ExecuteGraphQL(GraphQuery.ToText());
+        ShopifyProduct."Updated At" := JsonHelper.GetValueAsDateTime(JResponse, 'data.productUpdate.product.updatedAt');
+    end;
+
     /// <summary> 
     /// Update Shopify Product Fields.
     /// </summary>
