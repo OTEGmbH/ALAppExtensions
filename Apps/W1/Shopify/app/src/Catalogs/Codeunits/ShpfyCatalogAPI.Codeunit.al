@@ -417,7 +417,7 @@ codeunit 88015 "Shpfy Catalog API"
                     Catalog."Shop Code" := Shop.Code;
                     Catalog.Name := CopyStr(JsonHelper.GetValueAsText(JNode, 'title'), 1, MaxStrLen(Catalog.Name));
                     if Catalog.Name.ToLower().Contains('channel catalog') then
-                        exit;
+                        continue;
 
                     Catalog.SetRange(Id, CatalogId);
                     // Catalog.SetRange("Company SystemId", ShopifyCompany.SystemId);
