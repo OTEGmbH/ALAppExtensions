@@ -128,4 +128,9 @@ codeunit 88036 "Shpfy Customer Events"
     internal procedure OnBeforeSkipCustomerCreation(Customer: Record Customer; Shop: Record "Shpfy Shop"; SkippedRecord: Codeunit OTE.Shopify."Shpfy Skipped Record"; var isHandled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeUpdateShopifyCustomerBeforeFindCustomerAddress(Customer: Record Customer; var ShopifyCustomer: Record "Shpfy Customer"; Shop: Record "Shpfy Shop"; var CustomerAddress: Record "Shpfy Customer Address"; var Skipaddress: Boolean)
+    begin
+    end;
 }

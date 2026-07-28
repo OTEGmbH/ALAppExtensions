@@ -44,7 +44,10 @@ codeunit 88045 "Shpfy Sync Customers"
     var
         Customer: Record Customer;
     begin
-        CustomerExport.SetCreateCustomers(false);
+        if G_CustomerSet then
+            CustomerExport.SetCreateCustomers(true)
+        else
+            CustomerExport.SetCreateCustomers(false);
         //OTE Customer sync 07.10.2025 JR START
         if G_CustomerSet then
             CustomerExport.Run(G_Customer)

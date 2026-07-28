@@ -266,12 +266,19 @@ codeunit 88037 "Shpfy Customer Export"
     local procedure UpdateShopifyCustomer(Customer: Record Customer; var ShopifyCustomer: Record "Shpfy Customer")
     var
         CustomerAddress: Record "Shpfy Customer Address";
+        ShpfyCustomerEvents: Codeunit "Shpfy Customer Events";
+        Skipaddress: boolean;
     begin
-        CustomerAddress.SetRange("Customer Id", ShopifyCustomer.Id);
-        CustomerAddress.SetRange(Default, true);
-        if not CustomerAddress.FindFirst() then begin
-            CustomerAddress.SetRange(Default);
-            CustomerAddress.FindFirst();
+        //OTE Sometimes Customer Address can be empty 27.07.2026 JR START
+        shpfycustomerevents.OnBeforeUpdateShopifyCustomerBeforeFindCustomerAddress(Customer, ShopifyCustomer, Shop, CustomerAddress, Skipaddress);
+        //OTE Sometimes Customer Address can be empty 27.07.2026 JR STOP 
+        if not Skipaddress then begin
+            CustomerAddress.SetRange("Customer Id", ShopifyCustomer.Id);
+            CustomerAddress.SetRange(Default, true);
+            if not CustomerAddress.FindFirst() then begin
+                CustomerAddress.SetRange(Default);
+                CustomerAddress.FindFirst();
+            end;
         end;
 
         if FillInShopifyCustomerData(Customer, ShopifyCustomer, CustomerAddress) then begin
