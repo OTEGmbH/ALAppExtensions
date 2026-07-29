@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Comp. Locations Subform (ID 30170).
 /// </summary>
-page 88013 "Shpfy Comp. Locations Subform"
+page 30170 "Shpfy Comp. Locations Subform"
 {
     ApplicationArea = All;
     Caption = 'Locations';

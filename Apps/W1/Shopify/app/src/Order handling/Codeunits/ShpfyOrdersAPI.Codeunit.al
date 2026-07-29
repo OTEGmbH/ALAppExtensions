@@ -1,11 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using OTE.Shopify;
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Orders API (ID 30165).
 /// </summary>
-codeunit 88245 "Shpfy Orders API"
+codeunit 30165 "Shpfy Orders API"
 {
     Access = Internal;
 
@@ -34,7 +37,6 @@ codeunit 88245 "Shpfy Orders API"
     internal procedure GetOrdersToImport(ShopifyShop: Record "Shpfy Shop")
     var
         OrdersToImport: Record "Shpfy Orders to Import";
-        ShpfyOrderEvents: Codeunit "Shpfy Order Events";
         LastSyncTime: DateTime;
         NewSyncTime: DateTime;
         Cursor: Text;
@@ -45,16 +47,11 @@ codeunit 88245 "Shpfy Orders API"
 
         Clear(OrdersToImport);
         LastSyncTime := ShopifyShop.GetLastSyncTime("Shpfy Synchronization Type"::Orders);
-        //OTE JR 26.08.2025 JR START
-        ShpfyOrderEvents.OnBeforeSetLastTimeStamp(ShopifyShop, LastSyncTime);
-        //OTE JR 26.08.2025 JR STOP 
-
-
         Parameters.Add('Time', Format(LastSyncTime, 0, 9));
         if LastSyncTime = Shop.GetEmptySyncTime() then
-            GraphQLType := "Shpfy GraphQL Type"::GetOpenOrdersToImport
+            GraphQLType := "Shpfy GraphQL Type"::Orders_GetOpenOrdersToImport
         else
-            GraphQLType := "Shpfy GraphQL Type"::GetOrdersToImport;
+            GraphQLType := "Shpfy GraphQL Type"::Orders_GetOrdersToImport;
         NewSyncTime := CurrentDateTime;
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
@@ -65,15 +62,12 @@ codeunit 88245 "Shpfy Orders API"
                     else
                         Parameters.Add('After', Cursor);
                     if LastSyncTime = Shop.GetEmptySyncTime() then
-                        GraphQLType := "Shpfy GraphQL Type"::GetNextOpenOrdersToImport
+                        GraphQLType := "Shpfy GraphQL Type"::Orders_GetNextOpenOrdersToImport
                     else
-                        GraphQLType := "Shpfy GraphQL Type"::GetNextOrdersToImport;
+                        GraphQLType := "Shpfy GraphQL Type"::Orders_GetNextOrdersToImport;
                 end else
                     break;
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.orders.pageInfo.hasNextPage');
-        //OTE JR 26.08.2025 JR START
-        ShpfyOrderEvents.OnBeforeSetLastSyncTime(ShopifyShop, NewSyncTime, LastSyncTime);
-        //OTE JR 26.08.2025 JR STOP 
         ShopifyShop.SetLastSyncTime("Shpfy Synchronization Type"::Orders, NewSyncTime);
         Commit();
     end;
@@ -120,14 +114,16 @@ codeunit 88245 "Shpfy Orders API"
         JAttrib: JsonObject;
     begin
         CommunicationMgt.SetShop(ShopifyShop);
-        if CommunicationMgt.GetTestInProgress() then
-            exit;
         Clear(OrderAttribute);
         OrderAttribute."Order Id" := OrderHeader."Shopify Order Id";
         OrderAttribute."Key" := CopyStr(KeyName, 1, MaxStrLen(OrderAttribute."Key"));
-        OrderAttribute."Attribute Value" := CopyStr(Value, 1, MaxStrLen(OrderAttribute."Attribute Value"));
-        if not OrderAttribute.Insert() then
+        if OrderAttribute.Get(OrderAttribute."Order Id", OrderAttribute."Key") then begin
+            OrderAttribute."Attribute Value" := CopyStr(Value, 1, MaxStrLen(OrderAttribute."Attribute Value"));
             OrderAttribute.Modify();
+        end else begin
+            OrderAttribute."Attribute Value" := CopyStr(Value, 1, MaxStrLen(OrderAttribute."Attribute Value"));
+            OrderAttribute.Insert();
+        end;
 
         Clear(OrderAttribute);
         OrderAttribute.SetRange("Order Id", OrderHeader."Shopify Order Id");
@@ -141,7 +137,7 @@ codeunit 88245 "Shpfy Orders API"
 
         Parameters.Add('OrderId', Format(OrderHeader."Shopify Order Id"));
         Parameters.Add('CustomAttributes', Format(JAttributes).Replace('"key"', 'key').Replace('"value"', 'value').Replace('\', '\\').Replace('"', '\"'));
-        CommunicationMgt.ExecuteGraphQL(GraphQLType::UpdateOrderAttributes, Parameters);
+        CommunicationMgt.ExecuteGraphQL(GraphQLType::Orders_UpdateOrderAttributes, Parameters);
     end;
 
     /// <summary> 
@@ -190,7 +186,6 @@ codeunit 88245 "Shpfy Orders API"
     var
         OrdersToImport: Record "Shpfy Orders to Import";
         OrderHeader: Record "Shpfy Order Header";
-        ShpfyOrderEvents: Codeunit "Shpfy Order Events";
         RecordRef: RecordRef;
         Id: BigInteger;
         JArray: JsonArray;
@@ -209,7 +204,6 @@ codeunit 88245 "Shpfy Orders API"
                 if JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node') then begin
                     Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
                     Closed := JsonHelper.GetValueAsBoolean(JNode, 'closed');
-
                     OrdersToImport.SetRange(Id, Id);
                     if not OrdersToImport.FindFirst() then
                         Clear(OrdersToImport);
@@ -226,9 +220,9 @@ codeunit 88245 "Shpfy Orders API"
                     JsonHelper.GetValueIntoField(JNode, 'totalPriceSet.shopMoney.amount', RecordRef, OrdersToImport.FieldNo("Order Amount"));
                     JsonHelper.GetValueIntoField(JNode, 'totalPriceSet.shopMoney.currencyCode', RecordRef, OrdersToImport.FieldNo("Currency Code"));
                     JsonHelper.GetValueIntoField(JNode, 'channel.name', RecordRef, OrdersToImport.FieldNo("Channel Name"));
-                    JsonHelper.GetValueIntoField(JNode, 'displayAddress.countryCode', RecordRef, OrdersToImport.FieldNo("Sell-to Country/Region Code"));
-                    JsonHelper.GetValueIntoField(JNode, 'shippingAddress.countryCode', RecordRef, OrdersToImport.FieldNo("Ship-to Country/Region Code"));
-                    JsonHelper.GetValueIntoField(JNode, 'billingAddress.countryCode', RecordRef, OrdersToImport.FieldNo("Bill-to Country/Region Code"));
+                    JsonHelper.GetValueIntoField(JNode, 'displayAddress.countryCodeV2', RecordRef, OrdersToImport.FieldNo("Sell-to Country/Region Code"));
+                    JsonHelper.GetValueIntoField(JNode, 'shippingAddress.countryCodeV2', RecordRef, OrdersToImport.FieldNo("Ship-to Country/Region Code"));
+                    JsonHelper.GetValueIntoField(JNode, 'billingAddress.countryCodeV2', RecordRef, OrdersToImport.FieldNo("Bill-to Country/Region Code"));
                     JsonHelper.GetValueIntoField(JNode, 'totalTaxSet.shopMoney.amount', RecordRef, OrdersToImport.FieldNo("VAT Amount"));
                     JsonHelper.GetValueIntoField(JNode, 'totalTaxSet.presentmentMoney.amount', RecordRef, OrdersToImport.FieldNo("Presentment VAT Amount"));
                     RecordRef.SetTable(OrdersToImport);
@@ -251,10 +245,8 @@ codeunit 88245 "Shpfy Orders API"
                         end;
                         OrdersToImport.Tags := CopyStr(Tags.ToText(), 2, MaxStrLen(OrdersToImport.Tags));
                     end;
-                    //OTE JR 27.08.2025 JR START
-                    ShpfyOrderEvents.OnAfterSetOrderClosed(closed, OrdersToImport, ShopifyShop);
-                    //OTE JR 27.08.2025 JR STOP 
                     OrdersToImport."High Risk" := IsHighRiskOrder(JNode);
+                    OrdersToImport."Channel Liable Taxes" := ContainsChannelLiableTax(JNode);
                     OrderHeader.SetRange("Shopify Order Id", Id);
                     if OrderHeader.IsEmpty then
                         OrdersToImport."Import Action" := OrdersToImport."Import Action"::New
@@ -278,7 +270,7 @@ codeunit 88245 "Shpfy Orders API"
     begin
         ShopifyShop.Get(ShopCode);
         CommunicationMgt.SetShop(ShopifyShop);
-        GraphQLType := "Shpfy GraphQL Type"::MarkOrderAsPaid;
+        GraphQLType := "Shpfy GraphQL Type"::Orders_MarkOrderAsPaid;
         Parameters.Add('OrderId', Format(OrderId));
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
         exit(JsonHelper.GetValueAsBoolean(JResponse, 'data.orderMarkAsPaid.order.fullyPaid'));
@@ -292,7 +284,7 @@ codeunit 88245 "Shpfy Orders API"
     begin
         ShopifyShop.Get(ShopCode);
         CommunicationMgt.SetShop(ShopifyShop);
-        GraphQLType := "Shpfy GraphQL Type"::OrderCancel;
+        GraphQLType := "Shpfy GraphQL Type"::Orders_OrderCancel;
         Parameters.Add('OrderId', Format(OrderId));
         if CancelReason in [CancelReason::" ", CancelReason::Unknown] then
             CancelReason := CancelReason::Other;
@@ -317,5 +309,23 @@ codeunit 88245 "Shpfy Orders API"
                 if RiskLevel = RiskLevel::High then
                     exit(true);
             end;
+    end;
+
+    local procedure ContainsChannelLiableTax(JOrder: JsonObject): Boolean
+    var
+        JTaxLines: JsonArray;
+        JTaxLine: JsonToken;
+    begin
+        if not JsonHelper.GetJsonArray(JOrder, JTaxLines, 'taxLines') then
+            exit(false);
+
+        if JTaxLines.Count() = 0 then
+            exit(false);
+
+        if not JTaxLines.Get(0, JTaxLine) then
+            exit(false);
+
+        // Shopify keeps channelLiable consistent across tax lines, so checking the first entry is sufficient.
+        exit(JsonHelper.GetValueAsBoolean(JTaxLine, 'channelLiable'));
     end;
 }

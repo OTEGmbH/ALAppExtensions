@@ -1,15 +1,32 @@
-namespace OTE.Shopify;
+#if not CLEAN29
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88166 "Shpfy GQL RefundHeader" implements "Shpfy IGraphQL"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30229 "Shpfy GQL RefundHeader"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced by .graphql resource files. Use "Shpfy GraphQL Queries".GetQueryWithCost() instead.';
+    ObsoleteTag = '29.0';
 
-    internal procedure GetGraphQL(): Text
+    procedure GetGraphQL(): Text
+    var
+        GraphQLQueries: Codeunit "Shpfy GraphQL Queries";
+        ExpectedCost: Integer;
     begin
-        exit('{"query":"{ refund(id: \"gid://shopify/Refund/{{RefundId}}\") { createdAt updatedAt note duties { amountSet { presentmentMoney { amount } shopMoney { amount }} originalDuty { countryCodeOfOrigin harmonizedSystemCode id price { presentmentMoney { amount } shopMoney { amount }} taxLines { channelLiable title rate ratePercentage priceSet { presentmentMoney { amount } shopMoney { amount }}}}} return { id } order { legacyResourceId } totalRefundedSet { presentmentMoney { amount } shopMoney { amount }}}}"}');
+        exit(GraphQLQueries.GetQueryWithCost(Enum::"Shpfy GraphQL Type"::Refunds_GetRefundHeader, ExpectedCost));
     end;
 
-    internal procedure GetExpectedCost(): Integer
+    procedure GetExpectedCost(): Integer
+    var
+        GraphQLQueries: Codeunit "Shpfy GraphQL Queries";
+        ExpectedCost: Integer;
     begin
-        exit(3);
+        GraphQLQueries.GetQueryWithCost(Enum::"Shpfy GraphQL Type"::Refunds_GetRefundHeader, ExpectedCost);
+        exit(ExpectedCost);
     end;
 }
+#endif

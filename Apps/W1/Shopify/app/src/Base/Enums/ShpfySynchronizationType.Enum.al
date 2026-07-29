@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shopify Synchronization Type (ID 30103).
 /// </summary>
-enum 88004 "Shpfy Synchronization Type"
+enum 30103 "Shpfy Synchronization Type"
 {
     Access = Internal;
     Caption = 'Shopify Synchronization Type';

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Skipped Records (ID 30166).
 /// </summary>
-page 88029 "Shpfy Skipped Records"
+page 30166 "Shpfy Skipped Records"
 {
     ApplicationArea = All;
     Caption = 'Shopify Skipped Records';

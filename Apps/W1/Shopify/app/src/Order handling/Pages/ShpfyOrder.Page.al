@@ -1,5 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.CRM.Contact;
 using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
@@ -8,7 +14,7 @@ using Microsoft.Warehouse.Setup;
 /// <summary>
 /// Page Shpfy Order (ID 30113).
 /// </summary>
-page 88039 "Shpfy Order"
+page 30113 "Shpfy Order"
 {
     Caption = 'Shopify Order';
     DataCaptionFields = "Shopify Order No.";
@@ -37,18 +43,6 @@ page 88039 "Shpfy Order"
                     Editable = false;
                     ToolTip = 'Specifies the order number from Shopify.';
                 }
-#if not CLEAN25
-                field(RiskLevel; Rec."Risk Level")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the risk level from the Shopify order.';
-                    Visible = false;
-                    ObsoleteReason = 'This field is not imported.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-#endif
                 field("High Risk"; Rec."High Risk")
                 {
                     ApplicationArea = All;
@@ -68,6 +62,23 @@ page 88039 "Shpfy Order"
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the number of the customer who will buy the products.';
+                }
+                field(SellToContactNo; Rec."Sell-to Contact No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Sell-to Contact No.';
+                    TableRelation = Contact;
+                    Visible = false;
+                    ToolTip = 'Specifies the number of the contact person at the sell-to customer.';
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        Contact: Record Contact;
+                    begin
+                        Rec.LookupContactForCustomer(Rec."Sell-to Customer No.", Rec."Sell-to Contact No.", Contact);
+                        if Page.RunModal(0, Contact) = Action::LookupOK then
+                            Rec.Validate("Sell-to Contact No.", Contact."No.");
+                    end;
                 }
                 field(ShippingMethod; Rec."Shipping Method Code")
                 {
@@ -155,6 +166,7 @@ page 88039 "Shpfy Order"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    Importance = Additional;
                     ToolTip = 'Specifies whether this is a test order.';
                 }
                 field(CreatedAt; Rec."Created At")
@@ -173,7 +185,7 @@ page 88039 "Shpfy Order"
                     ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
-                    ToolTip = 'Specifies the date and time when the order was last modified.';
+                    ToolTip = 'Specifies the date and time when the order was last modified in Shopify.';
                 }
                 field(CancelledAt; Rec."Cancelled At")
                 {
@@ -189,19 +201,24 @@ page 88039 "Shpfy Order"
                     Importance = Additional;
                     ToolTip = 'Specifies the reason why the order was cancelled. Valid values are: customer, fraud, inventory, declined, other.';
                 }
+                field("Salesperson Code"; Rec."Salesperson Code")
+                {
+                    ApplicationArea = All;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the name of the salesperson who is assigned to the customer.';
+                }
                 field(AppName; Rec."App Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    Importance = Additional;
-                    ToolTip = 'The name of the app used by the channel where you sell your products. A channel can be a platform or a marketplace such as an online store or POS.';
+                    ToolTip = 'Specifies the name of the app used by the channel where you sell your products. A channel can be a platform or a marketplace such as an online store or POS.';
                 }
                 field(ChannelName; Rec."Channel Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
-                    ToolTip = 'The name of the channel where you sell your products. A channel can be a platform or a marketplace such as an online store or POS.';
+                    ToolTip = 'Specifies the name of the channel where you sell your products. A channel can be a platform or a marketplace such as an online store or POS.';
                 }
                 field(SourceName; Rec."Source Name")
                 {
@@ -224,6 +241,12 @@ page 88039 "Shpfy Order"
                     Editable = false;
                     Importance = Additional;
                     ToolTip = 'Specifies whether the order has had any edits applied.';
+                }
+                field(UseShopifyOrderNo; Rec."Use Shopify Order No.")
+                {
+                    ApplicationArea = All;
+                    Importance = Additional;
+                    Editable = not Rec.Processed;
                 }
                 field(Processed; Rec.Processed)
                 {
@@ -294,7 +317,7 @@ page 88039 "Shpfy Order"
             part(ShopifyOrderLines; "Shpfy Order Subform")
             {
                 ApplicationArea = All;
-                SubPageLink = "Shopify Order Id" = FIELD("Shopify Order Id");
+                SubPageLink = "Shopify Order Id" = field("Shopify Order Id");
                 UpdatePropagation = Both;
             }
             group(InvoiceDetails)
@@ -331,16 +354,79 @@ page 88039 "Shpfy Order"
                     Editable = false;
                     ToolTip = 'Specifies the sum of all discount amount on all lines in the document.';
                 }
+                field(RoundingAmount; Rec."Payment Rounding Amount")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    ToolTip = 'Specifies the amount of rounding applied to the total amount of the document.';
+                }
                 field(VATIncluded; Rec."VAT Included")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies if tax is included in the unit price.';
+                }
+                field("Channel Liable Taxes"; Rec."Channel Liable Taxes")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    ToolTip = 'Specifies if any tax line on the order is liable to be charged by the sales channel.';
                 }
                 field(CurrencyCode; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the currency of amounts on the document.';
+                }
+                group(ProcessedCurrHandling)
+                {
+                    ShowCaption = false;
+                    Visible = Rec.Processed;
+
+                    field(ProcessedCurrencyHandling; Rec."Processed Currency Handling")
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Processed Currency Handling';
+                        Importance = Additional;
+                        Editable = false;
+                        ToolTip = 'Specifies how the currency was handled when processing the order.';
+                    }
+                }
+                group(PresentmentCurrency)
+                {
+                    ShowCaption = false;
+                    Visible = PresentmentVisible;
+
+                    field("Presentment Subtotal Amount"; Rec."Presentment Subtotal Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                    }
+                    field("Pres. Shipping Charges Amount"; Rec."Pres. Shipping Charges Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                    }
+                    field("Presentment Total Amount"; Rec."Presentment Total Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Importance = Promoted;
+                    }
+                    field("Presentment VAT Amount"; Rec."Presentment VAT Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                    }
+                    field("Presentment Discount Amount"; Rec."Presentment Discount Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                    }
+                    field("Presentment Currency Code"; Rec."Presentment Currency Code")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                    }
                 }
             }
             group(ShippingAndBilling)
@@ -398,6 +484,23 @@ page 88039 "Shpfy Order"
                         Caption = 'Country Name';
                         Editable = false;
                         ToolTip = 'Specifies the name of the customer''s country/region';
+                    }
+                    field(ShipToContactNo; Rec."Ship-to Contact No.")
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Ship-to Contact No.';
+                        TableRelation = Contact;
+                        Visible = false;
+                        ToolTip = 'Specifies the number of the contact person at the ship-to address.';
+
+                        trigger OnLookup(var Text: Text): Boolean
+                        var
+                            Contact: Record Contact;
+                        begin
+                            Rec.LookupContactForCustomer(Rec."Sell-to Customer No.", Rec."Ship-to Contact No.", Contact);
+                            if Page.RunModal(0, Contact) = Action::LookupOK then
+                                Rec.Validate("Ship-to Contact No.", Contact."No.");
+                        end;
                     }
                 }
                 group(BillTo)
@@ -462,6 +565,23 @@ page 88039 "Shpfy Order"
                         Editable = false;
                         ToolTip = 'Specifies the name of the customer''s country/region.';
                     }
+                    field(BillToContactNo; Rec."Bill-to Contact No.")
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Bill-to Contact No.';
+                        TableRelation = Contact;
+                        Visible = false;
+                        ToolTip = 'Specifies the number of the contact person at the bill-to customer.';
+
+                        trigger OnLookup(var Text: Text): Boolean
+                        var
+                            Contact: Record Contact;
+                        begin
+                            Rec.LookupContactForCustomer(Rec."Bill-to Customer No.", Rec."Bill-to Contact No.", Contact);
+                            if Page.RunModal(0, Contact) = Action::LookupOK then
+                                Rec.Validate("Bill-to Contact No.", Contact."No.");
+                        end;
+                    }
                 }
             }
         }
@@ -472,6 +592,13 @@ page 88039 "Shpfy Order"
                 ApplicationArea = All;
                 Caption = 'Linked Documents';
                 SubPageLink = "Shopify Document Type" = const("Shpfy Shop Document Type"::"Shopify Shop Order"), "Shopify Document Id" = field("Shopify Order Id");
+            }
+            part(OrderTotals; "Shpfy Order Totals FactBox")
+            {
+                ApplicationArea = All;
+                Caption = 'Order Totals';
+                SubPageLink = "Shopify Order Id" = field("Shopify Order Id");
+                Visible = (Rec."Sales Order No." <> '') or (Rec."Sales Invoice No." <> '');
             }
             part(SalesHistory; "Sales Hist. Sell-to FactBox")
             {
@@ -498,7 +625,7 @@ page 88039 "Shpfy Order"
             part(OrderTags; "Shpfy Tag Factbox")
             {
                 ApplicationArea = All;
-                SubPageLink = "Parent Table No." = const(database::"Shpfy Order Header"), "Parent Id" = field("Shopify Order Id");
+                SubPageLink = "Parent Table No." = const(30118), "Parent Id" = field("Shopify Order Id");
             }
             part(ItemInvoicing; "Item Invoicing FactBox")
             {
@@ -574,6 +701,7 @@ page 88039 "Shpfy Order"
 
                     trigger OnAction();
                     var
+                        Shop: Record "Shpfy Shop";
                         ShopifyOrderHeader: Record "Shpfy Order Header";
                         ProcessShopifyOrders: Codeunit "Shpfy Process Orders";
                     begin
@@ -585,6 +713,8 @@ page 88039 "Shpfy Order"
                             Commit();
                             ShopifyOrderHeader.Get(Rec."Shopify Order Id");
                             ShopifyOrderHeader.SetRecFilter();
+                            Shop.Get(Rec."Shop Code");
+                            ProcessShopifyOrders.SetShop(Shop);
                             ProcessShopifyOrders.ProcessShopifyOrders(ShopifyOrderHeader);
                             Rec.Get(Rec."Shopify Order Id");
                         end;
@@ -629,10 +759,10 @@ page 88039 "Shpfy Order"
 
                     trigger OnAction()
                     var
-                        OrdersApi: Codeunit "Shpfy Orders API";
+                        Orders: Codeunit "Shpfy Orders";
                         ErrorInfo: ErrorInfo;
                     begin
-                        if OrdersApi.MarkAsPaid(Rec."Shopify Order Id", Rec."Shop Code") then
+                        if Orders.MarkAsPaid(Rec."Shopify Order Id", Rec."Shop Code") then
                             Message(MarkAsPaidMsg)
                         else begin
                             ErrorInfo.Message := MarkAsPaidFailedErr;
@@ -718,6 +848,20 @@ page 88039 "Shpfy Order"
                     end;
                 }
             }
+            action(ProvideFeedback)
+            {
+                ApplicationArea = All;
+                Caption = 'Provide Feedback';
+                ToolTip = 'Provide feedback on Shopify Connector.';
+                Image = Comment;
+
+                trigger OnAction()
+                var
+                    ShopMgt: Codeunit "Shpfy Shop Mgt.";
+                begin
+                    ShopMgt.RequestFeedback();
+                end;
+            }
         }
         area(navigation)
         {
@@ -766,7 +910,7 @@ page 88039 "Shpfy Order"
             action(Fulfillments)
             {
                 ApplicationArea = All;
-                Caption = 'Fulfillments';
+                Caption = 'Completed Fulfillments';
                 Image = ShipmentLines;
                 Promoted = true;
                 PromotedCategory = Category4;
@@ -811,7 +955,6 @@ page 88039 "Shpfy Order"
                     SalesHeader.Get(SalesHeader."Document Type"::Order, Rec."Sales Order No.");
                     SalesOrder.SetRecord(SalesHeader);
                     SalesOrder.Run();
-                    ;
                 end;
             }
             action(Refunds)
@@ -955,10 +1098,14 @@ page 88039 "Shpfy Order"
                     OrderLine.SetRange("Shopify Order Id", Rec."Shopify Order Id");
                     if OrderLine.FindSet() then
                         repeat
-                            FilterTxt += Format(OrderLine."Line Id") + '|';
+                            if FilterTxt <> '' then
+                                FilterTxt += '|';
+                            FilterTxt += Format(OrderLine."Line Id");
                         until OrderLine.Next() = 0;
-                    FilterTxt := FilterTxt.TrimEnd('|');
-                    TaxLine.SetFilter("Parent Id", FilterTxt);
+                    if FilterTxt = '' then
+                        TaxLine.SetRange("Parent Id", 0)
+                    else
+                        TaxLine.SetFilter("Parent Id", FilterTxt);
                     Page.Run(Page::"Shpfy Order Tax Lines", TaxLine);
                 end;
             }
@@ -967,22 +1114,26 @@ page 88039 "Shpfy Order"
 
     var
         CreateShopifyMsg: Label 'Create sales document from Shopify order %1?', Comment = '%1 = Order No.';
-        MarkAsPaidMsg: Label 'The order has been marked as paid.';
+        MarkAsPaidMsg: Label 'Specifies the order has been marked as paid.';
         ClearProcessedMsg: Label 'This order is already linked to a sales document in Business Central. Do you want to unlink it?';
         ClearProcessedErr: Label 'This order is already linked to a sales document in Business Central.';
-        MarkAsPaidFailedErr: Label 'The order could not be marked as paid. You can see the error message from Shopify Log Entries.';
+        MarkAsPaidFailedErr: Label 'Specifies the order could not be marked as paid. You can see the error message from Shopify Log Entries.';
         OrderCancelledMsg: Label 'Order has been cancelled successfully.';
-        OrderCancelFailedErr: Label 'The order could not be cancelled. You can see the error message from Shopify Log Entries.';
+        OrderCancelFailedErr: Label 'Specifies the order could not be cancelled. You can see the error message from Shopify Log Entries.';
         LogEntriesLbl: Label 'Log Entries';
         WorkDescription: Text;
+        PresentmentVisible: Boolean;
 
     trigger OnAfterGetRecord()
     begin
+        SetPresentmentCurrencyVisibility();
         WorkDescription := Rec.GetWorkDescription();
     end;
 
-    trigger OnOpenPage()
+    local procedure SetPresentmentCurrencyVisibility()
     begin
+        PresentmentVisible := Rec.IsPresentmentCurrencyOrder();
+
+        CurrPage.ShopifyOrderLines.Page.SetShowPresentmentCurrency(PresentmentVisible);
     end;
 }
-

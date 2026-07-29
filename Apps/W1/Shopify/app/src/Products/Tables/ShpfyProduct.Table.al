@@ -1,4 +1,9 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 using System.Reflection;
@@ -6,7 +11,7 @@ using System.Reflection;
 /// <summary>
 /// Table Shpfy Product (ID 30127).
 /// </summary>
-table 88049 "Shpfy Product"
+table 30127 "Shpfy Product"
 {
     Caption = 'Shopify Product';
     DataClassification = CustomerContent;
@@ -21,13 +26,13 @@ table 88049 "Shpfy Product"
         }
         field(2; "Created At"; DateTime)
         {
-            Caption = 'Created At';
+            Caption = 'Created At (Shopify)';
             DataClassification = CustomerContent;
             Editable = false;
         }
         field(3; "Updated At"; DateTime)
         {
-            Caption = 'Updated At';
+            Caption = 'Updated At (Shopify)';
             DataClassification = CustomerContent;
             Editable = false;
         }
@@ -139,41 +144,19 @@ table 88049 "Shpfy Product"
             DataClassification = SystemMetadata;
             Editable = false;
         }
-        field(88000; "Group Code 1"; code[50])
+        field(107; "Has Error"; Boolean)
         {
-            Caption = 'Group Code 1';
-            DataClassification = CustomerContent;
+            Caption = 'Has Error';
+            DataClassification = SystemMetadata;
+            Editable = false;
+            ToolTip = 'Specifies whether there is an error when creating an item.';
         }
-        field(88001; "Group Code 2"; code[50])
+        field(108; "Error Message"; Text[2048])
         {
-            Caption = 'Group Code 2';
-            DataClassification = CustomerContent;
-        }
-        field(88002; "Group Code 3"; code[50])
-        {
-            Caption = 'Group Code 3';
-            DataClassification = CustomerContent;
-        }
-
-        field(88010; "Group Description 1"; text[100])
-        {
-            Caption = 'Group Description 1';
-            DataClassification = CustomerContent;
-        }
-        field(88011; "Group Description 2"; text[100])
-        {
-            Caption = 'Group Description 2';
-            DataClassification = CustomerContent;
-        }
-        field(88012; "Group Description 3"; text[100])
-        {
-            Caption = 'Group Description 3';
-            DataClassification = CustomerContent;
-        }
-        field(88013; "Skip Metafields"; boolean)
-        {
-            Caption = 'Skip Metafields';
-            DataClassification = CustomerContent;
+            Caption = 'Error Message';
+            DataClassification = SystemMetadata;
+            Editable = false;
+            ToolTip = 'Specifies the error message if an error has occurred.';
         }
     }
     keys
@@ -181,6 +164,9 @@ table 88049 "Shpfy Product"
         key(PK; Id)
         {
             Clustered = true;
+        }
+        key(Key2; "Shop Code", "Item SystemId")
+        {
         }
     }
 

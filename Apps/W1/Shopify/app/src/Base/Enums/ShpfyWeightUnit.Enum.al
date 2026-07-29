@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Weight Unit (ID 30163).
 /// </summary>
-enum 88005 "Shpfy Weight Unit"
+enum 30163 "Shpfy Weight Unit"
 {
     Caption = 'Shopify Weight Unit';
     Extensible = false;

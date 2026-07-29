@@ -1,33 +1,39 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88050 "Shpfy Return"
+namespace Microsoft.Integration.Shopify;
+
+page 30151 "Shpfy Return"
 {
     ApplicationArea = All;
     Caption = 'Shopify Return';
     PageType = Document;
     SourceTable = "Shpfy Return Header";
     UsageCategory = None;
+    InsertAllowed = false;
 
     layout
     {
         area(content)
         {
-            Group(General)
+            group(General)
             {
                 field("Return No."; Rec."Return No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The No. of the return.';
+                    ToolTip = 'Specifies the No. of the return.';
                 }
                 field("Shopify Order No."; Rec."Shopify Order No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The unique identifier for the order that appears on the order page in the Shopify admin and the order status page. For example, "#1001", "EN1001", or "1001-A".';
+                    ToolTip = 'Specifies the unique identifier for the order that appears on the order page in the Shopify admin and the order status page. For example, "#1001", "EN1001", or "1001-A".';
                 }
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The status of the return.';
+                    ToolTip = 'Specifies the status of the return.';
                 }
                 field("Sell-to Customer No."; Rec."Sell-to Customer No.")
                 {
@@ -52,12 +58,12 @@ page 88050 "Shpfy Return"
                 field("Decline Reason"; Rec."Decline Reason")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The reason the customer''s return request was declined.';
+                    ToolTip = 'Specifies the reason the customer''s return request was declined.';
                 }
                 field("Total Quantity"; Rec."Total Quantity")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The sum of all line item quantities for the return.';
+                    ToolTip = 'Specifies the sum of all line item quantities for the return.';
                 }
             }
             part(Lines; "Shpfy Return Lines")
@@ -73,7 +79,7 @@ page 88050 "Shpfy Return"
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
-                    ToolTip = 'The sum of all line item quantities for the return.';
+                    ToolTip = 'Specifies the sum of all line item quantities for the return.';
                 }
             }
         }
@@ -113,6 +119,21 @@ page 88050 "Shpfy Return"
     trigger OnAfterGetCurrRecord()
     begin
         HasNote := Rec."Decline Note".HasValue();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        SetPresentmentCurrencyVisibleOnLines();
+    end;
+
+    local procedure SetPresentmentCurrencyVisibleOnLines()
+    var
+        OrderHeader: Record "Shpfy Order Header";
+    begin
+        if not OrderHeader.Get(Rec."Order Id") then
+            exit;
+
+        CurrPage.Lines.Page.ShowPresentmentCurrency(OrderHeader.IsPresentmentCurrencyOrder());
     end;
 
 }

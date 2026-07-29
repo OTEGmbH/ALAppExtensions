@@ -1,16 +1,21 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Shpfy - Read Permissions (ID 30100).
 /// </summary>
 #pragma warning disable AS0090, AS0049
-permissionset 88004 "OTEShpfy - Read"
+permissionset 30100 "Shpfy - Read"
 {
     Access = Internal;
     Assignable = false;
     Caption = 'Shopify - Read', MaxLength = 30;
 
-    IncludedPermissionSets = "OTEShpfy - Objects";
+    IncludedPermissionSets = "Shpfy - Objects";
 
     Permissions =
         tabledata "Shpfy Bulk Operation" = R,
@@ -35,6 +40,7 @@ permissionset 88004 "OTEShpfy - Read"
         tabledata "Shpfy Invoice Header" = R,
         tabledata "Shpfy Language" = R,
         tabledata "Shpfy Log Entry" = R,
+        tabledata "Shpfy Market Catalog Relation" = R,
         tabledata "Shpfy Metafield" = R,
         tabledata "Shpfy Order Attribute" = R,
         tabledata "Shpfy Order Disc.Appl." = R,
@@ -53,19 +59,25 @@ permissionset 88004 "OTEShpfy - Read"
         tabledata "Shpfy Payment Transaction" = R,
         tabledata "Shpfy Payout" = R,
         tabledata "Shpfy Product" = R,
-        tabledata "Shpfy Registered Store New" = R,
+        tabledata "Shpfy Product Collection" = R,
         tabledata "Shpfy Refund Header" = R,
         tabledata "Shpfy Refund Line" = R,
         tabledata "Shpfy Refund Shipping Line" = R,
+        tabledata "Shpfy Registered Store New" = R,
         tabledata "Shpfy Return Header" = R,
         tabledata "Shpfy Return Line" = R,
         tabledata "Shpfy Sales Channel" = R,
         tabledata "Shpfy Shipment Method Mapping" = R,
         tabledata "Shpfy Shop" = R,
+#if not CLEAN28
+#pragma warning disable AL0432
         tabledata "Shpfy Shop Collection Map" = R,
+#pragma warning restore AL0432
+#endif
         tabledata "Shpfy Shop Inventory" = R,
         tabledata "Shpfy Shop Location" = R,
         tabledata "Shpfy Skipped Record" = R,
+        tabledata "Shpfy Staff Member" = R,
         tabledata "Shpfy Synchronization Info" = R,
         tabledata "Shpfy Tag" = R,
         tabledata "Shpfy Tax Area" = R,

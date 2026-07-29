@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-table 88039 "Shpfy Refund Line"
+namespace Microsoft.Integration.Shopify;
+
+table 30145 "Shpfy Refund Line"
 {
     Caption = 'Refund Line';
     DataClassification = SystemMetadata;
@@ -50,42 +55,64 @@ table 88039 "Shpfy Refund Line"
             Caption = 'Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = OrderCurrencyCode();
         }
         field(8; "Presentment Amount"; Decimal)
         {
             Caption = 'Presentment Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = PresentmentCurrencyCode();
+            ToolTip = 'Specifies the price in presentment currency of a refunded line item.';
         }
         field(9; "Subtotal Amount"; Decimal)
         {
             Caption = 'Subtotal Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = OrderCurrencyCode();
         }
         field(10; "Presentment Subtotal Amount"; Decimal)
         {
             Caption = 'Presentment Subtotal Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = PresentmentCurrencyCode();
+            ToolTip = 'Specifies the subtotal price of a refunded line item in presentment currency.';
         }
         field(11; "Total Tax Amount"; Decimal)
         {
             Caption = 'Total Tax Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = OrderCurrencyCode();
         }
         field(12; "Presentment Total Tax Amount"; Decimal)
         {
             Caption = 'Presentment Total Tax Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = PresentmentCurrencyCode();
+            ToolTip = 'Specifies the total tax charged on a refunded line item in presentment currency.';
         }
         field(13; "Can Create Credit Memo"; Boolean)
         {
             Caption = 'Can Create Credit Memo';
             DataClassification = SystemMetadata;
             Editable = false;
+        }
+        field(14; "Is Exchange Item"; Boolean)
+        {
+            Caption = 'Is Exchange Item';
+            DataClassification = SystemMetadata;
+            Editable = false;
+            ToolTip = 'Specifies that this refund line was synthesized from a Return.exchangeLineItems entry rather than from a real Shopify refund line. Exchange-item refund lines carry a negative quantity so that the sales credit memo total matches the Shopify refund total without an extra balancing G/L line.';
         }
         field(101; "Item No."; Code[20])
         {
@@ -121,6 +148,13 @@ table 88039 "Shpfy Refund Line"
             DataClassification = SystemMetadata;
             Editable = false;
         }
+        field(106; "Unit of Measure Code"; Code[10])
+        {
+            Caption = 'Unit of Measure Code';
+            FieldClass = FlowField;
+            CalcFormula = lookup("Shpfy Order Line"."Unit of Measure Code" where("Line Id" = field("Order Line Id")));
+            Editable = false;
+        }
     }
     keys
     {
@@ -139,5 +173,23 @@ table 88039 "Shpfy Refund Line"
         DataCapture.SetRange("Linked To Id", Rec.SystemId);
         if not DataCapture.IsEmpty then
             DataCapture.DeleteAll(false);
+    end;
+
+    internal procedure OrderCurrencyCode(): Code[10]
+    var
+        OrderHeader: Record "Shpfy Order Header";
+        OrderLine: Record "Shpfy Order Line";
+    begin
+        if OrderLine.Get("Order Line Id") then
+            if OrderHeader.Get(OrderLine."Shopify Order Id") then
+                exit(OrderHeader."Currency Code");
+    end;
+
+    internal procedure PresentmentCurrencyCode(): Code[10]
+    var
+        RefundHeader: Record "Shpfy Refund Header";
+    begin
+        if RefundHeader.Get("Refund Id") then
+            exit(RefundHeader."Presentment Currency Code");
     end;
 }

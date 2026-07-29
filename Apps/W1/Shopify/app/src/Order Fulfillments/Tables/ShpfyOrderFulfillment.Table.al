@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Order Fulfillment (ID 30111).
 /// </summary>
-table 88029 "Shpfy Order Fulfillment"
+table 30111 "Shpfy Order Fulfillment"
 {
     Access = Internal;
     Caption = 'Shopify Order Fulfillment';
@@ -23,12 +28,12 @@ table 88029 "Shpfy Order Fulfillment"
         }
         field(3; "Created At"; DateTime)
         {
-            Caption = 'Created At';
+            Caption = 'Created At (Shopify)';
             DataClassification = SystemMetadata;
         }
         field(4; "Updated At"; DateTime)
         {
-            Caption = 'Updated At';
+            Caption = 'Updated At (Shopify)';
             DataClassification = SystemMetadata;
         }
         field(5; "Tracking Number"; Text[30])

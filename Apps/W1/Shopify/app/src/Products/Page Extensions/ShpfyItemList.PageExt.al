@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
-pageextension 88019 "Shpfy Item List" extends "Item List"
+pageextension 30120 "Shpfy Item List" extends "Item List"
 {
     actions
     {
@@ -58,6 +63,7 @@ pageextension 88019 "Shpfy Item List" extends "Item List"
     var
         Shop: Record "Shpfy Shop";
         ShopifyProduct: Record "Shpfy Product";
+        ShopifyVariant: Record "Shpfy Variant";
     begin
         IsProductMapped := false;
         ShopifyProduct.SetLoadFields("Item SystemId", "Shop Code");
@@ -70,5 +76,18 @@ pageextension 88019 "Shpfy Item List" extends "Item List"
                         exit;
                     end;
             until ShopifyProduct.Next() = 0;
+
+        if not IsProductMapped then begin
+            ShopifyVariant.SetLoadFields("Item SystemId", "Shop Code");
+            ShopifyVariant.SetRange("Item SystemId", Rec.SystemId);
+            if ShopifyVariant.FindSet() then
+                repeat
+                    if Shop.Get(ShopifyVariant."Shop Code") then
+                        if Shop.Enabled then begin
+                            IsProductMapped := true;
+                            exit;
+                        end;
+                until ShopifyVariant.Next() = 0;
+        end;
     end;
 }

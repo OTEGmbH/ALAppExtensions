@@ -1,13 +1,18 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
 /// <summary>
 /// Page Shpfy Order Fulfillments (ID 30112).
 /// </summary>
-page 88037 "Shpfy Order Fulfillments"
+page 30112 "Shpfy Order Fulfillments"
 {
-    Caption = 'Shopify Fulfillments';
+    Caption = 'Shopify Completed Fulfillments';
     CardPageID = "Shpfy Order Fulfillment";
     DeleteAllowed = false;
     Editable = false;
@@ -44,12 +49,12 @@ page 88037 "Shpfy Order Fulfillments"
                 field(CreatedAt; Rec."Created At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time when the fulfillment was created.';
+                    ToolTip = 'Specifies the date and time when the fulfillment was created in Shopify.';
                 }
                 field(UpdatedAt; Rec."Updated At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time when the fulfillment was last modified.';
+                    ToolTip = 'Specifies the date and time when the fulfillment was last modified in Shopify.';
                 }
                 field(TrackingNumber; Rec."Tracking Number")
                 {

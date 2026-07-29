@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Process Orders (ID 30167).
 /// </summary>
-codeunit 88247 "Shpfy Process Orders"
+codeunit 30167 "Shpfy Process Orders"
 {
     Access = Internal;
 
@@ -17,7 +22,7 @@ codeunit 88247 "Shpfy Process Orders"
     var
         ShopifyOrderHeader: Record "Shpfy Order Header";
     begin
-        Shop := Rec;
+        SetShop(Rec);
         ShopifyOrderHeader.Reset();
         if ShopifyOrderFilter <> '' then
             ShopifyOrderHeader.SetView(ShopifyOrderFilter);
@@ -58,6 +63,9 @@ codeunit 88247 "Shpfy Process Orders"
                 ShopifyOrderHeader."Has Error" := false;
                 ShopifyOrderHeader."Error Message" := '';
                 ShopifyOrderHeader.Processed := true;
+                if not Shop.Get(Shop.Code) then
+                    Shop.Get(ShopifyOrderHeader."Shop Code");
+                ShopifyOrderHeader."Processed Currency Handling" := Shop."Currency Handling";
             end;
             ShopifyOrderHeader.Modify(true);
             Commit();
@@ -100,6 +108,11 @@ codeunit 88247 "Shpfy Process Orders"
                     Commit();
                 until RefundHeader.Next() = 0;
         end;
+    end;
+
+    internal procedure SetShop(ShopifyShop: Record "Shpfy Shop")
+    begin
+        Shop := ShopifyShop;
     end;
 }
 

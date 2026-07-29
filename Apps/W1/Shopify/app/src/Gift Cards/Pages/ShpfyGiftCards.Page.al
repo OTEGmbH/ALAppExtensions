@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Gift Cards (ID 30110).
 /// </summary>
-page 88021 "Shpfy Gift Cards"
+page 30110 "Shpfy Gift Cards"
 {
 
     ApplicationArea = All;

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Order Payment Gateway (ID 30120).
 /// </summary>
-table 88035 "Shpfy Order Payment Gateway"
+table 30120 "Shpfy Order Payment Gateway"
 {
     Access = Internal;
     Caption = 'Shopify Order Payment Gateway';

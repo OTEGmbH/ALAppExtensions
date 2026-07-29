@@ -1,15 +1,32 @@
-namespace OTE.Shopify;
+#if not CLEAN29
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88141 "Shpfy GQL NextRefundLines" implements "Shpfy IGraphQL"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30232 "Shpfy GQL NextRefundLines"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced by .graphql resource files. Use "Shpfy GraphQL Queries".GetQueryWithCost() instead.';
+    ObsoleteTag = '29.0';
 
-    internal procedure GetGraphQL(): Text
+    procedure GetGraphQL(): Text
+    var
+        GraphQLQueries: Codeunit "Shpfy GraphQL Queries";
+        ExpectedCost: Integer;
     begin
-        exit('{"query":"{ refund(id: \"gid://shopify/Refund/{{RefundId}}\") { refundLineItems(first: 10, after:\"{{After}}\") { pageInfo { endCursor hasNextPage } nodes { lineItem { id } quantity restockType location { legacyResourceId } restocked priceSet { presentmentMoney { amount } shopMoney { amount }} subtotalSet { presentmentMoney { amount } shopMoney { amount }} totalTaxSet { presentmentMoney { amount } shopMoney { amount }}}}}}"}');
+        exit(GraphQLQueries.GetQueryWithCost(Enum::"Shpfy GraphQL Type"::Refunds_GetNextRefundLines, ExpectedCost));
     end;
 
-    internal procedure GetExpectedCost(): Integer
+    procedure GetExpectedCost(): Integer
+    var
+        GraphQLQueries: Codeunit "Shpfy GraphQL Queries";
+        ExpectedCost: Integer;
     begin
-        exit(53);
+        GraphQLQueries.GetQueryWithCost(Enum::"Shpfy GraphQL Type"::Refunds_GetNextRefundLines, ExpectedCost);
+        exit(ExpectedCost);
     end;
 }
+#endif

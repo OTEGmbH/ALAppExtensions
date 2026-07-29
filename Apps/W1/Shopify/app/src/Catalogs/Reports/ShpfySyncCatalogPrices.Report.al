@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Report Shpfy Sync Catalog Prices (ID 30116).
 /// </summary>
-report 88001 "Shpfy Sync Catalog Prices"
+report 30116 "Shpfy Sync Catalog Prices"
 {
     Caption = 'Shopify Sync Catalog Prices';
     UsageCategory = Tasks;
@@ -24,8 +29,8 @@ report 88001 "Shpfy Sync Catalog Prices"
 
             trigger OnAfterGetRecord()
             begin
-                if CompanyId <> '' then
-                    SyncCatalogPrices.SetCompanyId(CompanyId);
+                SetCatalogType(CatalogType);
+                SyncCatalogPrices.SetCompanyId(CompanyId);
                 SyncCatalogPrices.Run(Shop);
             end;
         }
@@ -43,6 +48,13 @@ report 88001 "Shpfy Sync Catalog Prices"
                     ApplicationArea = All;
                     Visible = false;
                 }
+                field(ShopifyCatalogType; CatalogType)
+                {
+                    Caption = 'Catalog Type';
+                    Tooltip = 'Specifies the catalog type to sync prices for.';
+                    ApplicationArea = All;
+                    Visible = false;
+                }
             }
         }
     }
@@ -51,4 +63,11 @@ report 88001 "Shpfy Sync Catalog Prices"
         SyncCatalogPrices: Codeunit "Shpfy Sync Catalog Prices";
         CompanyId: Text;
         NoShopSelectedErr: Label 'You must select a shop to sync prices for.';
+        CatalogType: Enum "Shpfy Catalog Type";
+
+    internal procedure SetCatalogType(ShpfyCatalogType: Enum "Shpfy Catalog Type")
+    begin
+        CatalogType := ShpfyCatalogType;
+        SyncCatalogPrices.SetCatalogType(ShpfyCatalogType);
+    end;
 }

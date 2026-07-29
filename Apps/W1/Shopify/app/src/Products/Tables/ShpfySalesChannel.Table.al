@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Sales Channel (ID 30159).
 /// </summary>
-table 88050 "Shpfy Sales Channel"
+table 30160 "Shpfy Sales Channel"
 {
     Caption = 'Shopify Sales Channel';
     DataClassification = CustomerContent;

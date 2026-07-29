@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Log Entries (ID 30119).
 /// </summary>
-page 88027 "Shpfy Log Entries"
+page 30119 "Shpfy Log Entries"
 {
     ApplicationArea = All;
     Caption = 'Shopify Log Entries';
@@ -96,8 +101,10 @@ page 88027 "Shpfy Log Entries"
                 ToolTip = 'Clear the list of log entries that are older than 7 days.';
 
                 trigger OnAction();
+                var
+                    ShpfyLogEntries: Codeunit "Shpfy Log Entries";
                 begin
-                    Rec.DeleteEntries(7);
+                    ShpfyLogEntries.DeleteEntries(Rec, 7);
                 end;
             }
             action(Delete0days)
@@ -112,10 +119,21 @@ page 88027 "Shpfy Log Entries"
                 ToolTip = 'Clear the list of all log entries.';
 
                 trigger OnAction();
+                var
+                    ShpfyLogEntries: Codeunit "Shpfy Log Entries";
                 begin
-                    Rec.DeleteEntries(0);
+                    ShpfyLogEntries.DeleteEntries(Rec, 0);
                 end;
             }
+        }
+    }
+
+    views
+    {
+        view(WithErrors)
+        {
+            Caption = 'With errors';
+            Filters = where("Has Error" = const(true));
         }
     }
 }

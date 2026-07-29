@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Order Risks (ID 30170).
 /// </summary>
-codeunit 88260 "Shpfy Order Risks"
+codeunit 30170 "Shpfy Order Risks"
 {
     Access = Internal;
 
@@ -34,11 +39,9 @@ codeunit 88260 "Shpfy Order Risks"
         Parameters: Dictionary of [text, Text];
         GraphQLType: Enum "Shpfy GraphQL Type";
     begin
-        if CommunicationMgt.GetTestInProgress() then
-            exit;
         CommunicationMgt.SetShop(OrderHeader."Shop Code");
         Parameters.Add('OrderId', Format(OrderHeader."Shopify Order Id"));
-        JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType::OrderRisks, Parameters);
+        JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType::Orders_OrderRisks, Parameters);
         if JsonHelper.GetJsonArray(JResponse, JRiskAssessments, 'data.order.risk.assessments') then
             UpdateOrderRisks(OrderHeader, JRiskAssessments);
     end;

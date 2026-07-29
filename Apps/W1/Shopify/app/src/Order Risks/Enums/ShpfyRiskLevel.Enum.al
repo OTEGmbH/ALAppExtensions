@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Risk Level (ID 30126).
 /// </summary>
-enum 88052 "Shpfy Risk Level"
+enum 30126 "Shpfy Risk Level"
 {
     Caption = 'Shopify Risk Level';
     Extensible = false;

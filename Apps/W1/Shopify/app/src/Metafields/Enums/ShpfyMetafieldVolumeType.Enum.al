@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-enum 88029 "Shpfy Metafield Volume Type"
+namespace Microsoft.Integration.Shopify;
+
+enum 30158 "Shpfy Metafield Volume Type"
 {
     Access = Internal;
 

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Tags (ID 30104).
 /// </summary>
-page 88007 "Shpfy Tags"
+page 30104 "Shpfy Tags"
 {
     Caption = 'Shopify Tags';
     PageType = List;

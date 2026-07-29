@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Utilities;
 
-codeunit 88000 "Company Details Checklist Item"
+codeunit 30203 "Company Details Checklist Item"
 {
     Access = Internal;
 

@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using System.DataAdministration;
 
-codeunit 88207 "Shpfy Log Entries Delete"
+codeunit 30274 "Shpfy Log Entries Delete"
 {
     Access = Internal;
     Permissions = tabledata "Shpfy Log Entry" = rd,

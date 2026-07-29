@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-enum 88045 "Shpfy ReturnRefund ProcessType" implements "Shpfy IReturnRefund Process"
+namespace Microsoft.Integration.Shopify;
+
+enum 30139 "Shpfy ReturnRefund ProcessType" implements "Shpfy IReturnRefund Process"
 {
     Extensible = true;
     DefaultImplementation = "Shpfy IReturnRefund Process" = "Shpfy RetRefProc Default";
@@ -16,7 +21,7 @@ enum 88045 "Shpfy ReturnRefund ProcessType" implements "Shpfy IReturnRefund Proc
     }
     value(3; "Auto Create Credit Memo")
     {
-        Caption = 'Auto Create Credit Memo';
+        Caption = 'Auto Create Sales Document';
         Implementation = "Shpfy IReturnRefund Process" = "Shpfy RetRefProc Cr.Memo";
     }
 }

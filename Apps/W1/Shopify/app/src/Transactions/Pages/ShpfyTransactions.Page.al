@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Receivables;
 
 /// <summary>
 /// Page Shpfy Transactions (ID 30134).
 /// </summary>
-page 88069 "Shpfy Transactions"
+page 30134 "Shpfy Transactions"
 {
     ApplicationArea = All;
     Caption = 'Shopify Transactions';
@@ -30,7 +35,7 @@ page 88069 "Shpfy Transactions"
                 field(CreatedAt; Rec."Created At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time at which the transaction is processed.';
+                    ToolTip = 'Specifies the date and time when the transaction was created in Shopify.';
                 }
                 field(Type; Rec.Type)
                 {
@@ -47,17 +52,6 @@ page 88069 "Shpfy Transactions"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the name of the gateway the transaction was issued through.';
                 }
-#if not CLEAN25
-                field(SourceName; Rec."Source Name")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the origin of the transaction. This is set by Shopify. Example values: web, pos, iphone, android.';
-                    Visible = false;
-                    ObsoleteReason = 'Source name is no longer used.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-#endif
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
@@ -67,6 +61,16 @@ page 88069 "Shpfy Transactions"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the currency of the transaction.';
+                }
+                field("Presentment Amount"; Rec."Presentment Amount")
+                {
+                    ApplicationArea = All;
+                    Visible = PresentmentCurrencyVisible;
+                }
+                field("Presentment Currency"; Rec."Presentment Currency")
+                {
+                    ApplicationArea = All;
+                    Visible = PresentmentCurrencyVisible;
                 }
                 field(Test; Rec.Test)
                 {
@@ -117,6 +121,11 @@ page 88069 "Shpfy Transactions"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the standardized error code, independent of the payment provider. Valid values are: incorrect_number, invalid_number, invalid_expiry_date, invalid_cvc, expired_card, incorrect_cvc, incorrect_zip, incorrect_address, card_declined, processing_error, call_issuer, pick_up_card.';
+                }
+                field(ShpfyOrderNo; Rec."Shpfy Order No.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the order number from Shopify.';
                 }
                 field(ShopifyOrderId; Rec."Shopify Order Id")
                 {
@@ -211,5 +220,21 @@ page 88069 "Shpfy Transactions"
     }
 
     var
+        PresentmentCurrencyVisible: Boolean;
         IgnorePostedTransactionsLbl: Label 'You have selected posted Shopify transactions. Do you want to use posted transactions?';
+
+    trigger OnAfterGetRecord()
+    begin
+        SetPresentmentCurrencyVisibility();
+    end;
+
+    local procedure SetPresentmentCurrencyVisibility()
+    var
+        OrderHeader: Record "Shpfy Order Header";
+    begin
+        if not OrderHeader.Get(Rec."Shopify Order Id") then
+            exit;
+
+        PresentmentCurrencyVisible := OrderHeader.IsPresentmentCurrencyOrder();
+    end;
 }

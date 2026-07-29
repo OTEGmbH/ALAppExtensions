@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Codeunit Shpfy Sync Catalog Prices (ID 30295).
 /// </summary>
-codeunit 88016 "Shpfy Sync Catalog Prices"
+codeunit 30295 "Shpfy Sync Catalog Prices"
 {
     Access = Internal;
     TableNo = "Shpfy Shop";
@@ -18,6 +23,8 @@ codeunit 88016 "Shpfy Sync Catalog Prices"
         SetShop(Rec);
         Catalog.SetRange("Shop Code", Shop.Code);
         Catalog.SetRange("Sync Prices", true);
+        if CatalogType <> CatalogType::" " then
+            Catalog.SetRange("Catalog Type", CatalogType);
         if CompanyId <> '' then
             Catalog.SetRange("Company SystemId", CompanyId);
         if Catalog.FindSet() then
@@ -35,6 +42,7 @@ codeunit 88016 "Shpfy Sync Catalog Prices"
         CatalogAPI: Codeunit "Shpfy Catalog API";
         ProductPriceCalc: Codeunit "Shpfy Product Price Calc.";
         CompanyId: Text;
+        CatalogType: Enum "Shpfy Catalog Type";
 
     internal procedure SyncCatalogPrices(var Catalog: Record "Shpfy Catalog")
     var
@@ -107,5 +115,11 @@ codeunit 88016 "Shpfy Sync Catalog Prices"
     internal procedure SetCompanyId(ShopifyCompanyId: Text)
     begin
         CompanyId := ShopifyCompanyId;
+    end;
+
+    internal procedure SetCatalogType(ShopifyCatalogType: Enum "Shpfy Catalog Type")
+    begin
+        CatalogType := ShopifyCatalogType;
+        CatalogAPI.SetCatalogType(ShopifyCatalogType);
     end;
 }

@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88219 "Shpfy Mtfld Type Json" implements "Shpfy IMetafield Type"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30353 "Shpfy Mtfld Type Json" implements "Shpfy IMetafield Type"
 {
     procedure HasAssistEdit(): Boolean
     begin

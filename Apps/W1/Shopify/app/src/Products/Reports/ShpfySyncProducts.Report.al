@@ -1,9 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
+
+using System.Telemetry;
 
 /// <summary>
 /// Report Shpfy Sync Products (ID 30108).
 /// </summary>
-report 88018 "Shpfy Sync Products"
+report 30108 "Shpfy Sync Products"
 {
     Caption = 'Shopify Sync Products';
     UsageCategory = Tasks;
@@ -22,8 +29,8 @@ report 88018 "Shpfy Sync Products"
             begin
                 if OnlySyncPrices then
                     Sync.SetOnlySyncPriceOn();
-                if NumberOfRecords <> -1 then
-                    Sync.SetNumberOfRecords(NumberOfRecords);
+                if RecordCount <> -1 then
+                    Sync.SetNumberOfRecords(RecordCount);
                 Sync.Run(Shop);
             end;
         }
@@ -37,13 +44,13 @@ report 88018 "Shpfy Sync Products"
                 field(OnlySyncPrice; OnlySyncPrices)
                 {
                     Caption = 'Only Sync Price';
-                    Tooltip = 'Only sync prices from D365BC to Shopify';
+                    Tooltip = 'Specifies if only prices are synchronized from Business Central to Shopify';
                     ApplicationArea = All;
                 }
-                field(NumberOfRecords; NumberOfRecords)
+                field(NumberOfRecords; RecordCount)
                 {
                     Caption = 'Number of Records';
-                    Tooltip = 'Number of records to synchronize';
+                    Tooltip = 'Specifies the of records to synchronize';
                     ApplicationArea = All;
                     Visible = false;
                 }
@@ -53,5 +60,12 @@ report 88018 "Shpfy Sync Products"
 
     var
         OnlySyncPrices: Boolean;
-        NumberOfRecords: Integer;
+        RecordCount: Integer;
+
+    trigger OnPreReport()
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
+    begin
+        FeatureTelemetry.LogUsage('0000QWC', 'Shopify', 'Shopify sync products executed.');
+    end;
 }

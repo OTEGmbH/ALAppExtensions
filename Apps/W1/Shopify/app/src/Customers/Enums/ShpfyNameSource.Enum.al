@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Name Source (ID 30108) implements Interface Shpfy ICustomer Name.
 /// </summary>
-enum 88016 "Shpfy Name Source" implements "Shpfy ICustomer Name"
+enum 30108 "Shpfy Name Source" implements "Shpfy ICustomer Name"
 {
     Caption = 'Shopify Name Source';
     Extensible = false;

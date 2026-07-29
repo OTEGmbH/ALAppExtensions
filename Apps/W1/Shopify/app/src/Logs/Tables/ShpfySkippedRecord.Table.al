@@ -1,12 +1,17 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using System.Reflection;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Utilities;
+using System.Reflection;
 
 /// <summary>
 /// Table Shpfy Skipped Record (ID 30159).
 /// </summary>
-table 88024 "Shpfy Skipped Record"
+table 30159 "Shpfy Skipped Record"
 {
     Caption = 'Shopify Skipped Record';
     DataClassification = CustomerContent;
@@ -85,12 +90,15 @@ table 88024 "Shpfy Skipped Record"
 
     local procedure GetRecDescription() Result: Text[250]
     var
+        Catalog: Record "Shpfy Catalog";
         RecRef: RecordRef;
         PKFilter: Text;
         Delimiter: Text;
         Pos: Integer;
     begin
         if RecRef.Get("Record ID") then begin
+            if RecRef.Number = Database::"Shpfy Catalog" then
+                exit(RecRef.Field(Catalog.FieldNo(Catalog.Name)).Value());
             RecRef.SetRecFilter();
             PKFilter := RecRef.GetView();
             repeat

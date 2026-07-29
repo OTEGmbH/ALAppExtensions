@@ -1,10 +1,15 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shopify Payout (ID 30125).
 /// </summary>
 /// 
-table 88044 "Shpfy Dispute"
+table 30155 "Shpfy Dispute"
 {
     Access = Internal;
     Caption = 'Shopify Dispute';
@@ -38,8 +43,10 @@ table 88044 "Shpfy Dispute"
         {
             Caption = 'Amount';
             DataClassification = CustomerContent;
+            AutoFormatType = 1;
+            AutoFormatExpression = Currency;
         }
-        field(6; "Reason"; enum "Shpfy Dispute Reason")
+        field(6; "Reason"; Enum "Shpfy Dispute Reason")
         {
             Caption = 'Shopify Dispute Reason';
             DataClassification = CustomerContent;
@@ -69,6 +76,12 @@ table 88044 "Shpfy Dispute"
             Caption = 'Finalized On';
             DataClassification = CustomerContent;
         }
+        field(101; "Shop Code"; Code[20])
+        {
+            Caption = 'Shop Code';
+            DataClassification = SystemMetadata;
+            TableRelation = "Shpfy Shop";
+        }
     }
     keys
     {
@@ -76,5 +89,6 @@ table 88044 "Shpfy Dispute"
         {
             Clustered = true;
         }
+        key(Key1; "Shop Code") { }
     }
 }

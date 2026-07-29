@@ -1,17 +1,21 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using OTE.Shopify;
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Sync Inventory (ID 30197).
 /// </summary>
-codeunit 88201 "Shpfy Sync Inventory"
+codeunit 30197 "Shpfy Sync Inventory"
 {
     Access = Internal;
     TableNo = "Shpfy Shop Inventory";
 
     var
         InventoryApi: Codeunit "Shpfy Inventory API";
+        SkipImport: Boolean;
 
     trigger OnRun()
     var
@@ -20,56 +24,28 @@ codeunit 88201 "Shpfy Sync Inventory"
         ShopFilter: Text;
     begin
         ShopFilter := Rec.GetFilter("Shop Code");
-        if ShopFilter <> '' then begin
+        if ShopFilter <> '' then
             ShopLocation.SetRange("Shop Code", ShopFilter);
-            ShopInventory.SetRange("Shop Code", ShopFilter);
+
+        ShopInventory.CopyFilters(Rec);
+
+        if not SkipImport then begin
+            ShopLocation.SetFilter("Stock Calculation", '<>%1', ShopLocation."Stock Calculation"::Disabled);
+            if ShopLocation.FindSet(false) then begin
+                InventoryApi.SetShop(ShopLocation."Shop Code");
+                InventoryApi.SetInventoryIds();
+                repeat
+                    InventoryApi.ImportStock(ShopLocation);
+                until ShopLocation.Next() = 0;
+            end;
+            InventoryApi.RemoveUnusedInventoryIds();
         end;
 
-        ShopLocation.SetFilter("Stock Calculation", '<>%1', ShopLocation."Stock Calculation"::Disabled);
-        if ShopLocation.FindSet(false) then begin
-            InventoryApi.SetShop(ShopLocation."Shop Code");
-            InventoryApi.SetInventoryIds();
-            repeat
-                InventoryApi.ImportStock(ShopLocation);
-            until ShopLocation.Next() = 0;
-        end;
-        InventoryApi.RemoveUnusedInventoryIds();
-        InventoryApi.ExportStock(ShopInventory);
+        InventoryApi.ExportStock(ShopInventory, SkipImport);
     end;
 
-    procedure ImportStock(_shopCode: code[20])
-    var
-        ShopLocation: Record "Shpfy Shop Location";
+    internal procedure SetSkipImport(ImportSkip: Boolean)
     begin
-        ShopLocation.SetRange("Shop Code", _shopCode);
-        ShopLocation.SetFilter("Stock Calculation", '<>%1', ShopLocation."Stock Calculation"::Disabled);
-        if ShopLocation.FindSet(false) then begin
-            InventoryApi.SetShop(ShopLocation."Shop Code");
-            InventoryApi.SetInventoryIds();
-            repeat
-                InventoryApi.ImportStock(ShopLocation);
-            until ShopLocation.Next() = 0;
-        end;
-        InventoryApi.RemoveUnusedInventoryIds();
-    end;
-
-    procedure ExportStock(var _ShopInventory: Record "Shpfy Shop Inventory")
-    var
-        ShpfyShopInventory: Record "Shpfy Shop Inventory";
-        MarkedShpfyShopInventory: Record "Shpfy Shop Inventory";
-    begin
-        if _ShopInventory.findset(false) then
-            repeat
-                ShpfyShopInventory.setrange("Shop Code", _ShopInventory."Shop Code");
-                ShpfyShopInventory.setrange("Product Id", _ShopInventory."Product Id");
-                ShpfyShopInventory.setrange("Variant Id", _ShopInventory."Variant Id");
-                ShpfyShopInventory.setrange("Location Id", _ShopInventory."Location Id");
-                if ShpfyShopInventory.findfirst() then begin
-                    MarkedShpfyShopInventory.GetBySystemId(ShpfyShopInventory.SystemId);
-                    MarkedShpfyShopInventory.mark(true);
-                end;
-            until _ShopInventory.Next() = 0;
-        MarkedShpfyShopInventory.MarkedOnly(true);
-        InventoryApi.ExportStock(MarkedShpfyShopInventory);
+        SkipImport := ImportSkip;
     end;
 }

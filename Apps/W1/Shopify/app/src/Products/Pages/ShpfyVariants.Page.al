@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Page Shpfy Variants (ID 30127).
 /// </summary>
-page 88062 "Shpfy Variants"
+page 30127 "Shpfy Variants"
 {
 
     Caption = 'Shopify Variants';
@@ -104,6 +109,12 @@ page 88062 "Shpfy Variants"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the price of a product variant.';
                 }
+                field(CompareAtPrice; Rec."Compare at Price")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                    ToolTip = 'Specifies the original price of the product variant in Shopify before a discount. Shopify displays it alongside the current price to show the price reduction.';
+                }
                 field(Barcode; Rec.Barcode)
                 {
                     ApplicationArea = All;
@@ -122,12 +133,12 @@ page 88062 "Shpfy Variants"
                 field(CreatedAt; Rec."Created At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time when the product variant was created.';
+                    ToolTip = 'Specifies the date and time when the product variant was created in Shopify.';
                 }
                 field(UpdatedAt; Rec."Updated At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time when the product variant was last modified.';
+                    ToolTip = 'Specifies the date and time when the product variant was last modified in Shopify.';
                 }
                 field(InventoryPolicy; Rec."Inventory Policy")
                 {
@@ -139,11 +150,17 @@ page 88062 "Shpfy Variants"
                     ApplicationArea = All;
                     ToolTip = 'Specifies whether a tax is charged when the product variant is sold.';
                 }
+#if not CLEAN28
                 field(TaxCode; Rec."Tax Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the Avalara tax code for the product variant. This parameter applies only to the stores that have the Avalara AvaTax app installed.';
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Shopify API 2025-10 deprecated taxCode on ProductVariant. This field is no longer available in the API.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field(UnitCost; Rec."Unit Cost")
                 {
                     ApplicationArea = All;

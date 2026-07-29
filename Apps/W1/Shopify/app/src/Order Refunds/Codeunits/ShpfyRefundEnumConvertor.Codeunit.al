@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88249 "Shpfy Refund Enum Convertor"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30231 "Shpfy Refund Enum Convertor"
 {
     SingleInstance = true;
     Access = Internal;

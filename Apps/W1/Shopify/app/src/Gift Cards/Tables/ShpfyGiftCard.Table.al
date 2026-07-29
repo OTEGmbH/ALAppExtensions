@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Gift Card (ID 30110).
 /// </summary>
-table 88017 "Shpfy Gift Card"
+table 30110 "Shpfy Gift Card"
 {
     Access = Internal;
     Caption = 'Shopify Gift Card';
@@ -25,6 +30,8 @@ table 88017 "Shpfy Gift Card"
         {
             Caption = 'Amount';
             DataClassification = SystemMetadata;
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
         field(4; "Order Line Id"; BigInteger)
         {
@@ -36,6 +43,8 @@ table 88017 "Shpfy Gift Card"
             CalcFormula = sum("Shpfy Order Transaction".Amount where("Gift Card Id" = field(Id)));
             Caption = 'Known Used Amount';
             FieldClass = FlowField;
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
     }
     keys

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Shops (ID 30102).
 /// </summary>
-page 88004 "Shpfy Shops"
+page 30102 "Shpfy Shops"
 {
     ApplicationArea = All;
     Caption = 'Shopify Shops';
@@ -42,4 +47,38 @@ page 88004 "Shpfy Shops"
             }
         }
     }
+
+    actions
+    {
+        area(Processing)
+        {
+            action(ProvideFeedback)
+            {
+                ApplicationArea = All;
+                Caption = 'Provide Feedback';
+                ToolTip = 'Provide feedback on Shopify Connector.';
+                Image = Comment;
+
+                trigger OnAction()
+                var
+                    ShopMgt: Codeunit "Shpfy Shop Mgt.";
+                begin
+                    ShopMgt.RequestFeedback();
+                end;
+            }
+        }
+        area(Promoted)
+        {
+            actionref(ProvideFeedback_Promoted; ProvideFeedback)
+            {
+            }
+        }
+    }
+
+    trigger OnOpenPage()
+    var
+        ShopMgt: Codeunit "Shpfy Shop Mgt.";
+    begin
+        ShopMgt.SendBelgianLocalizationNotification();
+    end;
 }

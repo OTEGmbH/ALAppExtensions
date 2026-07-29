@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Location;
 
 /// <summary>
 /// Report Shpfy Create Location Filter (ID 30101).
 /// </summary>
-report 88008 "Shpfy Create Location Filter"
+report 30101 "Shpfy Create Location Filter"
 {
     Caption = 'Shopify Create Location Filter';
     ProcessingOnly = true;

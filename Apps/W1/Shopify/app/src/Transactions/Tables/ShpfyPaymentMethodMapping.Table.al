@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Bank.BankAccount;
 
 /// <summary>
 /// Table Shpfy Payment Method Mapping (ID 30134).
 /// </summary>
-table 88057 "Shpfy Payment Method Mapping"
+table 30134 "Shpfy Payment Method Mapping"
 {
     Access = Internal;
     Caption = 'Shopify Payment Method';
@@ -44,15 +49,16 @@ table 88057 "Shpfy Payment Method Mapping"
             DataClassification = CustomerContent;
             MinValue = 0;
             ObsoleteReason = 'Priority is no longer used.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
+        field(6; "Manual Payment Gateway"; Boolean)
+        {
+            Caption = 'Manual Payment Gateway';
+            DataClassification = SystemMetadata;
+            Editable = false;
+        }
     }
     keys
     {

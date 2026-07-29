@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Table Shpfy Variant (ID 30129).
 /// </summary>
-table 88052 "Shpfy Variant"
+table 30129 "Shpfy Variant"
 {
     Caption = 'Shopify Variant';
     DataClassification = CustomerContent;
@@ -24,12 +29,12 @@ table 88052 "Shpfy Variant"
         }
         field(3; "Created At"; DateTime)
         {
-            Caption = 'CreatedAt';
+            Caption = 'Created At (Shopify)';
             DataClassification = CustomerContent;
         }
         field(4; "Updated At"; DateTime)
         {
-            Caption = 'Updated At';
+            Caption = 'Updated At (Shopify)';
             DataClassification = CustomerContent;
         }
         field(5; "Available For Sales"; Boolean)
@@ -46,6 +51,8 @@ table 88052 "Shpfy Variant"
         {
             Caption = 'Compare at Price';
             DataClassification = CustomerContent;
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
         field(8; "Display Name"; Text[250])
         {
@@ -66,17 +73,29 @@ table 88052 "Shpfy Variant"
         {
             Caption = 'Price';
             DataClassification = CustomerContent;
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
         field(12; SKU; Text[50])
         {
             Caption = 'SKU';
             DataClassification = CustomerContent;
         }
+#if not CLEANSCHEMA31
         field(13; "Tax Code"; Code[20])
         {
             Caption = 'Tax Code';
             DataClassification = CustomerContent;
+            ObsoleteReason = 'Shopify API 2025-10 deprecated taxCode on ProductVariant. This field is no longer available in the API.';
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '31.0';
+#endif
         }
+#endif
         field(14; Taxable; Boolean)
         {
             Caption = 'Taxable';
@@ -91,6 +110,7 @@ table 88052 "Shpfy Variant"
         {
             Caption = 'Weight';
             DataClassification = CustomerContent;
+            AutoFormatType = 0;
         }
         field(17; "Option 1 Name"; Text[50])
         {
@@ -126,6 +146,8 @@ table 88052 "Shpfy Variant"
         {
             Caption = 'Unit Cost';
             DataClassification = CustomerContent;
+            AutoFormatType = 2;
+            AutoFormatExpression = '';
         }
         field(24; "Image Id"; BigInteger)
         {
@@ -179,6 +201,16 @@ table 88052 "Shpfy Variant"
         field(108; "Image Hash"; Integer)
         {
             DataClassification = SystemMetadata;
+        }
+        field(109; "Tariff No."; Code[20])
+        {
+            Caption = 'Tariff No.';
+            DataClassification = CustomerContent;
+        }
+        field(110; "Country/Region of Origin Code"; Code[10])
+        {
+            Caption = 'Country/Region of Origin Code';
+            DataClassification = CustomerContent;
         }
     }
     keys

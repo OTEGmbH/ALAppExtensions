@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Foundation.PaymentTerms;
 
 /// <summary>
 /// Table Shpfy Payment Terms (ID 30157).
 /// </summary>
-table 88045 "Shpfy Payment Terms"
+table 30158 "Shpfy Payment Terms"
 {
     Caption = 'Payment Terms';
     DataClassification = CustomerContent;

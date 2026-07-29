@@ -1,11 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using System.Utilities;
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Log Entry Card (ID 30120).
 /// </summary>
-page 88028 "Shpfy Log Entry Card"
+page 30120 "Shpfy Log Entry Card"
 {
     Caption = 'Shopify Log Entry';
     DeleteAllowed = false;
@@ -167,8 +170,10 @@ page 88028 "Shpfy Log Entry Card"
                 ToolTip = 'Download the request that was made.';
 
                 trigger OnAction()
+                var
+                    ShpfyLogEntries: Codeunit "Shpfy Log Entries";
                 begin
-                    DownloadRequest();
+                    ShpfyLogEntries.DownloadRequest(Rec);
                 end;
             }
             action(DownloadResponseAction)
@@ -179,41 +184,38 @@ page 88028 "Shpfy Log Entry Card"
                 ToolTip = 'Download the response that was obtained.';
 
                 trigger OnAction()
+                var
+                    ShpfyLogEntries: Codeunit "Shpfy Log Entries";
                 begin
-                    DownloadResponse();
+                    ShpfyLogEntries.DownloadResponse(Rec);
+                end;
+            }
+            action(EscalateToShopify)
+            {
+                ApplicationArea = All;
+                Caption = 'Escalate to Shopify';
+                Image = SendEmailPDF;
+                ToolTip = 'Generate an escalation report to send to Shopify support.';
+                Enabled = CanEscalate;
+
+                trigger OnAction()
+                var
+                    ShpfyLogEntries: Codeunit "Shpfy Log Entries";
+                begin
+                    ShpfyLogEntries.TestConnectionAndDownload(Rec);
                 end;
             }
         }
     }
 
-    local procedure DownloadRequest()
+    trigger OnAfterGetCurrRecord()
     var
-        TempBlob: Codeunit "Temp Blob";
-        InStream: InStream;
-        TitleLbl: Label 'Download Request file';
-        OutStream: OutSTream;
-        ToFile: Text;
+        ShpfyLogEntries: Codeunit "Shpfy Log Entries";
     begin
-        TempBlob.CreateInStream(InStream);
-        TempBlob.CreateOutStream(OutStream);
-        OutStream.Write(Rec.GetRequest());
-        ToFile := 'Request_' + format(Rec."Entry No.") + '.json';
-        File.DownloadFromStream(InStream, TitleLbl, '', '(*.*)|*.*', ToFile);
+        CanEscalate := ShpfyLogEntries.CanEscalate(Rec);
     end;
 
-    local procedure DownloadResponse()
     var
-        TempBlob: Codeunit "Temp Blob";
-        InStream: InStream;
-        TitleLbl: Label 'Download Response file';
-        OutStream: OutSTream;
-        ToFile: Text;
-    begin
-        TempBlob.CreateInStream(InStream);
-        TempBlob.CreateOutStream(OutStream);
-        OutStream.Write(Rec.GetResponse());
-        ToFile := 'Response_' + format(Rec."Entry No.") + '.json';
-        File.DownloadFromStream(InStream, TitleLbl, '', '(*.*)|*.*', ToFile);
-    end;
+        CanEscalate: Boolean;
 }
 

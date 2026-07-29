@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88239 "Shpfy Fulfillment Orders API"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30238 "Shpfy Fulfillment Orders API"
 {
     var
         CommunicationMgt: Codeunit "Shpfy Communication Mgt.";
@@ -10,53 +15,18 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
 
     internal procedure RegisterFulfillmentService(var Shop: Record "Shpfy Shop")
     var
+        SyncShopLocations: Codeunit "Shpfy Sync Shop Locations";
         Parameters: Dictionary of [Text, Text];
         JResponse: JsonToken;
     begin
         CommunicationMgt.SetShop(Shop);
-        GraphQLType := "Shpfy GraphQL Type"::CreateFulfillmentService;
+        Parameters.Add('Name', SyncShopLocations.GetFulfillmentServiceName());
+        Parameters.Add('CallbackUrl', SyncShopLocations.GetFulfillmentServiceCallbackUrl());
+        GraphQLType := "Shpfy GraphQL Type"::Fulfillments_CreateFulfillmentService;
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
 
         Shop."Fulfillment Service Activated" := true;
         Shop.Modify();
-    end;
-
-    internal procedure GetShopifyFulfillmentOrders()
-    var
-        Shop: Record "Shpfy Shop";
-    begin
-        Shop.Reset();
-        if Shop.FindSet() then
-            repeat
-                if not Shop."Fulfillment Service Activated" then
-                    RegisterFulfillmentService(Shop);
-
-                GetShopifyFulFillmentOrders(Shop);
-            until Shop.Next() = 0;
-    end;
-
-    internal procedure GetShopifyFulFillmentOrders(Shop: Record "Shpfy Shop")
-    var
-        Cursor: Text;
-        Parameters: Dictionary of [Text, Text];
-        JResponse: JsonToken;
-    begin
-        CommunicationMgt.SetShop(Shop);
-
-        GraphQLType := "Shpfy GraphQL Type"::GetOpenFulfillmentOrders;
-        repeat
-            JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
-            if JResponse.IsObject() then
-                if ExtractFulfillmentOrders(Shop, JResponse.AsObject(), Cursor) then begin
-                    if Parameters.ContainsKey('After') then
-                        Parameters.Set('After', Cursor)
-                    else
-                        Parameters.Add('After', Cursor);
-                    GraphQLType := "Shpfy GraphQL Type"::GetNextOpenFulfillmentOrders;
-                end else
-                    break;
-        until not JsonHelper.GetValueAsBoolean(JResponse, 'data.fulfillmentOrders.pageInfo.hasNextPage');
-        Commit();
     end;
 
     internal procedure GetFulFillmentOrderLines(Shop: Record "Shpfy Shop"; FulfillmentOrderHeader: Record "Shpfy FulFillment Order Header")
@@ -69,7 +39,7 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
 
         Parameters.Add('FulfillmentOrderId', format(FulfillmentOrderHeader."Shopify Fulfillment Order Id"));
 
-        GraphQLType := "Shpfy GraphQL Type"::GetOpenFulfillmentOrderLines;
+        GraphQLType := "Shpfy GraphQL Type"::Fulfillments_GetOpenFulfillmentOrderLines;
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
             if JResponse.IsObject() then
@@ -78,23 +48,11 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
                         Parameters.Set('After', Cursor)
                     else
                         Parameters.Add('After', Cursor);
-                    GraphQLType := "Shpfy GraphQL Type"::GetNextOpenFulfillmentOrderLines;
+                    GraphQLType := "Shpfy GraphQL Type"::Fulfillments_GetNextOpenFulfillmentOrderLines;
                 end else
                     break;
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.fulfillmentOrder.lineItems.pageInfo.hasNextPage');
         Commit();
-    end;
-
-    internal procedure ExtractFulfillmentOrders(var ShopifyShop: Record "Shpfy Shop"; JResponse: JsonObject; var Cursor: Text): Boolean
-    var
-        JFulfillmentOrders: JsonArray;
-        JItem: JsonToken;
-    begin
-        if JsonHelper.GetJsonArray(JResponse, JFulfillmentOrders, 'data.fulfillmentOrders.edges') then begin
-            foreach JItem in JFulfillmentOrders do
-                ExtractFulfillmentOrder(ShopifyShop, JItem, Cursor);
-            exit(true);
-        end;
     end;
 
     internal procedure ExtractFulfillmentOrdersFromOrder(var ShopifyShop: Record "Shpfy Shop"; JResponse: JsonObject; var Cursor: Text): Boolean
@@ -114,6 +72,7 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
 
     internal procedure ExtractFulfillmentOrder(var ShopifyShop: Record "Shpfy Shop"; JFulfillmentOrder: JsonToken; var Cursor: Text)
     var
+        DataCapture: Record "Shpfy Data Capture";
         FulfillmentOrderHeader: Record "Shpfy FulFillment Order Header";
         Id: BigInteger;
         JNode: JsonObject;
@@ -136,9 +95,11 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
             FulfillmentOrderHeader."Shopify Location Id" := JsonHelper.GetValueAsBigInteger(JNode, 'assignedLocation.location.legacyResourceId');
             FulfillmentOrderHeader."Updated At" := JsonHelper.GetValueAsDateTime(JNode, 'updatedAt');
             FulfillmentOrderHeader.Status := CopyStr(JsonHelper.GetValueAsText(JNode, 'status'), 1, MaxStrLen(FulfillmentOrderHeader.Status));
+            FulfillmentOrderHeader."Request Status" := ConvertToRequestStatus(JsonHelper.GetValueAsText(JNode, 'requestStatus'));
             FulfillmentOrderHeader."Delivery Method Type" := ConvertToDeliveryMethodType(JsonHelper.GetValueAsText(JNode, 'deliveryMethod.methodType'));
             if not FulfillmentOrderHeader.Insert() then
                 FulfillmentOrderHeader.Modify();
+            DataCapture.Add(Database::"Shpfy FulFillment Order Header", FulfillmentOrderHeader.SystemId, JNode);
             GetFulfillmentOrderLines(ShopifyShop, FulfillmentOrderHeader);
         end;
     end;
@@ -146,6 +107,7 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
     internal procedure ExtractFulfillmentOrderLines(var ShopifyShop: Record "Shpfy Shop"; var FulfillmentOrderHeader: Record "Shpfy FulFillment Order Header"; JResponse: JsonObject; var Cursor: Text): Boolean
     var
         FulfillmentOrderLine: Record "Shpfy FulFillment Order Line";
+        DataCapture: Record "Shpfy Data Capture";
         Modified: Boolean;
         Id: BigInteger;
         JFulfillmentOrderLines: JsonArray;
@@ -164,6 +126,7 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
                         FulfillmentOrderLine."Shopify Order Id" := FulfillmentOrderHeader."Shopify Order Id";
                         FulfillmentOrderLine."Shopify Location Id" := FulfillmentOrderHeader."Shopify Location Id";
                         FulfillmentOrderLine."Delivery Method Type" := FulfillmentOrderHeader."Delivery Method Type";
+                        FulfillmentOrderLine."Line Item Id" := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JNode, 'lineItem.id'));
                         FulfillmentOrderLine."Shopify Product Id" := JsonHelper.GetValueAsBigInteger(JNode, 'lineItem.product.legacyResourceId');
                         FulfillmentOrderLine."Shopify Variant Id" := JsonHelper.GetValueAsBigInteger(JNode, 'lineItem.variant.legacyResourceId');
                         FulfillmentOrderLine."Total Quantity" := JsonHelper.GetValueAsDecimal(JNode, 'totalQuantity');
@@ -180,6 +143,10 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
                         if FulfillmentOrderLine."Shopify Location Id" <> FulfillmentOrderHeader."Shopify Location Id" then begin
                             Modified := true;
                             FulfillmentOrderLine."Shopify Location Id" := FulfillmentOrderHeader."Shopify Location Id";
+                        end;
+                        if FulfillmentOrderLine."Line Item Id" <> CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JNode, 'lineItem.id')) then begin
+                            Modified := true;
+                            FulfillmentOrderLine."Line Item Id" := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JNode, 'lineItem.id'));
                         end;
                         if FulfillmentOrderLine."Delivery Method Type" <> FulfillmentOrderHeader."Delivery Method Type" then begin
                             Modified := true;
@@ -206,6 +173,7 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
                     end;
                 end;
             end;
+            DataCapture.Add(Database::"Shpfy FulFillment Order Header", FulfillmentOrderHeader.SystemId, JFulfillmentOrderLines.AsToken());
             exit(true);
         end;
     end;
@@ -216,15 +184,13 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
         Parameters: Dictionary of [Text, Text];
         JResponse: JsonToken;
     begin
-        if CommunicationMgt.GetTestInProgress() then
-            exit;
-
         CommunicationMgt.SetShop(Shop);
 
-        if not Shop."Fulfillment Service Activated" then
-            RegisterFulfillmentService(Shop);
+        if Shop."Allow Outgoing Requests" then
+            if not Shop."Fulfillment Service Activated" then
+                RegisterFulfillmentService(Shop);
 
-        GraphQLType := "Shpfy GraphQL Type"::GetFulfillmentOrdersFromOrder;
+        GraphQLType := "Shpfy GraphQL Type"::Fulfillments_GetFulfillmentOrdersFromOrder;
         repeat
             if Parameters.ContainsKey('OrderId') then
                 Parameters.Set('OrderId', Format(OrderId))
@@ -237,10 +203,106 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
                         Parameters.Set('After', Cursor)
                     else
                         Parameters.Add('After', Cursor);
-                    GraphQLType := "Shpfy GraphQL Type"::GetNextFulfillmentOrdersFromOrder;
+                    GraphQLType := "Shpfy GraphQL Type"::Fulfillments_GetNextFulfillmentOrdersFromOrder;
                 end else
                     break;
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.order.fulfillmentOrders.pageInfo.hasNextPage');
+    end;
+
+    internal procedure GetAssignedFulfillmentOrders(var Shop: Record "Shpfy Shop"; var FulfillmentOrderIds: Dictionary of [BigInteger, Code[20]])
+    var
+        Cursor: Text;
+        Parameters: Dictionary of [Text, Text];
+        JResponse: JsonToken;
+    begin
+        if not Shop."Fulfillment Service Activated" then
+            exit;
+
+        CommunicationMgt.SetShop(Shop);
+
+        if not HasFulfillmentService() then begin
+            Shop."Fulfillment Service Activated" := false;
+            Shop.Modify();
+            exit;
+        end;
+
+        GraphQLType := "Shpfy GraphQL Type"::Fulfillments_GetAssignedFulfillmentOrders;
+
+        repeat
+            JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
+            if JResponse.IsObject() then
+                if ExtractAssignedFulfillmentOrderIds(Shop.Code, JResponse.AsObject(), FulfillmentOrderIds, Cursor) then begin
+                    if Parameters.ContainsKey('After') then
+                        Parameters.Set('After', Cursor)
+                    else
+                        Parameters.Add('After', Cursor);
+                    GraphQLType := "Shpfy GraphQL Type"::Fulfillments_GetNextAssignedFulfillmentOrders;
+                end else
+                    break;
+        until not JsonHelper.GetValueAsBoolean(JResponse, 'data.assignedFulfillmentOrders.pageInfo.hasNextPage');
+    end;
+
+    local procedure HasFulfillmentService(): Boolean
+    var
+        SyncShopLocations: Codeunit "Shpfy Sync Shop Locations";
+        Parameters: Dictionary of [Text, Text];
+        JResponse: JsonToken;
+        JLocations: JsonArray;
+    begin
+        GraphQLType := "Shpfy GraphQL Type"::Fulfillments_HasFulfillmentService;
+        Parameters.Add('Name', SyncShopLocations.GetFulfillmentServiceName());
+        JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
+        if not JResponse.IsObject() then
+            exit(false);
+
+        if not JsonHelper.GetJsonArray(JResponse.AsObject(), JLocations, 'data.locations.nodes') then
+            exit(false);
+
+        exit(JLocations.Count() > 0);
+    end;
+
+    local procedure ExtractAssignedFulfillmentOrderIds(ShopCode: Code[20]; JResponse: JsonObject; var FulfillmentOrderIds: Dictionary of [BigInteger, Code[20]]; var Cursor: Text): Boolean
+    var
+        JEdges: JsonArray;
+        JNode: JsonObject;
+        JItem: JsonToken;
+        Id: BigInteger;
+    begin
+        if JsonHelper.GetJsonArray(JResponse, JEdges, 'data.assignedFulfillmentOrders.edges') then begin
+            foreach JItem in JEdges do begin
+                Cursor := JsonHelper.GetValueAsText(JItem.AsObject(), 'cursor');
+                if JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node') then begin
+                    Id := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JNode, 'id'));
+                    if not FulfillmentOrderIds.ContainsKey(Id) then
+                        FulfillmentOrderIds.Add(Id, ShopCode);
+                end;
+            end;
+            exit(JEdges.Count() > 0);
+        end;
+        exit(false);
+    end;
+
+    internal procedure AcceptFulfillmentRequest(Shop: Record "Shpfy Shop"; var FulfillmentOrderHeader: Record "Shpfy FulFillment Order Header"): Boolean
+    var
+        Parameters: Dictionary of [Text, Text];
+        JResponse: JsonToken;
+        NewRequestStatus: Enum "Shpfy FF Request Status";
+    begin
+        CommunicationMgt.SetShop(Shop);
+        Parameters.Add('FulfillmentOrderId', Format(FulfillmentOrderHeader."Shopify Fulfillment Order Id"));
+
+        GraphQLType := "Shpfy GraphQL Type"::Fulfillments_AcceptFulfillmentRequest;
+        JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
+
+        if JResponse.IsObject() then begin
+            NewRequestStatus := ConvertToRequestStatus(JsonHelper.GetValueAsText(JResponse, 'data.fulfillmentOrderAcceptFulfillmentRequest.fulfillmentOrder.requestStatus'));
+            if NewRequestStatus = Enum::"Shpfy FF Request Status"::ACCEPTED then begin
+                FulfillmentOrderHeader."Request Status" := NewRequestStatus;
+                FulfillmentOrderHeader.Modify();
+                exit(true);
+            end;
+        end;
+        exit(false);
     end;
 
     local procedure ConvertToDeliveryMethodType(Value: Text): Enum "Shpfy Delivery Method Type"
@@ -250,5 +312,14 @@ codeunit 88239 "Shpfy Fulfillment Orders API"
             exit(Enum::"Shpfy Delivery Method Type".FromInteger(Enum::"Shpfy Delivery Method Type".Ordinals().Get(Enum::"Shpfy Delivery Method Type".Names().IndexOf(Value))))
         else
             exit(Enum::"Shpfy Delivery Method Type"::" ");
+    end;
+
+    local procedure ConvertToRequestStatus(Value: Text): Enum "Shpfy FF Request Status"
+    begin
+        Value := CommunicationMgt.ConvertToCleanOptionValue(Value);
+        if Enum::"Shpfy FF Request Status".Names().Contains(Value) then
+            exit(Enum::"Shpfy FF Request Status".FromInteger(Enum::"Shpfy FF Request Status".Ordinals().Get(Enum::"Shpfy FF Request Status".Names().IndexOf(Value))))
+        else
+            exit(Enum::"Shpfy FF Request Status"::" ");
     end;
 }

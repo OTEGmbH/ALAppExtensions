@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using System.Reflection;
 
-table 88036 "Shpfy Orders to Import"
+table 30121 "Shpfy Orders to Import"
 {
     Access = Internal;
     Caption = 'Shopify Orders to Import';
@@ -93,13 +98,8 @@ table 88036 "Shpfy Orders to Import"
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteReason = 'This field is not imported. Use field ';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#else
                                 ObsoleteState = Removed;
                                 ObsoleteTag = '28.0';
-#endif
         }
 #endif
         field(13; "Financial Status"; enum "Shpfy Financial Status")
@@ -121,6 +121,8 @@ table 88036 "Shpfy Orders to Import"
             Caption = 'Order Amount';
             DataClassification = CustomerContent;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Currency Code";
         }
 
         field(16; "Currency Code"; Code[10])
@@ -166,6 +168,8 @@ table 88036 "Shpfy Orders to Import"
             Caption = 'Channel Name';
             DataClassification = SystemMetadata;
             Editable = false;
+            TableRelation = "Shpfy Sales Channel".Name where("Shop Code" = field("Shop Code"));
+            ValidateTableRelation = false;
         }
         field(23; "Purchasing Entity"; Enum "Shpfy Order Purchasing Entity")
         {
@@ -198,13 +202,23 @@ table 88036 "Shpfy Orders to Import"
         {
             Caption = 'VAT Amount';
             DataClassification = SystemMetadata;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Currency Code";
         }
         field(29; "Presentment VAT Amount"; Decimal)
         {
             Caption = 'Presentment VAT Amount';
             DataClassification = SystemMetadata;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Currency Code";
         }
-        field(100; "Import Action"; enum "Shpfy Import Action")
+        field(30; "Channel Liable Taxes"; Boolean)
+        {
+            Caption = 'Channel Liable Taxes';
+            DataClassification = SystemMetadata;
+            Editable = false;
+        }
+        field(100; "Import Action"; Enum "Shpfy Import Action")
         {
             Caption = 'Import Action';
             DataClassification = CustomerContent;

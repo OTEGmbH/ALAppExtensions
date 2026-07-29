@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Registered Store (ID 30136).
 /// </summary>
-table 88018 "Shpfy Registered Store New"
+table 30138 "Shpfy Registered Store New"
 {
     Access = Internal;
     Caption = 'Shopify Registered Store';
@@ -26,6 +31,16 @@ table 88018 "Shpfy Registered Store New"
             Caption = 'Actual Scope';
             DataClassification = SystemMetadata;
         }
+        field(4; "Review Prompt Date"; Date)
+        {
+            Caption = 'Review Prompt Date';
+            DataClassification = SystemMetadata;
+        }
+        field(5; "Review Completed"; Boolean)
+        {
+            Caption = 'Review Completed';
+            DataClassification = SystemMetadata;
+        }
     }
     keys
     {
@@ -35,13 +50,11 @@ table 88018 "Shpfy Registered Store New"
         }
     }
 
-    [Scope('OnPrem')]
     internal procedure SetAccessToken(AccessToken: SecretText)
     begin
         IsolatedStorage.Set('AccessToken(' + Rec.SystemId + ')', AccessToken, DataScope::Module);
     end;
 
-    [Scope('OnPrem')]
     internal procedure GetAccessToken() Result: SecretText
     begin
         if not IsolatedStorage.Get('AccessToken(' + Rec.SystemId + ')', DataScope::Module, Result) then;

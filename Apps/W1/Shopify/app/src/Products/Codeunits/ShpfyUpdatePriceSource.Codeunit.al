@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Pricing.Source;
 using Microsoft.Sales.Customer;
 
-codeunit 88284 "Shpfy Update Price Source"
+codeunit 30272 "Shpfy Update Price Source"
 {
-    Access = Internal;
+    Access = Public;
     EventSubscriberInstance = Manual;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Price Source - Customer", 'OnBeforeGetId', '', true, false)]

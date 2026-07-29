@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Codeunit Shpfy Product Events (ID 30177).
 /// </summary>
-codeunit 88271 "Shpfy Product Events"
+codeunit 30177 "Shpfy Product Events"
 {
     /// <summary> 
     /// Description for OnAfterSetProductTitle.
@@ -17,8 +22,6 @@ codeunit 88271 "Shpfy Product Events"
     internal procedure OnAfterSetProductTitle(Item: Record Item; LanguageCode: Code[10]; var Title: Text)
     begin
     end;
-
-
 
     /// <summary> 
     /// Raised After Create Item.
@@ -76,6 +79,15 @@ codeunit 88271 "Shpfy Product Events"
     /// <param name="LanguageCode">Parameter of type Code[10].</param>
     [IntegrationEvent(false, false)]
     internal procedure OnAfterCreateProductBodyHtml(ItemNo: Code[20]; ShopifyShop: Record "Shpfy Shop"; var ProductBodyHtml: Text; LanguageCode: Code[10])
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before updating product metafields in Shopify.
+    /// </summary>
+    /// <param name="ProductId">The Shopify product Id.</param>
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeUpdateProductMetafields(ProductId: BigInteger)
     begin
     end;
 
@@ -343,7 +355,7 @@ codeunit 88271 "Shpfy Product Events"
     /// <param name="ShopifyVariant">Parameter of type Record "Shopify Variant".</param>
     /// <param name="xShopifyVariant">Parameter of type Record "Shopify Variant".</param>
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeSendUpdateShopifyProductVariant(ShopifyShop: Record "Shpfy Shop"; var ShopifyVariant: Record "Shpfy Variant"; var xShopifyVariant: Record "Shpfy Variant")
+    internal procedure OnBeforeSendUpdateShopifyProductVariant(ShopifyShop: Record "Shpfy Shop"; var ShopifyVariant: Record "Shpfy Variant"; xShopifyVariant: Record "Shpfy Variant")
     begin
     end;
 
@@ -383,6 +395,17 @@ codeunit 88271 "Shpfy Product Events"
     end;
 
     /// <summary> 
+    /// Raised After Modify Item Variant Picture.
+    /// </summary>
+    /// <param name="ItemVariant">Parameter of type Record "Item Variant".</param>
+    /// <param name="ImageUrl">Parameter of type Text.</param>
+    /// <param name="InStream">Parameter of type InStream.</param>
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterUpdateItemVariantPicture(var ItemVariant: Record "Item Variant"; ImageUrl: Text; InStream: InStream)
+    begin
+    end;
+
+    /// <summary> 
     /// Raised After Shopify Product fields are filled from Business Central Item. These fields are sent to Shopify when creating or updating a product.
     /// </summary>
     /// <param name="Item">Parameter of type Record Item.</param>
@@ -402,62 +425,31 @@ codeunit 88271 "Shpfy Product Events"
     internal procedure OnAfterProductsToSynchronizeFiltersSet(var ShopifyProduct: Record "Shpfy Product"; Shop: Record "Shpfy Shop"; OnlyUpdatePrice: Boolean)
     begin
     end;
-    //OTE OTE 19.09.2025 JR START
+
+    /// <summary>
+    /// Raised after the product variant data has been filled from Business Central Item, Item Variant, and Item Unit of Measure.
+    /// This event allows customization of the Shopify variant after all standard fields are set, but only when an Item Variant is present.
+    /// </summary>
+    /// <param name="ShopifyVariant">The Shopify variant record to be customized.</param>
+    /// <param name="Item">The source Item record.</param>
+    /// <param name="ItemVariant">The source Item Variant record.</param>
+    /// <param name="ItemUnitofMeasure">The source Item Unit of Measure record.</param>
+    /// <param name="Shop">The Shopify shop context.</param>
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeFillInProductFields(var ShopifyProduct: Record "Shpfy Product"; Item: Record Item)
+    internal procedure OnAfterFillInProductVariantDataFromVariant(var ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant"; ItemUnitofMeasure: Record "Item Unit of Measure"; Shop: Record "Shpfy Shop")
     begin
     end;
 
+    /// <summary>
+    /// Raised after the product variant data has been filled from Business Central Item and Item Variant (without Unit of Measure).
+    /// This event allows customization of the Shopify variant after all standard fields are set.
+    /// </summary>
+    /// <param name="ShopifyVariant">The Shopify variant record to be customized.</param>
+    /// <param name="Item">The source Item record.</param>
+    /// <param name="ItemVariant">The source Item Variant record.</param>
+    /// <param name="Shop">The Shopify shop context.</param>
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeLoopItemVariant(var ItemVariant: Record "Item Variant"; Shop: Record "Shpfy Shop"; var ShopifyProduct: Record "Shpfy Product")
+    internal procedure OnAfterFillInProductVariantData(var ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant"; Shop: Record "Shpfy Shop")
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforeUpdateProductCreateProductVariant(var ItemVariant: Record "Item Variant"; ProductId: BigInteger; Shop: Record "Shpfy Shop"; Item: Record Item; var Skip: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnAfterUpdateProduct(var ShopifyProduct: Record "Shpfy Product"; Shop: Record "Shpfy Shop")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforeAddMetafieldValueToGraphQL(MetafieldSet: Record "Shpfy Metafield"; var GraphQuery: TextBuilder; var isHandled: Boolean)
-    begin
-    end;
-
-    [InternalEvent(false)]
-    internal procedure OnAfterPushShopifyVariantPrice(Shop: Record "Shpfy Shop"; var ShopifyVariant: Record "Shpfy Variant"; xShopifyVariant: Record "Shpfy Variant")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforeModifyOrderLineAfterMapVariant(var ShopifyOrderLine: Record "Shpfy Order Line"; SHop: Record "Shpfy Shop")
-    begin
-    end;
-    //OTE OTE 19.09.2025 JR STOP 
-
-    //OTE Channel on Item "Layer" 26.01.2026 JR START
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforePublishProduct(ShopifyProduct: Record "Shpfy Product"; var SalesChannel: Record "Shpfy Sales Channel"; var isHandled: Boolean)
-    begin
-    end;
-    //OTE Channel on Item "Layer" 26.01.2026 JR STOP
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforeAddSingleMetafieldValue(_ShpfyMetafield: Record "Shpfy Metafield"; FieldKey: Text; FieldValue: Text; FieldType: Text; NodeId: Text; Handle: Text; DisplayName: Text; var isHandled: boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforeUpdateProductTags(Shop: Record "Shpfy Shop"; var ShopifyProduct: Record "Shpfy Product")
-    begin
-    end;
-
-
-
-
-
 }

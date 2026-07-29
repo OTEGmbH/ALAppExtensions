@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-table 88016 "Shpfy Doc. Link To Doc."
+namespace Microsoft.Integration.Shopify;
+
+table 30146 "Shpfy Doc. Link To Doc."
 {
     Caption = 'Doc. Link To BC Doc.';
     DataClassification = SystemMetadata;

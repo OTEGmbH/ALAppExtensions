@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Report Shpfy Add Company to Shopify (ID 30113).
 /// </summary>
-report 88003 "Shpfy Add Company to Shopify"
+report 30113 "Shpfy Add Company to Shopify"
 {
     ApplicationArea = All;
     Caption = 'Add Company to Shopify';
@@ -90,9 +95,17 @@ report 88003 "Shpfy Add Company to Shopify"
     /// <summary> 
     /// Set Shop.
     /// </summary>
-    /// <param name="Shop">Parameter of type Code[20].</param>
-    internal procedure SetShop(Shop: Code[20])
+    /// <param name="ShopifyShop">Parameter of type Code[20].</param>
+    internal procedure SetShop(ShopifyShop: Code[20])
     begin
-        ShopCode := Shop;
+        ShopCode := ShopifyShop;
+    end;
+
+    /// <summary> 
+    /// Returns the Shop value selected on request page.
+    /// </summary>
+    procedure GetShop(): Code[20]
+    begin
+        exit(ShopCode);
     end;
 }

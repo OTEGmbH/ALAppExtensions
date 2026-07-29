@@ -1,13 +1,18 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88046 "Shpfy Refund"
+namespace Microsoft.Integration.Shopify;
+
+page 30145 "Shpfy Refund"
 {
     ApplicationArea = All;
     Caption = 'Shopify Refund';
     PageType = Document;
     SourceTable = "Shpfy Refund Header";
     UsageCategory = None;
-    Editable = false;
+    InsertAllowed = false;
 
     layout
     {
@@ -33,7 +38,7 @@ page 88046 "Shpfy Refund"
                 field("Updated At"; Rec."Updated At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time when the refund was update in Shopify.';
+                    ToolTip = 'Specifies the date and time when the refund was updated in Shopify.';
                     Visible = false;
                 }
                 field("Sell-to Customer No."; Rec."Sell-to Customer No.")
@@ -71,6 +76,18 @@ page 88046 "Shpfy Refund"
                     ApplicationArea = All;
                     ToolTip = 'Specifies if this refunds already is processed into a Business Central document.';
                 }
+                field(CurrencyCode; Rec."Currency Code")
+                {
+                    ToolTip = 'Specifies the currency code for the refund.';
+                }
+                group(PresentmentCurrency)
+                {
+                    ShowCaption = false;
+                    Visible = PresentmentCurrencyVisible;
+
+                    field("Pres. Tot. Refunded Amount"; Rec."Pres. Tot. Refunded Amount") { }
+                    field("Presentment Currency Code"; Rec."Presentment Currency Code") { }
+                }
             }
             part(Lines; "Shpfy Refund Lines")
             {
@@ -103,6 +120,13 @@ page 88046 "Shpfy Refund"
                     MultiLine = true;
                     Style = Attention;
                 }
+                field(CallStack; Rec.GetLastErrorCallStack())
+                {
+                    Caption = 'Error Call Stack';
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'Specifies the processing error callstack.';
+                }
             }
         }
         area(FactBoxes)
@@ -120,9 +144,9 @@ page 88046 "Shpfy Refund"
         {
             action(CreateCreditMemo)
             {
-                Caption = 'Create Credit Memo';
-                Image = CreateCreditMemo;
-                ToolTip = 'Create a credit memo for this refund.';
+                Caption = 'Create Sales Document';
+                Image = CreateDocument;
+                ToolTip = 'Create a sales document for this refund. The document type (Credit Memo or Return Order) is determined by the shop setting.';
                 Enabled = CanCreateDocument;
 
                 trigger OnAction()
@@ -168,10 +192,21 @@ page 88046 "Shpfy Refund"
                 RunObject = Page "Shpfy Refund Shipping Lines";
                 RunPageLink = "Refund Id" = field("Refund Id");
             }
+            action(Transactions)
+            {
+                ApplicationArea = All;
+                Caption = 'Transactions';
+                Image = Payment;
+                ToolTip = 'View the transactions created for this refund that results in exchange of money.';
+                RunObject = Page "Shpfy Order Transactions";
+                RunPageLink = "Refund Id" = field("Refund Id");
+                RunPageMode = View;
+            }
         }
         area(Promoted)
         {
             actionref(PromotedShippingLines; ShippingLines) { }
+            actionref(PromotedTransactions; Transactions) { }
             actionref(PromotedCreateCreditNoted; CreateCreditMemo) { }
             actionref(PromotedRetrievedShopifyData; RetrievedShopifyData) { }
         }
@@ -181,9 +216,27 @@ page 88046 "Shpfy Refund"
         HasNote: Boolean;
         CanCreateDocument: Boolean;
 
+        PresentmentCurrencyVisible: Boolean;
+
     trigger OnAfterGetCurrRecord()
     begin
         HasNote := Rec.Note.HasValue();
         CanCreateDocument := Rec.CheckCanCreateDocument();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        SetPresentmentCurrencyVisibility();
+    end;
+
+    local procedure SetPresentmentCurrencyVisibility()
+    var
+        OrderHeader: Record "Shpfy Order Header";
+    begin
+        if not OrderHeader.Get(Rec."Order Id") then
+            exit;
+
+        PresentmentCurrencyVisible := OrderHeader.IsPresentmentCurrencyOrder();
+        CurrPage.Lines.Page.SetShowPresentmentCurrency(PresentmentCurrencyVisible);
     end;
 }

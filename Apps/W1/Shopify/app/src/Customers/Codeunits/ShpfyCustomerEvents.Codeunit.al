@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy Customer Events (ID 30115).
 /// </summary>
-codeunit 88036 "Shpfy Customer Events"
+codeunit 30115 "Shpfy Customer Events"
 {
     [IntegrationEvent(false, false)]
     /// <summary> 
@@ -121,16 +126,6 @@ codeunit 88036 "Shpfy Customer Events"
     /// <param name="Customer">Parameter of type Record Customer.</param>
     /// <param name="Handled">Parameter of type Boolean.</param>
     internal procedure OnBeforeUpdateCustomer(Shop: Record "Shpfy Shop"; var ShopifyCustomer: Record "Shpfy Customer"; var Customer: Record Customer; var Handled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforeSkipCustomerCreation(Customer: Record Customer; Shop: Record "Shpfy Shop"; SkippedRecord: Codeunit OTE.Shopify."Shpfy Skipped Record"; var isHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforeUpdateShopifyCustomerBeforeFindCustomerAddress(Customer: Record Customer; var ShopifyCustomer: Record "Shpfy Customer"; Shop: Record "Shpfy Shop"; var CustomerAddress: Record "Shpfy Customer Address"; var Skipaddress: Boolean)
     begin
     end;
 }

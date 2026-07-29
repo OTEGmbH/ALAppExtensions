@@ -1,13 +1,18 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Inventory.Item;
 using System.Environment;
 using System.Utilities;
-using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Codeunit Shpfy Hash (ID 30156).
 /// </summary>
-codeunit 88190 "Shpfy Hash"
+codeunit 30156 "Shpfy Hash"
 {
     Access = Internal;
 
@@ -83,6 +88,23 @@ codeunit 88190 "Shpfy Hash"
     begin
         if Item.Picture.Count > 0 then begin
             MediaId := Item.Picture.Item(1);
+            if TenantMedia.Get(MediaId) then
+                exit(CalcHash(TenantMedia));
+        end;
+    end;
+
+    /// <summary> 
+    /// Calc Item Variant Image Hash.
+    /// </summary>
+    /// <param name="ItemVariant">Parameter of type Record "Item Variant".</param>
+    /// <returns>Return value of type Integer.</returns>
+    internal procedure CalcItemVariantImageHash(ItemVariant: Record "Item Variant"): Integer
+    var
+        TenantMedia: Record "Tenant Media";
+        MediaId: Guid;
+    begin
+        if ItemVariant.Picture.Count() > 0 then begin
+            MediaId := ItemVariant.Picture.Item(1);
             if TenantMedia.Get(MediaId) then
                 exit(CalcHash(TenantMedia));
         end;

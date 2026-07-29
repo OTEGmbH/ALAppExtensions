@@ -1,4 +1,9 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 using System.Reflection;
@@ -6,7 +11,7 @@ using System.Reflection;
 /// <summary>
 /// Table Shpfy Customer (ID 30105).
 /// </summary>
-table 88011 "Shpfy Customer"
+table 30105 "Shpfy Customer"
 {
     Caption = 'Shopify Customer';
     DataClassification = CustomerContent;
@@ -89,13 +94,13 @@ table 88011 "Shpfy Customer"
 
         field(13; "Created At"; DateTime)
         {
-            Caption = 'Created At';
+            Caption = 'Created At (Shopify)';
             DataClassification = CustomerContent;
         }
 
         field(14; "Updated At"; DateTime)
         {
-            Caption = 'Updated At';
+            Caption = 'Updated At (Shopify)';
             DataClassification = CustomerContent;
         }
         field(15; "Last Updated by BC"; DateTime)

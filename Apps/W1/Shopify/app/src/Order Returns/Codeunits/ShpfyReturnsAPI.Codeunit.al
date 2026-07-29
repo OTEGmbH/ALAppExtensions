@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88259 "Shpfy Returns API"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30250 "Shpfy Returns API"
 {
     var
         CommunicationMgt: Codeunit "Shpfy Communication Mgt.";
@@ -25,7 +30,7 @@ codeunit 88259 "Shpfy Returns API"
                 Parameters.Set('After', JsonHelper.GetValueAsText(JReturns, 'pageInfo.endCursor'))
             else
                 Parameters.Add('After', JsonHelper.GetValueAsText(JReturns, 'pageInfo.endCursor'));
-            JResult := CommunicationMgt.ExecuteGraphQL("Shpfy GraphQL Type"::NextOrderReturns);
+            JResult := CommunicationMgt.ExecuteGraphQL("Shpfy GraphQL Type"::Returns_NextOrderReturns);
             GetReturns(OrderId, JsonHelper.GetJsonObject(JResult, 'data.order.returns'));
         end;
     end;
@@ -43,17 +48,21 @@ codeunit 88259 "Shpfy Returns API"
         ReturnLocations := GetReturnLocations(ReturnId);
 
         LineParameters.Add('ReturnId', Format(ReturnId));
-        GraphQLType := "Shpfy GraphQL Type"::GetReturnLines;
+        GraphQLType := "Shpfy GraphQL Type"::Returns_GetReturnLines;
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, LineParameters);
-            GraphQLType := "Shpfy GraphQL Type"::GetNextReturnLines;
+            GraphQLType := "Shpfy GraphQL Type"::Returns_GetNextReturnLines;
             JLines := JsonHelper.GetJsonArray(JResponse, 'data.return.returnLineItems.nodes');
             if LineParameters.ContainsKey('After') then
                 LineParameters.Set('After', JsonHelper.GetValueAsText(JResponse, 'data.return.returnLineItems.pageInfo.endCursor'))
             else
                 LineParameters.Add('After', JsonHelper.GetValueAsText(JResponse, 'data.return.returnLineItems.pageInfo.endCursor'));
-            foreach JLine in JLines do
-                FillInReturnLine(ReturnId, JLine.AsObject(), ReturnLocations);
+            foreach JLine in JLines do begin
+                if JsonHelper.GetValueAsText(JLine, '__typename') = 'ReturnLineItem' then
+                    FillInReturnLine(ReturnId, JLine.AsObject(), ReturnLocations);
+                if JsonHelper.GetValueAsText(JLine, '__typename') = 'UnverifiedReturnLineItem' then
+                    FillInUnverifiedReturnLine(ReturnId, JLine.AsObject());
+            end;
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.return.returnLineItems.pageInfo.hasNextPage');
     end;
 
@@ -67,7 +76,7 @@ codeunit 88259 "Shpfy Returns API"
         JReturn: JsonObject;
     begin
         HeaderParameters.Add('ReturnId', Format(ReturnId));
-        JResponse := CommunicationMgt.ExecuteGraphQL("Shpfy GraphQL Type"::GetReturnHeader, HeaderParameters);
+        JResponse := CommunicationMgt.ExecuteGraphQL("Shpfy GraphQL Type"::Returns_GetReturnHeader, HeaderParameters);
         JReturn := JsonHelper.GetJsonObject(JResponse, 'data.return');
         if not ReturnHeader.Get(ReturnId) then begin
             ReturnHeader."Return Id" := ReturnId;
@@ -104,16 +113,16 @@ codeunit 88259 "Shpfy Returns API"
         JOrder: JsonToken;
     begin
         LineParameters.Add('ReturnId', Format(ReturnId));
-        GraphQLType := "Shpfy GraphQL Type"::GetReverseFulfillmentOrders;
+        GraphQLType := "Shpfy GraphQL Type"::Returns_GetReverseFulfillmentOrders;
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, LineParameters);
 
-            GraphQLType := "Shpfy GraphQL Type"::GetNextReverseFulfillmentOrders;
+            GraphQLType := "Shpfy GraphQL Type"::Returns_GetNextReverseFulfillmentOrders;
             JOrders := JsonHelper.GetJsonArray(JResponse, 'data.return.reverseFulfillmentOrders.nodes');
-            if Parameters.ContainsKey('After') then
-                Parameters.Set('After', JsonHelper.GetValueAsText(JResponse, 'data.return.reverseFulfillmentOrders.pageInfo.endCursor'))
+            if LineParameters.ContainsKey('After') then
+                LineParameters.Set('After', JsonHelper.GetValueAsText(JResponse, 'data.return.reverseFulfillmentOrders.pageInfo.endCursor'))
             else
-                Parameters.Add('After', JsonHelper.GetValueAsText(JResponse, 'data.return.reverseFulfillmentOrders.pageInfo.endCursor'));
+                LineParameters.Add('After', JsonHelper.GetValueAsText(JResponse, 'data.return.reverseFulfillmentOrders.pageInfo.endCursor'));
 
             foreach JOrder in JOrders do
                 GetReturnLocationsFromReturnFulfillOrder(JsonHelper.GetValueAsText(JOrder, 'id'), ReturnLocations);
@@ -129,16 +138,16 @@ codeunit 88259 "Shpfy Returns API"
         JLine: JsonToken;
     begin
         LineParameters.Add('FulfillOrderId', FulfillOrderId);
-        GraphQLType := "Shpfy GraphQL Type"::GetReverseFulfillmentOrderLines;
+        GraphQLType := "Shpfy GraphQL Type"::Returns_GetReverseFulfillmentOrderLines;
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, LineParameters);
 
-            GraphQLType := "Shpfy GraphQL Type"::GetNextReverseFulfillmentOrders;
+            GraphQLType := "Shpfy GraphQL Type"::Returns_GetNextReverseFulfillmentOrderLines;
             JLines := JsonHelper.GetJsonArray(JResponse, 'data.reverseFulfillmentOrder.lineItems.nodes');
-            if Parameters.ContainsKey('After') then
-                Parameters.Set('After', JsonHelper.GetValueAsText(JResponse, 'data.reverseFulfillmentOrder.lineItems.pageInfo.endCursor'))
+            if LineParameters.ContainsKey('After') then
+                LineParameters.Set('After', JsonHelper.GetValueAsText(JResponse, 'data.reverseFulfillmentOrder.lineItems.pageInfo.endCursor'))
             else
-                Parameters.Add('After', JsonHelper.GetValueAsText(JResponse, 'data.reverseFulfillmentOrder.lineItems.pageInfo.endCursor'));
+                LineParameters.Add('After', JsonHelper.GetValueAsText(JResponse, 'data.reverseFulfillmentOrder.lineItems.pageInfo.endCursor'));
 
             foreach JLine in JLines do
                 CollectLocationsFromLineDispositions(JLine, ReturnLocations);
@@ -158,7 +167,7 @@ codeunit 88259 "Shpfy Returns API"
         if Dispositions.Count = 0 then
             exit;
 
-        // If dispositions have different locations (Item was restocked to multiple locations), 
+        // If dispositions have different locations (Item was restocked to multiple locations),
         // we cannot determine the return location for the line
         Dispositions.Get(0, Disposition);
         LocationId := JsonHelper.GetValueAsBigInteger(Disposition, 'location.legacyResourceId');
@@ -190,11 +199,13 @@ codeunit 88259 "Shpfy Returns API"
         if not ReturnLine.Get(Id) then begin
             ReturnLine."Return Line Id" := Id;
             ReturnLine."Return Id" := ReturnId;
+            ReturnLine.Type := ReturnLine.Type::Default;
             ReturnLine."Fulfillment Line Id" := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JLine, 'fulfillmentLineItem.id'));
             ReturnLine."Order Line Id" := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JLine, 'fulfillmentLineItem.lineItem.id'));
             ReturnLine.Insert();
         end;
-        ReturnLine."Return Reason" := ReturnEnumConvertor.ConvertToReturnReason(JsonHelper.GetValueAsText(JLine, 'returnReason'));
+        ReturnLine."Return Reason Name" := CopyStr(JsonHelper.GetValueAsText(JLine, 'returnReasonDefinition.name'), 1, MaxStrLen(ReturnLine."Return Reason Name"));
+        ReturnLine."Return Reason Handle" := CopyStr(JsonHelper.GetValueAsText(JLine, 'returnReasonDefinition.handle'), 1, MaxStrLen(ReturnLine."Return Reason Handle"));
         // If item was restocked to multiple locations, we cannot determine the return location for the line
         if ReturnLocations.Get(ReturnLine."Order Line Id", ReturnLocation) then
             ReturnLine."Location Id" := ReturnLocation;
@@ -210,6 +221,36 @@ codeunit 88259 "Shpfy Returns API"
         JsonHelper.GetValueIntoField(JLine, 'totalWeight.value', ReturnLineRecordRef, ReturnLine.FieldNo(Weight));
         JsonHelper.GetValueIntoField(JLine, 'withCodeDiscountedTotalPriceSet.shopMoney.amount', ReturnLineRecordRef, ReturnLine.FieldNo("Discounted Total Amount"));
         JsonHelper.GetValueIntoField(JLine, 'withCodeDiscountedTotalPriceSet.presentmentMoney.amount', ReturnLineRecordRef, ReturnLine.FieldNo("Presentment Disc. Total Amt."));
+        ReturnLineRecordRef.Modify();
+        ReturnLineRecordRef.Close();
+        DataCapture.Add(Database::"Shpfy Return Line", ReturnLine.SystemId, JLine);
+    end;
+
+    local procedure FillInUnverifiedReturnLine(ReturnId: BigInteger; JLine: JsonObject)
+    var
+        DataCapture: Record "Shpfy Data Capture";
+        ReturnLine: Record "Shpfy Return Line";
+        ReturnLineRecordRef: RecordRef;
+        Id: BigInteger;
+    begin
+        Id := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JLine, 'id'));
+        if not ReturnLine.Get(Id) then begin
+            ReturnLine."Return Line Id" := Id;
+            ReturnLine."Return Id" := ReturnId;
+            ReturnLine.Type := ReturnLine.Type::Unverified;
+            ReturnLine.Insert();
+        end;
+        ReturnLine."Return Reason Name" := CopyStr(JsonHelper.GetValueAsText(JLine, 'returnReasonDefinition.name'), 1, MaxStrLen(ReturnLine."Return Reason Name"));
+        ReturnLine."Return Reason Handle" := CopyStr(JsonHelper.GetValueAsText(JLine, 'returnReasonDefinition.handle'), 1, MaxStrLen(ReturnLine."Return Reason Handle"));
+        ReturnLine.SetReturnReasonNote(JsonHelper.GetValueAsText(JLine, 'returnReasonNote'));
+        ReturnLine.SetCustomerNote(JsonHelper.GetValueAsText(JLine, 'customerNote'));
+
+        ReturnLineRecordRef.GetTable(ReturnLine);
+        JsonHelper.GetValueIntoField(JLine, 'quantity', ReturnLineRecordRef, ReturnLine.FieldNo(Quantity));
+        JsonHelper.GetValueIntoField(JLine, 'refundableQuantity', ReturnLineRecordRef, ReturnLine.FieldNo("Refundable Quantity"));
+        JsonHelper.GetValueIntoField(JLine, 'refundedQuantity', ReturnLineRecordRef, ReturnLine.FieldNo("Refunded Quantity"));
+        JsonHelper.GetValueIntoField(JLine, 'unitPrice.amount', ReturnLineRecordRef, ReturnLine.FieldNo("Unit Price"));
+        JsonHelper.GetValueIntoField(JLine, 'unitPrice.currency', ReturnLineRecordRef, ReturnLine.FieldNo("Unit Price Currency"));
         ReturnLineRecordRef.Modify();
         ReturnLineRecordRef.Close();
         DataCapture.Add(Database::"Shpfy Return Line", ReturnLine.SystemId, JLine);

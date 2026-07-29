@@ -1,9 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
+
+using System.Telemetry;
 
 /// <summary>
 /// Report Shpfy Sync Orders from Shopify (ID 30104).
 /// </summary>
-report 88012 "Shpfy Sync Orders from Shopify"
+report 30104 "Shpfy Sync Orders from Shopify"
 {
     ApplicationArea = All;
     Caption = 'Sync Orders from Shopify';
@@ -20,7 +27,7 @@ report 88012 "Shpfy Sync Orders from Shopify"
             {
                 DataItemLink = "Shop Code" = field(Code);
                 DataItemLinkReference = Shop;
-                RequestFilterFields = "Fully Paid", "Financial Status", "Fulfillment Status", Confirmed, "Import Action", "Attribute Key Filter", "Attribute Key Exists", "Channel Name", "Order No.", "High Risk", "Sell-to Country/Region Code", "Ship-to Country/Region Code", "Bill-to Country/Region Code", "VAT Amount";
+                RequestFilterFields = "Fully Paid", "Financial Status", "Fulfillment Status", Confirmed, "Import Action", "Attribute Key Filter", "Attribute Key Exists", "Channel Name", "Channel Liable Taxes", "Order No.", "High Risk", "Sell-to Country/Region Code", "Ship-to Country/Region Code", "Bill-to Country/Region Code", "VAT Amount";
 
                 trigger OnPreDataItem()
                 var
@@ -83,6 +90,8 @@ report 88012 "Shpfy Sync Orders from Shopify"
 
             trigger OnAfterGetRecord()
             begin
+                Shop.GetShopSettings();
+                Shop.Modify();
                 Clear(OrdersAPI);
                 OrdersAPI.GetOrdersToImport(Shop);
             end;
@@ -98,7 +107,10 @@ report 88012 "Shpfy Sync Orders from Shopify"
         ProcessMsg: Label ' To Process: #1###########', Comment = '#1 = ToPrgress';
 
     trigger OnPreReport()
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
+        FeatureTelemetry.LogUsage('0000QWB', 'Shopify', 'Shopify sync orders executed.');
         ToImportView := OrdersToImport.GetView(false);
     end;
 

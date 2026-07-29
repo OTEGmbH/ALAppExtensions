@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Product Status (ID 30130).
 /// </summary>
-enum 88060 "Shpfy Product Status"
+enum 30130 "Shpfy Product Status"
 {
     Caption = 'Shopify Product Status';
     Extensible = false;
@@ -19,6 +24,10 @@ enum 88060 "Shpfy Product Status"
     value(2; Draft)
     {
         Caption = 'Draft';
+    }
+    value(3; Unlisted)
+    {
+        Caption = 'Unlisted';
     }
 
 }

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Credit Card Company (ID 30132).
 /// </summary>
-table 88055 "Shpfy Credit Card Company"
+table 30132 "Shpfy Credit Card Company"
 {
     Access = Internal;
     Caption = 'Shopify Credit Card Company';

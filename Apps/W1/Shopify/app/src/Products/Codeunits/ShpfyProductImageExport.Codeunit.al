@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Codeunit Shpfy Product Image Export (ID 30179).
 /// </summary>
-codeunit 88273 "Shpfy Product Image Export"
+codeunit 30179 "Shpfy Product Image Export"
 {
     Access = Internal;
     Permissions = tabledata Item = r;

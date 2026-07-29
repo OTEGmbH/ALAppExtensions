@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88032 "Shpfy Fulfillment Order Card"
+namespace Microsoft.Integration.Shopify;
+
+page 30140 "Shpfy Fulfillment Order Card"
 {
     ApplicationArea = All;
     Caption = 'Shopify Fulfillment Order';
@@ -56,6 +61,41 @@ page 88032 "Shpfy Fulfillment Order Card"
                 ApplicationArea = All;
                 Caption = 'Lines';
                 SubPageLink = "Shopify Fulfillment Order Id" = field("Shopify Fulfillment Order Id");
+            }
+        }
+    }
+
+    actions
+    {
+        area(navigation)
+        {
+            action("Retrieved Shopify Data")
+            {
+                ApplicationArea = All;
+                Caption = 'Retrieved Shopify Data';
+                Image = Entry;
+                ToolTip = 'View the data retrieved from Shopify.';
+
+                trigger OnAction();
+                var
+                    DataCapture: Record "Shpfy Data Capture";
+                begin
+                    DataCapture.SetCurrentKey("Linked To Table", "Linked To Id");
+                    DataCapture.SetRange("Linked To Table", Database::"Shpfy FulFillment Order Header");
+                    DataCapture.SetRange("Linked To Id", Rec.SystemId);
+                    Page.Run(Page::"Shpfy Data Capture List", DataCapture);
+                end;
+            }
+        }
+        area(promoted)
+        {
+            group(Category_Inspect)
+            {
+                Caption = 'Inspect';
+
+                actionref("Retrieved Shopify Data_Promoted"; "Retrieved Shopify Data")
+                {
+                }
             }
         }
     }

@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Location;
 
 /// <summary>
 /// Page Shpfy Shop Locations Mapping (ID 30117).
 /// </summary>
-page 88025 "Shpfy Shop Locations Mapping"
+page 30117 "Shpfy Shop Locations Mapping"
 {
     Caption = 'Shopify Shop Locations';
     InsertAllowed = false;
@@ -61,18 +66,12 @@ page 88025 "Shpfy Shop Locations Mapping"
                 field("Default Product Location"; Rec."Default Product Location")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The default product locations will be added to new products in Shopify.';
+                    ToolTip = 'Specifies the default product locations will be added to new products in Shopify.';
                 }
-                //OTE JR 19.09.2025 JR START
-                field("Initial Inventory Push"; Rec."Initial Inventory Push")
-                {
-                    ApplicationArea = All;
-                }
-                //OTE JR 19.09.2025 JR STOP 
                 field("Stock Calculation"; Rec."Stock Calculation")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Select the stock calculation used for this location.';
+                    ToolTip = 'Specifies the stock calculation used for this location.';
                 }
                 field(Active; Rec.Active)
                 {

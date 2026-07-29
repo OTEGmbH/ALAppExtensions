@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88216 "Shpfy Mtfld Type Dimension" implements "Shpfy IMetafield Type"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30351 "Shpfy Mtfld Type Dimension" implements "Shpfy IMetafield Type"
 {
     var
         DimensionJsonTemplateTxt: Label '{"value": %1, "unit": "%2"}', Locked = true;

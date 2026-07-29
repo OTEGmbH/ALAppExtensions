@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
 /// <summary>
 /// Report Shpfy Sync Shipm. to Shopify (ID 30109).
 /// </summary>
-report 88019 "Shpfy Sync Shipm. to Shopify"
+report 30109 "Shpfy Sync Shipm. to Shopify"
 {
     ApplicationArea = All;
     Caption = 'Sync Shipments To Shopify';
@@ -43,8 +48,15 @@ report 88019 "Shpfy Sync Shipm. to Shopify"
                 end else
                     if ShopifyOrderHeader.Get("Sales Shipment Header"."Shpfy Order Id") then begin
                         Shop.Get(ShopifyOrderHeader."Shop Code");
+
+                        // Get assigned fulfillment orders if not already retrieved for this shop
+                        if not QueriedShopCodes.Contains(Shop.Code) then begin
+                            FulfillmentOrdersAPI.GetAssignedFulfillmentOrders(Shop, AssignedFulfillmentOrderIds);
+                            QueriedShopCodes.Add(Shop.Code);
+                        end;
+
                         FulfillmentOrdersAPI.GetShopifyFulfillmentOrdersFromShopifyOrder(Shop, "Sales Shipment Header"."Shpfy Order Id");
-                        ExportShipments.CreateShopifyFulfillment("Sales Shipment Header");
+                        ExportShipments.CreateShopifyFulfillment("Sales Shipment Header", AssignedFulfillmentOrderIds);
                     end else
                         SkippedRecord.LogSkippedRecord("Sales Shipment Header"."Shpfy Order Id", "Sales Shipment Header".RecordId, StrSubstNo(ShopifyOrderNotExistsLbl, "Sales Shipment Header"."Shpfy Order Id"), Shop);
             end;
@@ -54,6 +66,8 @@ report 88019 "Shpfy Sync Shipm. to Shopify"
     var
         ExportShipments: Codeunit "Shpfy Export Shipments";
         FulfillmentOrdersAPI: Codeunit "Shpfy Fulfillment Orders API";
+        AssignedFulfillmentOrderIds: Dictionary of [BigInteger, Code[20]];
+        QueriedShopCodes: List of [Code[20]];
         NoLinesApplicableLbl: Label 'No lines applicable for fulfillment.';
         ShopifyOrderNotExistsLbl: Label 'Shopify order %1 does not exist.', Comment = '%1 = Shopify Order Id';
 }

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit ShoShpfypify Cust. By Email/Phone (ID 30113) implements Interface Shpfy ICustomer Mapping.
 /// </summary>
-codeunit 88034 "Shpfy Cust. By Email/Phone" implements "Shpfy ICustomer Mapping"
+codeunit 30113 "Shpfy Cust. By Email/Phone" implements "Shpfy ICustomer Mapping"
 {
     Access = Internal;
 
@@ -48,14 +53,18 @@ codeunit 88034 "Shpfy Cust. By Email/Phone" implements "Shpfy ICustomer Mapping"
             if AllowCreate then begin
                 CustomerAddress.SetRange("Customer Id", CustomerId);
                 CustomerAddress.SetRange(Default, true);
-                if CustomerAddress.FindFirst() then begin
-                    CreateCustomer.SetShop(ShopCode);
-                    CreateCustomer.SetTemplateCode(TemplateCode);
-                    CustomerAddress.SetRecFilter();
-                    CreateCustomer.Run(CustomerAddress);
-                    ShopifyCustomer.CalcFields("Customer No.");
-                    exit(ShopifyCustomer."Customer No.");
+                if not CustomerAddress.FindFirst() then begin
+                    CustomerAddress.SetRange(Default);
+                    if not CustomerAddress.FindFirst() then
+                        exit('');
                 end;
+                CreateCustomer.SetShop(ShopCode);
+                CreateCustomer.SetTemplateCode(TemplateCode);
+                CustomerAddress.SetRecFilter();
+                CreateCustomer.Run(CustomerAddress);
+                ShopifyCustomer.Get(CustomerId);
+                ShopifyCustomer.CalcFields("Customer No.");
+                exit(ShopifyCustomer."Customer No.");
             end;
 
         end else begin

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Payment Transactions (ID 30124).
 /// </summary>
-page 88056 "Shpfy Payment Transactions"
+page 30124 "Shpfy Payment Transactions"
 {
 
     Caption = 'Shopify Payment Transactions';
@@ -21,7 +26,7 @@ page 88056 "Shpfy Payment Transactions"
                 field(ProcessedAt; Rec."Processed At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time at which the transaction is processed.';
+                    ToolTip = 'Specifies the date and time when the transaction was processed in Shopify.';
                 }
                 field(Type; Rec.Type)
                 {

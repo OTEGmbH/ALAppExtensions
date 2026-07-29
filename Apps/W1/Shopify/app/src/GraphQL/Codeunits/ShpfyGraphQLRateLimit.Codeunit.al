@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using System.Utilities;
 
 /// <summary>
 /// Codeunit Shpfy GraphQL Rate Limit (ID 30153).
 /// </summary>
-codeunit 88188 "Shpfy GraphQL Rate Limit"
+codeunit 30153 "Shpfy GraphQL Rate Limit"
 {
     Access = Internal;
     SingleInstance = true;
@@ -56,9 +61,8 @@ codeunit 88188 "Shpfy GraphQL Rate Limit"
         if LastRequestedOn = 0DT then
             LastRequestedOn := CurrentDateTime - 1000;
         if (ExpectedCost = 0) or (ExpectedCost > LastAvailable) then begin
-            NextRequestAfter := CurrentDateTime;
             WaitTime := CalcWaitTime(ExpectedCost);
-            NextRequestAfter := LastRequestedOn + WaitTime;
+            NextRequestAfter := CurrentDateTime + WaitTime;
             WaitForRequestAvailable();
         end;
     end;

@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
 /// <summary>
 /// PageExtension Shpfy Sales Invoice Update (ID 30125) extends Record Posted Sales Inv. - Update.
 /// </summary>
-pageextension 88003 "Shpfy Sales Invoice Update" extends "Posted Sales Inv. - Update"
+pageextension 30125 "Shpfy Sales Invoice Update" extends "Posted Sales Inv. - Update"
 {
     layout
     {

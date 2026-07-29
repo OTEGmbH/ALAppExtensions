@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Table Shpfy Order Line (ID 30119).
 /// </summary>
-table 88033 "Shpfy Order Line"
+table 30119 "Shpfy Order Line"
 {
     Caption = 'Shopify Order Line';
     DataClassification = SystemMetadata;
@@ -40,18 +45,23 @@ table 88033 "Shpfy Order Line"
             Caption = 'Quantity';
             DataClassification = SystemMetadata;
             DecimalPlaces = 0 : 5;
+            AutoFormatType = 0;
         }
         field(6; "Unit Price"; Decimal)
         {
             Caption = 'Unit Price';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 2;
+            AutoFormatExpression = OrderCurrencyCode();
         }
         field(7; "Discount Amount"; Decimal)
         {
             Caption = 'Discount Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = OrderCurrencyCode();
         }
         field(8; "Shopify Variant Id"; BigInteger)
         {
@@ -95,6 +105,7 @@ table 88033 "Shpfy Order Line"
             DataClassification = SystemMetadata;
             DecimalPlaces = 0 : 5;
             Editable = false;
+            AutoFormatType = 0;
         }
         field(16; Tip; Boolean)
         {
@@ -111,20 +122,41 @@ table 88033 "Shpfy Order Line"
         field(18; "Presentment Unit Price"; Decimal)
         {
             Caption = 'Presentment Unit Price';
+            ToolTip = 'Specifies the prices in presentment currency for one unit on the line.';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = OrderPresentmentCurrencyCode();
         }
         field(19; "Presentment Discount Amount"; Decimal)
         {
             Caption = 'Presentment Discount Amount';
+            ToolTip = 'Specifies the discount amount in presentment currency that is granted for the item on the line.';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = OrderPresentmentCurrencyCode();
         }
         field(20; "Delivery Method Type"; Enum "Shpfy Delivery Method Type")
         {
             Caption = 'Delivery Method Type';
             DataClassification = SystemMetadata;
             Editable = false;
+        }
+        field(21; Weight; Decimal)
+        {
+            Caption = 'Weight';
+            DataClassification = SystemMetadata;
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+            AutoFormatType = 0;
+        }
+        field(22; "Is Exchange Item"; Boolean)
+        {
+            Caption = 'Is Exchange Item';
+            DataClassification = SystemMetadata;
+            Editable = false;
+            ToolTip = 'Specifies that this line was added to the order as the new item in a return-with-exchange. Lines marked as exchange items are excluded from BC sales documents created from the Shopify order, because the corresponding credit memo will offset their value via the linked refund.';
         }
         field(1000; "Item No."; Code[20])
         {
@@ -165,14 +197,6 @@ table 88033 "Shpfy Order Line"
                     ErrorIfSalesOrderExists();
             end;
         }
-
-        //OTE New Field for skipping mapping 02.04.2026 JR START
-        field(88000; "Skip Item Mapping"; boolean)
-        {
-            Caption = 'Skip Item Mapping';
-            DataClassification = ToBeClassified;
-        }
-        //OTE New Field for skipping mapping 02.04.2026 JR STOP 
     }
 
     keys
@@ -185,6 +209,9 @@ table 88033 "Shpfy Order Line"
         {
             SumIndexFields = Quantity;
             MaintainSiftIndex = true;
+        }
+        key(Key3; "Line Id")
+        {
         }
     }
 
@@ -208,6 +235,22 @@ table 88033 "Shpfy Order Line"
     begin
         ShopifyOrderHeader.Get("Shopify Order Id");
         ShopifyOrderHeader.TestField("Sales Order No.", '');
+    end;
+
+    local procedure OrderCurrencyCode(): Code[10]
+    var
+        OrderHeader: Record "Shpfy Order Header";
+    begin
+        if OrderHeader.Get("Shopify Order Id") then
+            exit(OrderHeader."Currency Code");
+    end;
+
+    local procedure OrderPresentmentCurrencyCode(): Code[10]
+    var
+        OrderHeader: Record "Shpfy Order Header";
+    begin
+        if OrderHeader.Get("Shopify Order Id") then
+            exit(OrderHeader."Presentment Currency Code");
     end;
 }
 

@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-enum 88026 "Shpfy Metafield Owner Type" implements "Shpfy IMetafield Owner Type"
+namespace Microsoft.Integration.Shopify;
+
+enum 30156 "Shpfy Metafield Owner Type" implements "Shpfy IMetafield Owner Type"
 {
     value(0; Customer)
     {

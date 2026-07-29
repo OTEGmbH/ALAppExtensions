@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using System.Utilities;
 
-codeunit 88224 "Shpfy Mtfld Type Num Decimal" implements "Shpfy IMetafield Type"
+codeunit 30319 "Shpfy Mtfld Type Num Decimal" implements "Shpfy IMetafield Type"
 {
     procedure HasAssistEdit(): Boolean
     begin

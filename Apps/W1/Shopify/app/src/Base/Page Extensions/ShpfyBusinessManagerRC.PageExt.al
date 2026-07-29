@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Finance.RoleCenters;
 
 /// <summary>
 /// PageExtension Shpfy Business Manager RC (ID 30101) extends Record Business Manager Role Center.
 /// </summary>
-pageextension 88000 "Shpfy Business Manager RC" extends "Business Manager Role Center"
+pageextension 30101 "Shpfy Business Manager RC" extends "Business Manager Role Center"
 {
     layout
     {
@@ -24,7 +29,7 @@ pageextension 88000 "Shpfy Business Manager RC" extends "Business Manager Role C
             group(Shpfy)
             {
                 Caption = 'Shopify';
-                ToolTip = 'Manage Shopify Shops, customers, products, orders, gift cards, transactions and payouts.';
+                ToolTip = 'Manage Shopify Shops, customers, companies, products, orders, gift cards, transactions and payouts.';
 
                 action(ShpfyShops)
                 {
@@ -42,6 +47,14 @@ pageextension 88000 "Shpfy Business Manager RC" extends "Business Manager Role C
                     RunObject = page "Shpfy Customers";
                     ToolTip = 'View or edit detailed information for the customers that you trade with through Shopify.';
                 }
+                action(ShpfyCompanies)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Companies';
+                    Image = Company;
+                    RunObject = page "Shpfy Companies";
+                    ToolTip = 'View or edit detailed information for the companies that you trade with through Shopify.';
+                }
                 action(ShpfyProducts)
                 {
                     ApplicationArea = All;
@@ -56,7 +69,6 @@ pageextension 88000 "Shpfy Business Manager RC" extends "Business Manager Role C
                     Caption = 'Orders';
                     Image = OrderList;
                     RunObject = page "Shpfy Orders";
-                    RunPageView = where(Closed = const(false));
                     ToolTip = 'View your Shopify agreements with customers to sell certain products on certain delivery and payment terms.';
                 }
                 action(Refunds)

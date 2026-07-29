@@ -1,12 +1,17 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using Microsoft.Sales.Document;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
 
 /// <summary>
 /// Page Shpfy Orders (ID 30115).
 /// </summary>
-page 88042 "Shpfy Orders"
+page 30115 "Shpfy Orders"
 {
     ApplicationArea = All;
     Caption = 'Shopify Orders';
@@ -20,6 +25,7 @@ page 88042 "Shpfy Orders"
     AboutTitle = 'About Shopify Orders';
     AboutText = 'These orders from all your connected shops are ready to become sales orders or invoices in Business Central. They''re here because you aren''t automatically creating sales documents in Business Central.';
     SourceTableView = sorting("Created At") order(descending);
+
     layout
     {
         area(content)
@@ -36,17 +42,6 @@ page 88042 "Shpfy Orders"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the Shopify Shop from which the order originated.';
                 }
-#if not CLEAN25
-                field(RiskLevel; Rec."Risk Level")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the risk level from the Shopify order.';
-                    Visible = false;
-                    ObsoleteReason = 'This field is not imported.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-#endif
                 field("High Risk"; Rec."High Risk")
                 {
                     ApplicationArea = All;
@@ -118,7 +113,7 @@ page 88042 "Shpfy Orders"
                 field(CreatedAt; Rec."Created At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time when the order was created.';
+                    ToolTip = 'Specifies the date and time when the order was created in Shopify.';
                 }
                 field(Confirmed; Rec.Confirmed)
                 {
@@ -145,6 +140,24 @@ page 88042 "Shpfy Orders"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the sum of the line amounts on all lines in the document minus any discount amounts plus the shipping costs.';
+                }
+                field(AppName; Rec."App Name")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the name of the app used by the channel where you sell your products. A channel can be a platform or a marketplace such as an online store or POS.';
+                    Visible = false;
+                }
+                field("Channel Liable Taxes"; Rec."Channel Liable Taxes")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if any tax line on the order is liable to be charged by the channel.';
+                    Visible = false;
+                }
+                field(CancelReason; Rec."Cancel Reason")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                    ToolTip = 'Specifies the reason why the order was cancelled. Valid values are: customer, fraud, inventory, declined, other.';
                 }
                 field(Processed; Rec.Processed)
                 {
@@ -189,6 +202,13 @@ page 88042 "Shpfy Orders"
                 Caption = 'Linked Documents';
                 SubPageLink = "Shopify Document Type" = const("Shpfy Shop Document Type"::"Shopify Shop Order"), "Shopify Document Id" = field("Shopify Order Id");
             }
+            part(OrderTotals; "Shpfy Order Totals FactBox")
+            {
+                ApplicationArea = All;
+                Caption = 'Order Totals';
+                SubPageLink = "Shopify Order Id" = field("Shopify Order Id");
+                Visible = (Rec."Sales Order No." <> '') or (Rec."Sales Invoice No." <> '');
+            }
             part(CustomerStatistics; "Customer Statistics FactBox")
             {
                 ApplicationArea = All;
@@ -202,7 +222,7 @@ page 88042 "Shpfy Orders"
             part(OrderTags; "Shpfy Tag Factbox")
             {
                 ApplicationArea = All;
-                SubPageLink = "Parent Table No." = const(database::"Shpfy Order Header"), "Parent Id" = field("Shopify Order Id");
+                SubPageLink = "Parent Table No." = const(30118), "Parent Id" = field("Shopify Order Id");
             }
             part(OrderAttributes; "Shpfy Order Attributes")
             {
@@ -321,6 +341,20 @@ page 88042 "Shpfy Orders"
                     Rec.Modify();
                 end;
             }
+            action(ProvideFeedback)
+            {
+                ApplicationArea = All;
+                Caption = 'Provide Feedback';
+                ToolTip = 'Provide feedback on Shopify Connector.';
+                Image = Comment;
+
+                trigger OnAction()
+                var
+                    ShopMgt: Codeunit "Shpfy Shop Mgt.";
+                begin
+                    ShopMgt.RequestFeedback();
+                end;
+            }
         }
         area(navigation)
         {
@@ -407,7 +441,30 @@ page 88042 "Shpfy Orders"
         }
     }
 
+    views
+    {
+        view(UnprocessedOrders)
+        {
+            Caption = 'Unprocessed Orders';
+            Filters = where(Processed = const(false));
+        }
+        view(OrderWithConflicts)
+        {
+            Caption = 'Orders with Conflicts';
+            Filters = where("Has Order State Error" = const(true));
+        }
+        view(OrderWithProcessingErrors)
+        {
+            Caption = 'Orders with Processing Errors';
+            Filters = where("Has Error" = const(true));
+        }
+        view(OpenOrders)
+        {
+            Caption = 'Open Orders';
+            Filters = where(Closed = const(false));
+        }
+    }
+
     var
         ConfirmLbl: Label 'Create sales document(s) from the selected Shopify order(s)?';
 }
-

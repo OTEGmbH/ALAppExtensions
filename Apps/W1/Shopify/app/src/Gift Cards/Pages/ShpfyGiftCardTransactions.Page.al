@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Gift Card Transactions (ID 30111).
 /// </summary>
-page 88022 "Shpfy Gift Card Transactions"
+page 30111 "Shpfy Gift Card Transactions"
 {
     Caption = 'Shopify Gift Card Transactions';
     DeleteAllowed = false;
@@ -69,7 +74,7 @@ page 88022 "Shpfy Gift Card Transactions"
                 field("Created At"; Rec."Created At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time at which the transaction is processed.';
+                    ToolTip = 'Specifies the date and time when the transaction was created in Shopify.';
                 }
                 field(Authorization; Rec.Authorization)
                 {

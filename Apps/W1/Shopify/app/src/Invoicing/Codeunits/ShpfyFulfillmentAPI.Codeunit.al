@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Fulfillment API (ID 30315).
 /// </summary>
-codeunit 88204 "Shpfy Fulfillment API"
+codeunit 30361 "Shpfy Fulfillment API"
 {
     Access = Internal;
 
@@ -20,7 +25,7 @@ codeunit 88204 "Shpfy Fulfillment API"
         GraphQLType: Enum "Shpfy GraphQL Type";
         Parameters: Dictionary of [Text, Text];
     begin
-        GraphQLType := "Shpfy GraphQL Type"::FulfillOrder;
+        GraphQLType := "Shpfy GraphQL Type"::Fulfillments_FulfillOrder;
         Parameters.Add('FulfillmentOrderId', Format(FulfillmentOrderId));
         JResponse := ShpfyCommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
     end;
@@ -29,21 +34,25 @@ codeunit 88204 "Shpfy Fulfillment API"
     /// Gets fulfillment order ids for a provided shopify order id.
     /// </summary>
     /// <param name="OrderId">Shopify order id to get fulfillments from.</param>
-    /// <param name="NumberOfLines">Number of fulfillment orders to get.</param>
     /// <returns>List of fulfillment order ids.</returns>
-    internal procedure GetFulfillmentOrderIds(OrderId: Text; NumberOfLines: Integer) FulfillmentOrderList: List of [BigInteger]
+    internal procedure GetFulfillmentOrderIds(OrderId: Text) FulfillmentOrderList: List of [BigInteger]
     var
+        ShpfyJsonHelper: Codeunit "Shpfy Json Helper";
         GraphQLType: Enum "Shpfy GraphQL Type";
         Parameters: Dictionary of [Text, Text];
         JFulfillments: JsonToken;
     begin
-        GraphQLType := "Shpfy GraphQL Type"::GetFulfillmentOrderIds;
+        GraphQLType := "Shpfy GraphQL Type"::Fulfillments_GetFulfillmentOrderIds;
         Parameters.Add('OrderId', OrderId);
-        Parameters.Add('NumberOfOrders', Format(NumberOfLines));
-        JFulfillments := ShpfyCommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
-        FulfillmentOrderList := ParseFulfillmentOrders(JFulfillments);
-
-        exit(FulfillmentOrderList);
+        repeat
+            JFulfillments := ShpfyCommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
+            FulfillmentOrderList.AddRange(ParseFulfillmentOrders(JFulfillments));
+            GraphQLType := "Shpfy GraphQL Type"::Fulfillments_GetNextFulfillmentOrderIds;
+            if Parameters.ContainsKey('After') then
+                Parameters.Set('After', ShpfyJsonHelper.GetValueAsText(JFulfillments, 'data.order.fulfillmentOrders.pageInfo.endCursor'))
+            else
+                Parameters.Add('After', ShpfyJsonHelper.GetValueAsText(JFulfillments, 'data.order.fulfillmentOrders.pageInfo.endCursor'));
+        until not ShpfyJsonHelper.GetValueAsBoolean(JFulfillments, 'data.order.fulfillmentOrders.pageInfo.hasNextPage');
     end;
 
     /// <summary>

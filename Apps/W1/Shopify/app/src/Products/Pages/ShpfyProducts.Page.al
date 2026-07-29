@@ -1,4 +1,9 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 using System.Environment.Configuration;
@@ -6,7 +11,7 @@ using System.Environment.Configuration;
 /// <summary>
 /// Page Shpfy Products (ID 30126).
 /// </summary>
-page 88059 "Shpfy Products"
+page 30126 "Shpfy Products"
 {
 
     ApplicationArea = All;
@@ -40,7 +45,7 @@ page 88059 "Shpfy Products"
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the status of the product in Shopify. Valid values are: active, archived, draft. If you change this, this will immediately send to Shopify.';
+                    ToolTip = 'Specifies the status of the product in Shopify. Valid values are: active, archived, draft, unlisted. If you change this, this will immediately send to Shopify.';
 
                     trigger OnValidate()
                     var
@@ -131,19 +136,15 @@ page 88059 "Shpfy Products"
                         CurrPage.SaveRecord();
                     end;
                 }
-                field("Skip Metafields"; Rec."Skip Metafields")
-                {
-                    ApplicationArea = All;
-                }
                 field(CreatedAt; Rec."Created At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies when the product was created.';
+                    ToolTip = 'Specifies when the product was created in Shopify.';
                 }
                 field(UpdatedAt; Rec."Updated At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies when the product was updated.';
+                    ToolTip = 'Specifies when the product was updated in Shopify.';
                 }
                 field(ProductType; Rec."Product Type")
                 {
@@ -167,6 +168,12 @@ page 88059 "Shpfy Products"
                     ExtendedDatatype = URL;
                     ToolTip = 'Specifies the url to preview the product on the webshop.';
                 }
+                field("Error"; Rec."Has Error") { }
+                field(ErrorMessage; Rec."Error Message")
+                {
+                    Style = Attention;
+                    StyleExpr = true;
+                }
             }
             part(Variants; "Shpfy Variants")
             {
@@ -185,7 +192,7 @@ page 88059 "Shpfy Products"
             part(ItemTags; "Shpfy Tag Factbox")
             {
                 ApplicationArea = All;
-                SubPageLink = "Parent Table No." = const(database::"Shpfy Product"), "Parent Id" = field(Id);
+                SubPageLink = "Parent Table No." = const(30127), "Parent Id" = field(Id);
             }
             part(Stock; "Shpfy Inventory FactBox")
             {
@@ -319,61 +326,6 @@ page 88059 "Shpfy Products"
                     Tags.RunModal();
                 end;
             }
-            action(UpdateTagsToShopify)
-            {
-                ApplicationArea = All;
-                Caption = 'Update Tags to Shopify';
-                Image = UpdateUnitCost;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                ToolTip = 'Push the current tags from Business Central to Shopify for the selected products. This overwrites any tags on Shopify with the local tags. If no tags exist locally, the tags on Shopify will be cleared.';
-
-                trigger OnAction()
-                var
-                    ShopifyProduct: Record "Shpfy Product";
-                    ProductApi: Codeunit "Shpfy Product API";
-                begin
-                    CurrPage.SetSelectionFilter(ShopifyProduct);
-                    if ShopifyProduct.FindSet() then begin
-                        ProductApi.SetShop(ShopifyProduct."Shop Code");
-                        repeat
-                            ProductApi.UpdateProductTags(ShopifyProduct);
-                        until ShopifyProduct.Next() = 0;
-                    end;
-                end;
-            }
-            action(ClearTagsOnShopify)
-            {
-                ApplicationArea = All;
-                Caption = 'Clear Tags on Shopify';
-                Image = Delete;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                ToolTip = 'Remove all tags from the selected products directly on Shopify. Local tags in Business Central are not deleted.';
-
-                trigger OnAction()
-                var
-                    ShopifyProduct: Record "Shpfy Product";
-                    ProductApi: Codeunit "Shpfy Product API";
-                    ConfirmQst: Label 'Do you want to clear all tags on Shopify for the selected %1 product(s)?', Comment = '%1 = number of selected products';
-                begin
-                    CurrPage.SetSelectionFilter(ShopifyProduct);
-                    if ShopifyProduct.IsEmpty() then
-                        exit;
-                    if not Confirm(ConfirmQst, false, ShopifyProduct.Count()) then
-                        exit;
-                    if ShopifyProduct.FindSet() then begin
-                        ProductApi.SetShop(ShopifyProduct."Shop Code");
-                        repeat
-                            ProductApi.ClearProductTags(ShopifyProduct);
-                        until ShopifyProduct.Next() = 0;
-                    end;
-                end;
-            }
             action(Metafields)
             {
                 ApplicationArea = All;
@@ -391,6 +343,27 @@ page 88059 "Shpfy Products"
                 begin
                     Rec.TestField(Id);
                     Metafields.RunForResource(Database::"Shpfy Product", Rec.Id, Rec."Shop Code");
+                end;
+            }
+            action(CreateItem)
+            {
+                Caption = 'Create Item';
+                Image = NewItem;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Convert selected Shopify Products to Items.';
+
+                trigger OnAction();
+                var
+                    Product: Record "Shpfy Product";
+                    CreateItem: Codeunit "Shpfy Create Item";
+                begin
+                    if Confirm(CreateItemConfirmLbl) then begin
+                        CurrPage.SetSelectionFilter(Product);
+                        CreateItem.CreateItemsFromShopifyProducts(Product);
+                        CurrPage.Update(false);
+                    end;
                 end;
             }
             group(Sync)
@@ -478,6 +451,20 @@ page 88059 "Shpfy Products"
                     end;
                 }
             }
+            action(ProvideFeedback)
+            {
+                ApplicationArea = All;
+                Caption = 'Provide Feedback';
+                ToolTip = 'Provide feedback on Shopify Connector.';
+                Image = Comment;
+
+                trigger OnAction()
+                var
+                    ShopMgt: Codeunit "Shpfy Shop Mgt.";
+                begin
+                    ShopMgt.RequestFeedback();
+                end;
+            }
         }
     }
 
@@ -512,4 +499,5 @@ page 88059 "Shpfy Products"
         AddItemsMsg: Label 'Add Items to Shopify';
         SyncProductsMsg: Label 'Sync Products';
         NoItemNotificationMsg: Label 'There isn''t data here yet. Do you want to synchronize products?';
+        CreateItemConfirmLbl: Label 'Do you want to create items from selected Shopify products?';
 }

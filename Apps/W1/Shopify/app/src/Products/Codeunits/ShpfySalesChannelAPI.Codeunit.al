@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Sales Channel API (ID 30372).
 /// </summary>
-codeunit 88278 "Shpfy Sales Channel API"
+codeunit 30372 "Shpfy Sales Channel API"
 {
     Access = Internal;
 
@@ -27,7 +32,7 @@ codeunit 88278 "Shpfy Sales Channel API"
         CurrentChannels := CollectChannels(ShopCode);
 
         CommunicationMgt.SetShop(ShopCode);
-        GraphQLType := GraphQLType::GetSalesChannels;
+        GraphQLType := GraphQLType::Base_GetSalesChannels;
 
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
@@ -37,7 +42,7 @@ codeunit 88278 "Shpfy Sales Channel API"
                     Parameters.Set('After', Cursor)
                 else
                     Parameters.Add('After', Cursor);
-                GraphQLType := GraphQLType::GetNextSalesChannels;
+                GraphQLType := GraphQLType::Base_GetNextSalesChannels;
             end;
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.publications.pageInfo.hasNextPage');
 

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Payment Terms API (ID 30168).
 /// </summary>
-codeunit 88263 "Shpfy Payment Terms API"
+codeunit 30360 "Shpfy Payment Terms API"
 {
     Access = Internal;
 
@@ -23,7 +28,7 @@ codeunit 88263 "Shpfy Payment Terms API"
         JTemplate: JsonToken;
         JResponse: JsonToken;
     begin
-        GraphQLType := GraphQLType::GetPaymentTerms;
+        GraphQLType := GraphQLType::Payments_GetPaymentTerms;
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType);
 
         JsonHelper.GetJsonArray(JResponse, JTemplates, 'data.paymentTermsTemplates');

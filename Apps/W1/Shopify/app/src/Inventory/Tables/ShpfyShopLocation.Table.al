@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Location;
 
 /// <summary>
 /// Table Shpfy Shop Location (ID 30113).
 /// </summary>
-table 88020 "Shpfy Shop Location"
+table 30113 "Shpfy Shop Location"
 {
     Caption = 'Shopify Shop Location';
     DataClassification = CustomerContent;
@@ -142,16 +147,20 @@ table 88020 "Shpfy Shop Location"
                 end;
             end;
         }
-
-
-        //OTE JR 19.09.2025 JR START
-        field(88000; "Initial Inventory Push"; boolean)
+        field(13; "Fulfillment Service Id"; BigInteger)
         {
-            Caption = 'Initial Inventory Push';
+            Caption = 'Fulfillment Service Id';
             DataClassification = SystemMetadata;
-            Description = 'Indicates that the initial inventory push has been done for this location.';
+            Editable = false;
+            Description = 'The Id of the fulfillment service in Shopify.';
         }
-        //OTE JR 19.09.2025 JR STOP 
+        field(14; "Fulfillment Srv. Callback Url"; Text[500])
+        {
+            Caption = 'Fulfillment Service Callback Url';
+            DataClassification = SystemMetadata;
+            Editable = false;
+            Description = 'The callback URL of the fulfillment service in Shopify.';
+        }
     }
 
     keys
@@ -177,13 +186,13 @@ table 88020 "Shpfy Shop Location"
     internal procedure CreateLocationFilter()
     var
         Location: Record Location;
-        CreateLocationFilter: Report "Shpfy Create Location Filter";
+        ShopifyCreateLocationFilter: Report "Shpfy Create Location Filter";
     begin
         if "Location Filter" <> '' then
             Location.SetFilter(Code, "Location Filter");
-        CreateLocationFilter.SetTableView(Location);
-        CreateLocationFilter.RunModal();
-        "Location Filter" := CopyStr(CreateLocationFilter.GetLocationFilter(), 1, MaxStrLen("Location Filter"));
+        ShopifyCreateLocationFilter.SetTableView(Location);
+        ShopifyCreateLocationFilter.RunModal();
+        "Location Filter" := CopyStr(ShopifyCreateLocationFilter.GetLocationFilter(), 1, MaxStrLen("Location Filter"));
     end;
 
 }

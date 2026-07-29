@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Inventory Item (ID 30126).
 /// </summary>
-table 88048 "Shpfy Inventory Item"
+table 30126 "Shpfy Inventory Item"
 {
     Access = Internal;
     Caption = 'Shopify Inventory Item';
@@ -65,10 +70,12 @@ table 88048 "Shpfy Inventory Item"
         {
             Caption = 'Unit Cost';
             DataClassification = CustomerContent;
+            AutoFormatType = 2;
+            AutoFormatExpression = '';
         }
         field(12; "Updated At"; DateTime)
         {
-            Caption = 'Updated At';
+            Caption = 'Updated At (Shopify)';
             DataClassification = CustomerContent;
         }
     }

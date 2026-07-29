@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88054 "Shpfy Disputes"
+namespace Microsoft.Integration.Shopify;
+
+page 30161 "Shpfy Disputes"
 {
     Editable = false;
     PageType = List;

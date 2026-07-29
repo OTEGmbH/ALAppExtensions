@@ -1,13 +1,18 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Finance.Currency;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.History;
-using Microsoft.Finance.Currency;
 
 /// <summary>
 /// Codeunit Draft Orders API (ID 30159).
 /// </summary>
-codeunit 88203 "Shpfy Draft Orders API"
+codeunit 30159 "Shpfy Draft Orders API"
 {
     Access = Internal;
 
@@ -48,7 +53,7 @@ codeunit 88203 "Shpfy Draft Orders API"
         Parameters: Dictionary of [Text, Text];
         JResponse: JsonToken;
     begin
-        GraphQLType := "Shpfy GraphQL Type"::DraftOrderComplete;
+        GraphQLType := "Shpfy GraphQL Type"::Orders_DraftOrderComplete;
         Parameters.Add('DraftOrderId', Format(DraftOrderId));
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
         exit(JResponse);
@@ -175,6 +180,14 @@ codeunit 88203 "Shpfy Draft Orders API"
                 GraphQuery.Append(Format(TempOrderLine."Unit Price", 0, 9));
                 GraphQuery.Append(', currencyCode: ');
                 GraphQuery.Append(GetISOCode(TempOrderHeader."Currency Code"));
+                GraphQuery.Append('}, weight: {value: ');
+                GraphQuery.Append(Format(TempOrderLine.Weight, 0, 9));
+                GraphQuery.Append(', unit: ');
+                if Shop."Weight Unit" = Shop."Weight Unit"::" " then begin
+                    Shop."Weight Unit" := Shop.GetShopWeightUnit();
+                    Shop.Modify();
+                end;
+                GraphQuery.Append(Shop."Weight Unit".Names.Get(Shop."Weight Unit".Ordinals.IndexOf(Shop."Weight Unit".AsInteger())).Trim().ToUpper().Replace(' ', '_'));
                 GraphQuery.Append('}},');
             until TempOrderLine.Next() = 0;
 

@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88058 "Shpfy Add Item Confirm"
+namespace Microsoft.Integration.Shopify;
+
+page 30144 "Shpfy Add Item Confirm"
 {
     Caption = 'Add to Shopify shop';
     InstructionalText = 'Add to Shopify shop';
@@ -45,17 +50,17 @@ page 88058 "Shpfy Add Item Confirm"
         AddToStoreActiveConfirmLbl: Label 'The item %1 will be added to the %2 store as a new product, and it will be immediately active.', Comment = '%1 - Item description, %2 - Shopify store name';
         AddToStoreDraftConfirmLbl: Label 'The item %1 will be added to the %2 store as a new product, and it will remain in draft until you activate it.', Comment = '%1 - Item description, %2 - Shopify store name';
 
-    internal procedure SetIsActive(Active: Boolean)
+    procedure SetIsActive(Active: Boolean)
     begin
         IsActive := Active;
     end;
 
-    internal procedure SetItemDescription(Description: Text[100])
+    procedure SetItemDescription(Description: Text[100])
     begin
         ItemDescription := Description;
     end;
 
-    internal procedure SetShopCode(Code: Code[20])
+    procedure SetShopCode(Code: Code[20])
     begin
         ShopCode := Code;
     end;

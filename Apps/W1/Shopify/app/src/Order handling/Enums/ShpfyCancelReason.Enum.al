@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Cancel Reason (ID 30116).
 /// </summary>
-enum 88035 "Shpfy Cancel Reason"
+enum 30116 "Shpfy Cancel Reason"
 {
     Caption = 'Shopify Cancel Reason';
     Extensible = false;

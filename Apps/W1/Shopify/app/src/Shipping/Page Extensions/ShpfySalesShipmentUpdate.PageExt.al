@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
-pageextension 88020 "Shpfy Sales Shipment Update" extends "Posted Sales Shipment - Update"
+pageextension 30123 "Shpfy Sales Shipment Update" extends "Posted Sales Shipment - Update"
 {
     layout
     {

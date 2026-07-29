@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Tax Type (ID 30110).
 /// </summary>
-enum 88018 "Shpfy Tax Type"
+enum 30110 "Shpfy Tax Type"
 {
     Access = Internal;
     Caption = 'Shopify Tax Type';

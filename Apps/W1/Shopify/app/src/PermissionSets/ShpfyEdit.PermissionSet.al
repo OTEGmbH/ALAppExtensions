@@ -1,16 +1,21 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Shpfy - Edit Permissions (ID 30102).
 /// </summary>
-permissionset 88001 "OTEShpfy - Edit"
+permissionset 30102 "Shpfy - Edit"
 {
     Access = Internal;
     Assignable = false;
     Caption = 'Shopify - Edit', MaxLength = 30;
 
-    IncludedPermissionSets = "OTEShpfy - Read",
-        "OTEShpfy Indirect Perm";
+    IncludedPermissionSets = "Shpfy - Read",
+        "Shpfy Indirect Perm";
 
     Permissions =
         tabledata "Shpfy Bulk Operation" = IMD,
@@ -35,12 +40,8 @@ permissionset 88001 "OTEShpfy - Edit"
         tabledata "Shpfy Invoice Header" = IMD,
         tabledata "Shpfy Language" = IMD,
         tabledata "Shpfy Log Entry" = IMD,
+        tabledata "Shpfy Market Catalog Relation" = IMD,
         tabledata "Shpfy Metafield" = IMD,
-        tabledata "Shpfy Refund Header" = IMD,
-        tabledata "Shpfy Refund Line" = IMD,
-        tabledata "Shpfy Refund Shipping Line" = IMD,
-        tabledata "Shpfy Return Header" = IMD,
-        tabledata "Shpfy Return Line" = IMD,
         tabledata "Shpfy Order Attribute" = IMD,
         tabledata "Shpfy Order Disc.Appl." = IMD,
         tabledata "Shpfy Order Fulfillment" = IMD,
@@ -50,22 +51,33 @@ permissionset 88001 "OTEShpfy - Edit"
         tabledata "Shpfy Order Payment Gateway" = IMD,
         tabledata "Shpfy Order Risk" = IMD,
         tabledata "Shpfy Order Shipping Charges" = IMD,
-        tabledata "Shpfy Orders To Import" = IMD,
         tabledata "Shpfy Order Tax Line" = IMD,
         tabledata "Shpfy Order Transaction" = IMD,
+        tabledata "Shpfy Orders To Import" = IMD,
         tabledata "Shpfy Payment Method Mapping" = IMD,
         tabledata "Shpfy Payment Terms" = IMD,
         tabledata "Shpfy Payment Transaction" = IMD,
         tabledata "Shpfy Payout" = IMD,
         tabledata "Shpfy Product" = IMD,
+        tabledata "Shpfy Product Collection" = IMD,
+        tabledata "Shpfy Refund Header" = IMD,
+        tabledata "Shpfy Refund Line" = IMD,
+        tabledata "Shpfy Refund Shipping Line" = IMD,
         tabledata "Shpfy Registered Store New" = imd,
+        tabledata "Shpfy Return Header" = IMD,
+        tabledata "Shpfy Return Line" = IMD,
         tabledata "Shpfy Sales Channel" = IMD,
         tabledata "Shpfy Shipment Method Mapping" = IMD,
         tabledata "Shpfy Shop" = IMD,
+#if not CLEAN28
+#pragma warning disable AL0432
         tabledata "Shpfy Shop Collection Map" = IMD,
+#pragma warning restore AL0432
+#endif
         tabledata "Shpfy Shop Inventory" = IMD,
         tabledata "Shpfy Shop Location" = IMD,
         tabledata "Shpfy Skipped Record" = IMD,
+        tabledata "Shpfy Staff Member" = IMD,
         tabledata "Shpfy Synchronization Info" = IMD,
         tabledata "Shpfy Tag" = IMD,
         tabledata "Shpfy Tax Area" = IMD,

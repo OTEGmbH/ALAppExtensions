@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-enum 88020 "Shpfy Shop Document Type" implements "Shpfy IOpenShopifyDocument"
+namespace Microsoft.Integration.Shopify;
+
+enum 30144 "Shpfy Shop Document Type" implements "Shpfy IOpenShopifyDocument"
 {
     Extensible = true;
     DefaultImplementation = "Shpfy IOpenShopifyDocument" = "Shpfy OpenDoc NotSupported";

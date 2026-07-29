@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Order Shipping Charges (ID 30128).
 /// </summary>
-page 88063 "Shpfy Order Shipping Charges"
+page 30128 "Shpfy Order Shipping Charges"
 {
     Caption = 'Shopify Order Shipping Charges';
     DeleteAllowed = false;
@@ -11,7 +16,6 @@ page 88063 "Shpfy Order Shipping Charges"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
-    PromotedActionCategories = 'New,Process,Report,Inspect';
     SourceTable = "Shpfy Order Shipping Charges";
     UsageCategory = None;
 
@@ -43,10 +47,20 @@ page 88063 "Shpfy Order Shipping Charges"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the shipping cost amount.';
                 }
+                field(PresentmentAmount; Rec."Presentment Amount")
+                {
+                    ApplicationArea = All;
+                    Visible = PresentmentCurrencyVisible;
+                }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the shipping cost discount amount.';
+                }
+                field("Presentment Discount Amount"; Rec."Presentment Discount Amount")
+                {
+                    ApplicationArea = All;
+                    Visible = PresentmentCurrencyVisible;
                 }
                 field(Source; Rec.Source)
                 {
@@ -72,15 +86,26 @@ page 88063 "Shpfy Order Shipping Charges"
     {
         area(Processing)
         {
+            action(TaxLines)
+            {
+                ApplicationArea = All;
+                Caption = 'Tax Lines';
+                Image = TaxDetail;
+                ToolTip = 'View the tax lines for the selected shipping charge.';
+
+                trigger OnAction();
+                var
+                    OrderTaxLine: Record "Shpfy Order Tax Line";
+                begin
+                    OrderTaxLine.SetRange("Parent Id", Rec."Shopify Shipping Line Id");
+                    Page.Run(Page::"Shpfy Order Tax Lines", OrderTaxLine);
+                end;
+            }
             action(RetrievedShopifyData)
             {
                 ApplicationArea = All;
                 Caption = 'Retrieved Shopify Data';
                 Image = Entry;
-                Promoted = true;
-                PromotedCategory = Category4;
-                PromotedIsBig = true;
-                PromotedOnly = true;
                 ToolTip = 'View the data retrieved from Shopify.';
 
                 trigger OnAction();
@@ -94,6 +119,29 @@ page 88063 "Shpfy Order Shipping Charges"
                 end;
             }
         }
+        area(Promoted)
+        {
+            actionref(TaxLines_Promoted; TaxLines) { }
+            actionref(RetrievedShopifyData_Promoted; RetrievedShopifyData) { }
+        }
     }
+
+    var
+        PresentmentCurrencyVisible: Boolean;
+
+    trigger OnAfterGetRecord()
+    begin
+        SetShowPresentmentCurrencyVisibility();
+    end;
+
+    local procedure SetShowPresentmentCurrencyVisibility()
+    var
+        OrderHeader: Record "Shpfy Order Header";
+    begin
+        if not OrderHeader.Get(Rec."Shopify Order Id") then
+            exit;
+
+        PresentmentCurrencyVisible := OrderHeader.IsPresentmentCurrencyOrder();
+    end;
 }
 

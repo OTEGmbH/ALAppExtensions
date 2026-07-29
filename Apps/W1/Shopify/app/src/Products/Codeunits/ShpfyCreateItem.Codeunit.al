@@ -1,14 +1,22 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using Microsoft.Inventory.Item;
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Finance.Currency;
 using Microsoft.Foundation.UOM;
-using Microsoft.Purchases.Vendor;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Purchases.Vendor;
+using System.Text;
 
 /// <summary>
 /// Codeunit Shpfy Create Item (ID 30171).
 /// </summary>
-codeunit 88264 "Shpfy Create Item"
+codeunit 30171 "Shpfy Create Item"
 {
     Access = Internal;
     Permissions =
@@ -18,6 +26,7 @@ codeunit 88264 "Shpfy Create Item"
         tabledata "Item Unit of Measure" = rim,
         tabledata "Item Variant" = rim,
         tabledata "Item Vendor" = rim,
+        tabledata "Tariff Number" = r,
         tabledata "Unit of Measure" = rim,
         tabledata Vendor = rim;
     TableNo = "Shpfy Variant";
@@ -107,7 +116,7 @@ codeunit 88264 "Shpfy Create Item"
         ItemNo: Text;
         VariantCode: Text;
     begin
-        if (not ShopifyProduct."Has Variants" and not (Shop."SKU Mapping" = Shop."SKU Mapping"::"Variant Code")) or ((ShopifyVariant."UoM Option Id" = 1) and (ShopifyVariant."Option 2 Name" = '')) then begin
+        if (not ShopifyProduct."Has Variants") or ((ShopifyVariant."UoM Option Id" = 1) and (ShopifyVariant."Option 2 Name" = '')) then begin
             Clear(ItemVariant);
             CreateReferences(ShopifyProduct, ShopifyVariant, Item, ItemVariant);
             if IsNullGuid(ShopifyVariant."Item SystemId") then begin
@@ -225,6 +234,8 @@ codeunit 88264 "Shpfy Create Item"
         ItemCategory: Record "Item Category";
         ItemVariant: Record "Item Variant";
         Vendor: Record Vendor;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        ProcessOrder: Codeunit "Shpfy Process Order";
         CurrentTemplateCode: Code[20];
         ItemNo: Code[20];
         Code: Text;
@@ -244,6 +255,7 @@ codeunit 88264 "Shpfy Create Item"
                         ItemNo := CopyStr(Code, 1, MaxStrLen(ItemNo));
                     end;
             end;
+        Clear(Item."No.");
         Clear(Item."Item Category Code");
         Clear(Item."Base Unit of Measure");
         CreateItemFromTemplate(Item, CurrentTemplateCode, ItemNo);
@@ -252,10 +264,21 @@ codeunit 88264 "Shpfy Create Item"
         CreateItemUnitOfMeasure(ShopifyVariant, Item);
 
         if ShopifyVariant."Unit Cost" <> 0 then
-            Item.Validate("Unit Cost", ShopifyVariant."Unit Cost");
+            if Shop."Currency Code" = '' then
+                Item.Validate("Unit Cost", ShopifyVariant."Unit Cost")
+            else
+                Item.Validate("Unit Cost", Round(CurrencyExchangeRate.ExchangeAmtFCYToLCY(WorkDate(), Shop."Currency Code", ShopifyVariant."Unit Cost", CurrencyExchangeRate.ExchangeRate(WorkDate(), Shop."Currency Code"))));
 
         if ShopifyVariant.Price <> 0 then
-            Item.Validate("Unit Price", ShopifyVariant.Price);
+            if Shop."Currency Code" = '' then
+                Item.Validate("Unit Price", ShopifyVariant.Price)
+            else
+                Item.Validate("Unit Price", Round(CurrencyExchangeRate.ExchangeAmtFCYToLCY(WorkDate(), Shop."Currency Code", ShopifyVariant.Price, CurrencyExchangeRate.ExchangeRate(WorkDate(), Shop."Currency Code"))));
+
+        if Shop."Sync HS Code and Country" then begin
+            Item.Validate("Tariff No.", GetTariffNo(ShopifyVariant."Tariff No."));
+            Item.Validate("Country/Region of Origin Code", ProcessOrder.GetCountryCode(ShopifyVariant."Country/Region of Origin Code"));
+        end;
 
         if ShopifyProduct."Product Type" <> '' then begin
             ItemCategory.SetFilter(Description, FilterMgt.CleanFilterValue(ShopifyProduct."Product Type", MaxStrLen(ItemCategory.Description)));
@@ -269,6 +292,9 @@ codeunit 88264 "Shpfy Create Item"
                 Item."Vendor No." := Vendor."No.";
         end;
 
+        if Shop."Sync Item Marketing Text" then
+            CreateEntityText(ShopifyProduct, Item);
+
         Item.Modify();
         if ForVariant then begin
             ShopifyVariant."Item SystemId" := Item.SystemId;
@@ -280,6 +306,24 @@ codeunit 88264 "Shpfy Create Item"
 
         Clear(ItemVariant);
         CreateReferences(ShopifyProduct, ShopifyVariant, Item, ItemVariant);
+    end;
+
+    local procedure CreateEntityText(ShopifyProduct: Record "Shpfy Product"; Item: Record Item)
+    var
+        EntityTextRec: Record "Entity Text";
+        EntityText: Codeunit "Entity Text";
+    begin
+        if not ShopifyProduct."Description as HTML".HasValue() then
+            exit;
+
+        EntityTextRec.Company := CopyStr(CompanyName(), 1, MaxStrLen(EntityTextRec.Company));
+        EntityTextRec."Source Table Id" := Database::Item;
+        EntityTextRec."Source System Id" := Item.SystemId;
+        EntityTextRec.Scenario := "Entity Text Scenario"::"Marketing Text";
+        EntityTextRec.Insert();
+
+        EntityText.UpdateText(EntityTextRec, ShopifyProduct.GetDescriptionHtml());
+        EntityTextRec.Modify();
     end;
 
     local procedure CreateItemUnitOfMeasure(ShopifyVariant: Record "Shpfy Variant"; Item: Record Item)
@@ -318,9 +362,14 @@ codeunit 88264 "Shpfy Create Item"
     begin
         if not ItemTempl.Get(ItemTemplCode) then
             exit;
-        Item."No." := ItemNo;
+
+        if ItemNo <> '' then
+            Item."No." := ItemNo
+        else
+            ItemTemplMgt.InitItemNo(Item, ItemTempl);
+
         Item.Insert(true);
-        ItemTemplMgt.ApplyItemTemplate(Item, ItemTempl);
+        ItemTemplMgt.ApplyItemTemplate(Item, ItemTempl, true);
     end;
 
     /// <summary> 
@@ -431,6 +480,64 @@ codeunit 88264 "Shpfy Create Item"
                     exit(UnitofMeasure.Code);
                 end;
             end;
+    end;
+
+    /// <summary>
+    /// Get Tariff No.
+    /// Returns the tariff number only when it already exists in Business Central, so importing a
+    /// product from Shopify does not create new Tariff Number records. Shopify returns the harmonized
+    /// system code without separators (e.g. "610443" instead of "6104.43"), so when there is no exact
+    /// match the lookup falls back to comparing the digits of the existing BC Tariff Numbers.
+    /// </summary>
+    /// <param name="TariffNo">Parameter of type Code[20]: the harmonized system code received from Shopify.</param>
+    /// <returns>Return value of type Code[20]: the matching Tariff Number, or empty if it does not exist.</returns>
+    internal procedure GetTariffNo(TariffNo: Code[20]): Code[20]
+    var
+        TariffNumber: Record "Tariff Number";
+        Digits: Text;
+    begin
+        if TariffNo = '' then
+            exit('');
+        if TariffNumber.Get(TariffNo) then
+            exit(TariffNo);
+
+        Digits := FilterMgt.KeepDigits(TariffNo);
+        if Digits = '' then
+            exit('');
+        TariffNumber.SetLoadFields("No.");
+        if TariffNumber.FindSet() then
+            repeat
+                if FilterMgt.KeepDigits(TariffNumber."No.") = Digits then
+                    exit(TariffNumber."No.");
+            until TariffNumber.Next() = 0;
+        exit('');
+    end;
+
+    /// <summary>
+    /// Create Items from Shopify Products.
+    /// </summary>
+    /// <param name="Product">Parameter of type Record "Shpfy Product".</param>
+    internal procedure CreateItemsFromShopifyProducts(var Product: Record "Shpfy Product")
+    begin
+        if Product.FindSet() then
+            repeat
+                CreateItemFromShopifyProduct(Product);
+            until Product.Next() = 0;
+    end;
+
+    /// <summary>
+    /// Create Item from Shopify Product.
+    /// </summary>
+    /// <param name="Product">Parameter of type Record "Shpfy Product".</param>
+    internal procedure CreateItemFromShopifyProduct(Product: Record "Shpfy Product")
+    var
+        ProductImport: Codeunit "Shpfy Product Import";
+    begin
+        ProductImport.SetShop(Product."Shop Code");
+        ProductImport.SetProduct(Product);
+        ProductImport.SetCreateNewItem(true);
+        Commit();  // Ensure product/variant creation is committed before running the item create/update
+        ProductImport.Run();
     end;
 
     /// <summary> 

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Transaction Type (ID 30134).
 /// </summary>
-enum 88065 "Shpfy Transaction Type"
+enum 30134 "Shpfy Transaction Type"
 {
     Caption = 'Shopify Transaction Type';
     Extensible = false;

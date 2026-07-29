@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
 /// <summary>
 /// Codeunit Shpfy Shipping Events (ID 30192).
 /// </summary>
-codeunit 88288 "Shpfy Shipping Events"
+codeunit 30192 "Shpfy Shipping Events"
 {
     [IntegrationEvent(false, false)]
     /// <summary> 

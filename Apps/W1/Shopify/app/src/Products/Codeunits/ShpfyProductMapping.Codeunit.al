@@ -1,4 +1,9 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
@@ -7,7 +12,7 @@ using Microsoft.Purchases.Vendor;
 /// <summary>
 /// Codeunit Shpfy Product Mapping (ID 30181).
 /// </summary>
-codeunit 88275 "Shpfy Product Mapping"
+codeunit 30181 "Shpfy Product Mapping"
 {
     Access = Internal;
     Permissions =
@@ -88,7 +93,7 @@ codeunit 88275 "Shpfy Product Mapping"
                         ShopifyVariant."Mapped By Item" := true;
                     end;
                     ShopifyVariant.Modify();
-                    exit(ShopifyVariant."Mapped By Item" or (not ShopifyProduct."Has Variants") OR (not IsNullGuid(ShopifyVariant."Item Variant SystemId")) or ((ShopifyVariant."UoM Option Id" = 1) and (ShopifyVariant."Option 2 Name" = '')));
+                    exit(ShopifyVariant."Mapped By Item" or (not ShopifyProduct."Has Variants") or (not IsNullGuid(ShopifyVariant."Item Variant SystemId")) or ((ShopifyVariant."UoM Option Id" = 1) and (ShopifyVariant."Option 2 Name" = '')));
                 end;
         end else
             exit(true);
@@ -201,7 +206,7 @@ codeunit 88275 "Shpfy Product Mapping"
                             Shop."SKU Mapping"::"Item No. + Variant Code":
                                 begin
                                     Codes := ShopifyVariant.SKU.Split(Shop."SKU Field Separator");
-                                    Case Codes.Count of
+                                    case Codes.Count of
                                         1:
                                             begin
                                                 CodeNo := Codes.Get(1);
@@ -260,19 +265,20 @@ codeunit 88275 "Shpfy Product Mapping"
                         else
                             Found := (not ShopifyProduct."Has Variants") or ((ShopifyVariant."UoM Option Id" = 1) and (ShopifyVariant."Option 2 Name" = ''));
                     if not Found then
-                        if ShopifyProduct."Has Variants" then
-                            case ShopifyVariant."UoM Option Id" of
-                                1:
-                                    Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), CopyStr(ShopifyVariant."Option 1 Value", 1, 10), ItemNo, VariantCode);
-                                2:
-                                    Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), CopyStr(ShopifyVariant."Option 2 Value", 1, 10), ItemNo, VariantCode);
-                                3:
-                                    Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), CopyStr(ShopifyVariant."Option 3 Value", 1, 10), ItemNo, VariantCode);
-                                else
-                                    Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), '', ItemNo, VariantCode);
-                            end
-                        else
-                            Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), '', ItemNo, VariantCode);
+                        if Shop."Find Mapping by Barcode" then
+                            if ShopifyProduct."Has Variants" then
+                                case ShopifyVariant."UoM Option Id" of
+                                    1:
+                                        Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), CopyStr(ShopifyVariant."Option 1 Value", 1, 10), ItemNo, VariantCode);
+                                    2:
+                                        Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), CopyStr(ShopifyVariant."Option 2 Value", 1, 10), ItemNo, VariantCode);
+                                    3:
+                                        Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), CopyStr(ShopifyVariant."Option 3 Value", 1, 10), ItemNo, VariantCode);
+                                    else
+                                        Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), '', ItemNo, VariantCode);
+                                end
+                            else
+                                Found := ItemReferenceMgt.FindByBarcode(CopyStr(ShopifyVariant.BarCode.ToUpper(), 1, 50), '', ItemNo, VariantCode);
                     if Found then
                         if FindItem.Get(ItemNo) then begin
                             Item := FindItem;

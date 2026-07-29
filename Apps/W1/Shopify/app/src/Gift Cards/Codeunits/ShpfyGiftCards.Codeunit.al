@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Gift Cards (ID 30125).
 /// </summary>
-codeunit 88062 "Shpfy Gift Cards"
+codeunit 30125 "Shpfy Gift Cards"
 {
     Access = Internal;
 

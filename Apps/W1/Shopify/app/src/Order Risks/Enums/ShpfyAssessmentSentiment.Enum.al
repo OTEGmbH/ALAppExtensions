@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Assessment Sentiment (ID 30164).
 /// </summary>
-enum 88051 "Shpfy Assessment Sentiment"
+enum 30164 "Shpfy Assessment Sentiment"
 {
     Caption = 'Shopify Assessment Sentiment';
     Extensible = false;

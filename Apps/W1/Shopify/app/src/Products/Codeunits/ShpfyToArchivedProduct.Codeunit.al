@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy ToArchivedProduct (ID 30186) implements Interface Shpfy IRemoveProductAction.
 /// </summary>
-codeunit 88281 "Shpfy ToArchivedProduct" implements "Shpfy IRemoveProductAction"
+codeunit 30186 "Shpfy ToArchivedProduct" implements "Shpfy IRemoveProductAction"
 {
     Access = Internal;
 

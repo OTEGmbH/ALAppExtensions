@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88005 "Shpfy Filter Mgt."
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30104 "Shpfy Filter Mgt."
 {
     Access = Internal;
 
@@ -12,5 +17,10 @@ codeunit 88005 "Shpfy Filter Mgt."
     internal procedure CleanFilterValue(Value: Text; MaxLength: Integer): Text;
     begin
         exit(CleanFilterValue(CopyStr(Value, 1, MaxLength)));
+    end;
+
+    internal procedure KeepDigits(Value: Text): Text;
+    begin
+        exit(DelChr(Value, '=', DelChr(Value, '=', '0123456789')));
     end;
 }

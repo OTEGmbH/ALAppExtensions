@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Page Shpfy Company Card (ID 30157).
 /// </summary>
-page 88011 "Shpfy Company Card"
+page 30157 "Shpfy Company Card"
 {
     Caption = 'Shopify Company Card';
     InsertAllowed = false;

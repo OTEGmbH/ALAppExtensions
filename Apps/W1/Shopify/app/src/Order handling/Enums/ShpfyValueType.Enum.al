@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Value Type (ID 30123).
 /// </summary>
-enum 88043 "Shpfy Value Type"
+enum 30123 "Shpfy Value Type"
 {
     Access = Internal;
     Caption = 'Shopify Value Type';

@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy VAT Registration No. (ID 30368) implements Interface Shpfy Tax Registration Id Mapping.
 /// </summary>
-codeunit 88026 "Shpfy VAT Registration No." implements "Shpfy Tax Registration Id Mapping"
+codeunit 30368 "Shpfy VAT Registration No." implements "Shpfy Tax Registration Id Mapping"
 {
     Access = Internal;
 
@@ -17,5 +22,11 @@ codeunit 88026 "Shpfy VAT Registration No." implements "Shpfy Tax Registration I
     procedure SetMappingFiltersForCustomers(var Customer: Record Customer; CompanyLocation: Record "Shpfy Company Location")
     begin
         Customer.SetRange("VAT Registration No.", CompanyLocation."Tax Registration Id");
+    end;
+
+    procedure UpdateTaxRegistrationId(var Customer: Record Customer; NewTaxRegistrationId: Text[150])
+    begin
+        Customer.Validate("VAT Registration No.", CopyStr(NewTaxRegistrationId, 1, MaxStrLen(Customer."VAT Registration No.")));
+        Customer.Modify(true);
     end;
 }

@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88234 "Shpfy Metafield Owner Company" implements "Shpfy IMetafield Owner Type"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30366 "Shpfy Metafield Owner Company" implements "Shpfy IMetafield Owner Type"
 {
 
     procedure GetTableId(): Integer
@@ -23,7 +28,7 @@ codeunit 88234 "Shpfy Metafield Owner Company" implements "Shpfy IMetafield Owne
         UpdatedAt: DateTime;
     begin
         Parameters.Add('CompanyId', Format(OwnerId));
-        GraphQLType := GraphQLType::CompanyMetafieldIds;
+        GraphQLType := GraphQLType::Metafields_CompanyMetafieldIds;
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
         if JsonHelper.GetJsonObject(JResponse, JCompany, 'data.company') then
             if JsonHelper.GetJsonArray(JResponse, JMetafields, 'data.company.metafields.edges') then

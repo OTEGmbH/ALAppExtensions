@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy Customer API (ID 30114).
 /// </summary>
-codeunit 88035 "Shpfy Customer API"
+codeunit 30114 "Shpfy Customer API"
 {
     Access = Internal;
     Permissions = tabledata Customer = rim;
@@ -130,7 +135,7 @@ codeunit 88035 "Shpfy Customer API"
     begin
         if EMail <> '' then begin
             Parameters.Add('EMail', EMail.ToLower());
-            JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType::FindCustomerIdByEMail, Parameters);
+            JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType::Customers_FindCustomerIdByEMail, Parameters);
             if JsonHelper.GetJsonArray(JResponse, JCustomers, 'data.customers.edges') then
                 foreach JItem in JCustomers do
                     if JsonHelper.GetJsonObject(JItem.AsObject(), JCustomer, 'node') then
@@ -154,7 +159,7 @@ codeunit 88035 "Shpfy Customer API"
     begin
         if Phone <> '' then begin
             Parameters.Add('Phone', Phone);
-            JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType::FindCustomerIdByPhone, Parameters);
+            JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType::Customers_FindCustomerIdByPhone, Parameters);
             if JsonHelper.GetJsonArray(JResponse, JCustomers, 'data.customers.edges') then
                 foreach JItem in JCustomers do
                     if JsonHelper.GetJsonObject(JItem.AsObject(), JCustomer, 'node') then
@@ -178,7 +183,7 @@ codeunit 88035 "Shpfy Customer API"
             exit(false);
 
         Parameters.Add('CustomerId', Format(ShopifyCustomer.Id));
-        JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType::GetCustomer, Parameters);
+        JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType::Customers_GetCustomer, Parameters);
         if JsonHelper.GetJsonObject(JResponse, JCustomer, 'data.customer') then
             exit(UpdateShopifyCustomerFields(ShopifyCustomer, JCustomer));
     end;
@@ -200,7 +205,7 @@ codeunit 88035 "Shpfy Customer API"
         Parameters: Dictionary of [Text, Text];
         LastSync: DateTime;
     begin
-        GraphQLType := GraphQLType::GetCustomerIds;
+        GraphQLType := GraphQLType::Customers_GetCustomerIds;
         LastSync := Shop.GetLastSyncTime("Shpfy Synchronization Type"::Customers);
         Parameters.Add('LastSync', Format(LastSync, 0, 9));
         repeat
@@ -218,7 +223,7 @@ codeunit 88035 "Shpfy Customer API"
                     Parameters.Set('After', Cursor)
                 else
                     Parameters.Add('After', Cursor);
-                GraphQLType := GraphQLType::GetNextCustomerIds;
+                GraphQLType := GraphQLType::Customers_GetNextCustomerIds;
             end;
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.customers.pageInfo.hasNextPage');
     end;
@@ -266,11 +271,11 @@ codeunit 88035 "Shpfy Customer API"
                 if JItem.IsObject then begin
                     if ShopifyCustomer.Id <> CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JItem, 'id')) then
                         Error(UpdateCustIdErr);
-                    if JsonHelper.GetValueAsText(JItem, 'emailMarketingConsent.marketingState') = 'SUBSCRIBED' then
+                    if JsonHelper.GetValueAsText(JItem, 'defaultEmailAddress.marketingState') = 'SUBSCRIBED' then
                         ShopifyCustomer."Accepts Marketing" := true
                     else
                         ShopifyCustomer."Accepts Marketing" := false;
-                    ShopifyCustomer."Accepts Marketing Update At" := JsonHelper.GetValueAsDateTime(JItem, 'emailMarketingConsent.consentUpdatedAt');
+                    ShopifyCustomer."Accepts Marketing Update At" := JsonHelper.GetValueAsDateTime(JItem, 'defaultEmailAddress.marketingUpdatedAt');
                     ShopifyCustomer."Tax Exempt" := JsonHelper.GetValueAsBoolean(JItem, 'taxExempt');
                     ShopifyCustomer."Updated At" := JsonHelper.GetValueAsDateTime(JItem, 'updatedAt');
                     ShopifyCustomer."Verified Email" := JsonHelper.GetValueAsBoolean(JItem, 'verifiedEmail');
@@ -344,7 +349,7 @@ codeunit 88035 "Shpfy Customer API"
 
         if HasChange then begin
             GraphQuery.Remove(GraphQuery.Length - 1, 2);
-            GraphQuery.Append('}}) {customer {id, tags, updatedAt, verifiedEmail, emailMarketingConsent {consentUpdatedAt marketingState}, defaultAddress {id, province, country}}, userErrors {field, message}}}"}');
+            GraphQuery.Append('}}) {customer {id, tags, updatedAt, verifiedEmail, defaultEmailAddress {marketingState marketingUpdatedAt}, defaultAddress {id, province, country}}, userErrors {field, message}}}"}');
             exit(GraphQuery.ToText());
         end;
     end;
@@ -381,16 +386,16 @@ codeunit 88035 "Shpfy Customer API"
 #pragma warning disable AA0139
         ShopifyCustomer."First Name" := JsonHelper.GetValueAsText(JCustomer, 'firstName', MaxStrLen(ShopifyCustomer."First Name"));
         ShopifyCustomer."Last Name" := JsonHelper.GetValueAsText(JCustomer, 'lastName', MaxStrLen(ShopifyCustomer."Last Name"));
-        ShopifyCustomer.Email := JsonHelper.GetValueAsText(JCustomer, 'email', MaxStrLen(ShopifyCustomer.Email));
+        ShopifyCustomer.Email := JsonHelper.GetValueAsText(JCustomer, 'defaultEmailAddress.emailAddress', MaxStrLen(ShopifyCustomer.Email));
 #pragma warning restore AA0139
-        PhoneNo := JsonHelper.GetValueAsText(JCustomer, 'phone');
+        PhoneNo := JsonHelper.GetValueAsText(JCustomer, 'defaultPhoneNumber.phoneNumber');
         PhoneNo := DelChr(PhoneNo, '=', DelChr(PhoneNo, '=', '1234567890/+ .()'));
         ShopifyCustomer."Phone No." := CopyStr(PhoneNo, 1, MaxStrLen(ShopifyCustomer."Phone No."));
-        if JsonHelper.GetValueAsText(JCustomer, 'emailMarketingConsent.marketingState') = 'SUBSCRIBED' then
+        if JsonHelper.GetValueAsText(JCustomer, 'defaultEmailAddress.marketingState') = 'SUBSCRIBED' then
             ShopifyCustomer."Accepts Marketing" := true
         else
             ShopifyCustomer."Accepts Marketing" := false;
-        ShopifyCustomer."Accepts Marketing Update At" := JsonHelper.GetValueAsDateTime(JCustomer, 'emailMarketingConsent.consentUpdatedAt');
+        ShopifyCustomer."Accepts Marketing Update At" := JsonHelper.GetValueAsDateTime(JCustomer, 'defaultEmailAddress.marketingUpdatedAt');
         ShopifyCustomer."Tax Exempt" := JsonHelper.GetValueAsBoolean(JCustomer, 'taxExempt');
         ShopifyCustomer."Verified Email" := JsonHelper.GetValueAsBoolean(JCustomer, 'verifiedEmail');
         StateString := JsonHelper.GetValueAsText(JCustomer, 'state').ToLower();
@@ -489,10 +494,10 @@ codeunit 88035 "Shpfy Customer API"
         if ShopCounter.Count = 1 then
             ShopifyCustomer.ModifyAll("Shop Id", Shop."Shop Id", false)
         else begin
-            GraphQLType := "Shpfy GraphQL Type"::GetAllCustomerIds;
+            GraphQLType := "Shpfy GraphQL Type"::Customers_GetAllCustomerIds;
             repeat
                 JResult := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
-                GraphQLType := "Shpfy GraphQL Type"::GetNextAllCustomerIds;
+                GraphQLType := "Shpfy GraphQL Type"::Customers_GetNextAllCustomerIds;
                 if JsonHelper.GetJsonArray(JResult, JArray, 'data.customers.nodes') then begin
                     FilterString := Format(JArray).TrimStart('[').TrimEnd(']').Replace('{"legacyResourceId":"', '').Replace('"}', '').Replace(',', '|');
                     ShopifyCustomer.SetFilter(Id, FilterString);

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Company Import (ID 30301).
 /// </summary>
-codeunit 88019 "Shpfy Company Import"
+codeunit 30301 "Shpfy Company Import"
 {
     Access = Internal;
     TableNo = "Shpfy Company";
@@ -16,11 +21,12 @@ codeunit 88019 "Shpfy Company Import"
         SetCompany(Rec.Id);
 
         if not CompanyApi.RetrieveShopifyCompany(ShopifyCompany, TempShopifyCustomer) then begin
-            ShopifyCompany.Delete();
+            if IsNew then
+                ShopifyCompany.Delete();
             exit;
         end;
 
-        CompanyApi.UpdateShopifyCompanyLocation(ShopifyCompany);
+        CompanyApi.UpdateShopifyCompanyLocations(ShopifyCompany);
 
         Commit();
         if CompanyMapping.FindMapping(ShopifyCompany, TempShopifyCustomer) then begin
@@ -46,6 +52,7 @@ codeunit 88019 "Shpfy Company Import"
         CompanyMapping: Codeunit "Shpfy Company Mapping";
         TemplateCode: Code[20];
         AllowCreate: Boolean;
+        IsNew: Boolean;
 
     local procedure SetCompany(Id: BigInteger)
     begin
@@ -57,6 +64,7 @@ codeunit 88019 "Shpfy Company Import"
                 ShopifyCompany."Shop Id" := Shop."Shop Id";
                 ShopifyCompany."Shop Code" := Shop.Code;
                 ShopifyCompany.Insert(false);
+                IsNew := true;
             end;
         end;
     end;

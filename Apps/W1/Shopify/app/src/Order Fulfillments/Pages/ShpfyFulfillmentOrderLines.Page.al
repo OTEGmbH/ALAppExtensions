@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88033 "Shpfy Fulfillment Order Lines"
+namespace Microsoft.Integration.Shopify;
+
+page 30139 "Shpfy Fulfillment Order Lines"
 {
     ApplicationArea = All;
     Caption = 'Shopify Fulfillment Order Lines';

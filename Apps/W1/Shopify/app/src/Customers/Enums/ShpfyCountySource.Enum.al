@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy County Source (ID 30104) implements Interface Shpfy ICounty.
 /// </summary>
-enum 88012 "Shpfy County Source" implements "Shpfy ICounty", "Shpfy ICounty From Json"
+enum 30104 "Shpfy County Source" implements "Shpfy ICounty", "Shpfy ICounty From Json"
 {
     Caption = 'Shopify County Source';
     Extensible = false;

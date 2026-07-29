@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Shipment Status (ID 30119).
 /// </summary>
-enum 88039 "Shpfy Shipment Status"
+enum 30119 "Shpfy Shipment Status"
 {
     Access = Internal;
     Caption = 'Shopify Shipment Status';

@@ -1,4 +1,9 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 using System.Threading;
@@ -7,7 +12,7 @@ using System.Visualization;
 /// <summary>
 /// Page Shpfy Activities (ID 30100).
 /// </summary>
-page 88000 "Shpfy Activities"
+page 30100 "Shpfy Activities"
 {
     Caption = 'Shopify Activities';
     PageType = CardPart;
@@ -33,7 +38,6 @@ page 88000 "Shpfy Activities"
                     ApplicationArea = All;
                     DrillDownPageId = "Shpfy Companies";
                     ToolTip = 'Specifies the number of imported companoes that aren''t mapped.';
-                    Visible = B2BEnabled;
                 }
                 field(UnmappedProducts; Rec."Unmapped Products")
                 {
@@ -86,7 +90,7 @@ page 88000 "Shpfy Activities"
                     begin
                         JobQueueLogEntry.SetRange(Status, JobQueueLogEntry.Status::Error);
                         JobQueueLogEntry.SetRange("Object Type to Run", JobQueueLogEntry."Object Type to Run"::Report);
-                        JobQueueLogEntry.SetFilter("Object Id to Run", '%1|%2|%3|%4|%5|%6|%7|%8|%9|%10', Report::"Shpfy Sync Orders from Shopify",
+                        JobQueueLogEntry.SetFilter("Object Id to Run", '%1|%2|%3|%4|%5|%6|%7|%8|%9|%10|%11|%12', Report::"Shpfy Sync Orders from Shopify",
                                                                 Report::"Shpfy Sync Shipm. to Shopify",
                                                                 Report::"Shpfy Sync Products",
                                                                 Report::"Shpfy Sync Stock to Shopify",
@@ -95,7 +99,9 @@ page 88000 "Shpfy Activities"
                                                                 Report::"Shpfy Sync Payments",
                                                                 Report::"Shpfy Sync Companies",
                                                                 Report::"Shpfy Sync Catalogs",
-                                                                Report::"Shpfy Sync Catalog Prices");
+                                                                Report::"Shpfy Sync Catalog Prices",
+                                                                Report::"Shpfy Sync Invoices to Shpfy",
+                                                                Report::"Shpfy Sync Disputes");
                         Page.Run(Page::"Job Queue Log Entries", JobQueueLogEntry);
                     end;
                 }
@@ -147,10 +153,6 @@ page 88000 "Shpfy Activities"
                 Commit();
             end;
 
-        Shop.SetRange("B2B Enabled", true);
-        B2BEnabled := not Shop.IsEmpty();
-
-        Shop.Reset();
         Shop.SetRange(Enabled, true);
         if Shop.FindFirst() then begin
             ApiVersion := CommunicationMgt.GetApiVersion();
@@ -159,6 +161,4 @@ page 88000 "Shpfy Activities"
         end;
     end;
 
-    var
-        B2BEnabled: Boolean;
 }

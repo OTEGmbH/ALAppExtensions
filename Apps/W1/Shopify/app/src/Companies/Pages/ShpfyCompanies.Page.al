@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Page Shpfy Companies (ID 30156).
 /// </summary>
-page 88010 "Shpfy Companies"
+page 30156 "Shpfy Companies"
 {
     ApplicationArea = All;
     Caption = 'Shopify Companies';
@@ -113,7 +118,7 @@ page 88010 "Shpfy Companies"
                 PromotedOnly = true;
                 PromotedCategory = Category4;
                 RunObject = Page "Shpfy Orders";
-                RunPageLink = "Customer Id" = field(Id);
+                RunPageLink = "Company Id" = field(Id);
                 ToolTip = 'View a list of Shopify orders for the company.';
             }
             action(ShopifyCatalogs)

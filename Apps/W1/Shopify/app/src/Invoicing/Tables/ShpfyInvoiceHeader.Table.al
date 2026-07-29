@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Invoice Header (ID 30156).
 /// </summary>
-table 88021 "Shpfy Invoice Header"
+table 30161 "Shpfy Invoice Header"
 {
     Caption = 'Shopify Invoice Header';
     DataClassification = CustomerContent;

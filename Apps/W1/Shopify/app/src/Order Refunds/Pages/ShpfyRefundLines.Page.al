@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88047 "Shpfy Refund Lines"
+namespace Microsoft.Integration.Shopify;
+
+page 30146 "Shpfy Refund Lines"
 {
     Caption = 'Refund Lines';
     PageType = ListPart;
@@ -31,40 +36,74 @@ page 88047 "Shpfy Refund Lines"
                 field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The quantity of a refunded line item.';
+                    ToolTip = 'Specifies the quantity of a refunded line item.';
                 }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The price of a refunded line item.';
+                    ToolTip = 'Specifies the price of a refunded line item.';
+                }
+                field("Presentment Amount"; Rec."Presentment Amount")
+                {
+                    ApplicationArea = All;
+                    Visible = PresentmentCurrencyVisible;
                 }
                 field(LineDiscount; (Rec.Quantity * Rec.Amount) - Rec."Subtotal Amount")
                 {
                     ApplicationArea = All;
                     Caption = 'Line Discount';
-                    ToolTip = 'The line discount of a refunded line item.';
+                    ToolTip = 'Specifies the line discount of a refunded line item.';
                     Editable = false;
                     BlankZero = true;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = Rec.OrderCurrencyCode();
+                }
+                field(PresentmentLineDiscount; (Rec.Quantity * Rec."Presentment Amount") - Rec."Presentment Subtotal Amount")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Presentment Line Discount';
+                    ToolTip = 'Specifies the line discount in presentment currency of a refunded line item.';
+                    Editable = false;
+                    BlankZero = true;
+                    Visible = PresentmentCurrencyVisible;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = Rec.PresentmentCurrencyCode();
                 }
                 field("Subtotal Amount"; Rec."Subtotal Amount")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The subtotal price of a refunded line item.';
+                    ToolTip = 'Specifies the subtotal price of a refunded line item.';
+                }
+                field("Presentment Subtotal Amount"; Rec."Presentment Subtotal Amount")
+                {
+                    ApplicationArea = All;
+                    Visible = PresentmentCurrencyVisible;
                 }
                 field("Total Tax Amount"; Rec."Total Tax Amount")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The total tax charged on a refunded line item.';
+                    ToolTip = 'Specifies the total tax charged on a refunded line item.';
+                }
+                field("Presentment Total Tax Amount"; Rec."Presentment Total Tax Amount")
+                {
+                    ApplicationArea = All;
+                    Visible = PresentmentCurrencyVisible;
                 }
                 field("Restock Type"; Rec."Restock Type")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The type of restock for the refunded line item.';
+                    ToolTip = 'Specifies the type of restock for the refunded line item.';
                 }
                 field(Restocked; Rec.Restocked)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Whether the refunded line item was restocked.';
+                    ToolTip = 'Specifies whether the refunded line item was restocked.';
+                }
+                field("Is Exchange Item"; Rec."Is Exchange Item")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                    ToolTip = 'Specifies that this refund line was synthesized from a Return.exchangeLineItems entry. Exchange-item refund lines carry a negative quantity so that the credit memo total matches the Shopify refund total.';
                 }
             }
         }
@@ -93,4 +132,12 @@ page 88047 "Shpfy Refund Lines"
             }
         }
     }
+
+    var
+        PresentmentCurrencyVisible: Boolean;
+
+    internal procedure SetShowPresentmentCurrency(Show: Boolean)
+    begin
+        PresentmentCurrencyVisible := Show;
+    end;
 }

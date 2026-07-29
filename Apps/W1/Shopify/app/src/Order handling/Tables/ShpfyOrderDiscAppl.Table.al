@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Order Disc.Appl. (ID 30117).
 /// </summary>
-table 88031 "Shpfy Order Disc.Appl."
+table 30117 "Shpfy Order Disc.Appl."
 {
     Access = Internal;
     Caption = 'Shopify Order Discount Application';
@@ -55,6 +60,7 @@ table 88031 "Shpfy Order Disc.Appl."
         {
             Caption = 'Value';
             DataClassification = SystemMetadata;
+            AutoFormatType = 0;
         }
     }
     keys

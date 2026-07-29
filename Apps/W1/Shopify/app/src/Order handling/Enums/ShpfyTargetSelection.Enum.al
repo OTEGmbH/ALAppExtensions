@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Target Selection (ID 30120).
 /// </summary>
-enum 88040 "Shpfy Target Selection"
+enum 30120 "Shpfy Target Selection"
 {
     Access = Internal;
     Caption = 'Shopify Target Selection';

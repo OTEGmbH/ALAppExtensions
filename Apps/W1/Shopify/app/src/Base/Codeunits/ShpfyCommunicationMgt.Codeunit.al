@@ -1,26 +1,29 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using System.Telemetry;
+namespace Microsoft.Integration.Shopify;
+
 using System.Azure.KeyVault;
 using System.Environment;
+using System.Telemetry;
 
 /// <summary>
 /// Codeunit Shpfy Communication Mgt. (ID 30103).
 /// </summary>
-codeunit 88004 "Shpfy Communication Mgt."
+codeunit 30103 "Shpfy Communication Mgt."
 {
     Access = Internal;
     SingleInstance = true;
 
     var
         Shop: Record "Shpfy Shop";
-        CommunicationEvents: Codeunit "Shpfy Communication Events";
         GraphQLQueries: Codeunit "Shpfy GraphQL Queries";
         NextExecutionTime: DateTime;
-        VersionTok: Label '2025-01', Locked = true;
+        VersionTok: Label '2026-07', Locked = true;
         OutgoingRequestsNotEnabledConfirmLbl: Label 'Importing data to your Shopify shop is not enabled, do you want to go to shop card to enable?';
         OutgoingRequestsNotEnabledErr: Label 'Importing data to your Shopify shop is not enabled, navigate to shop card to enable.';
-        IsTestInProgress: Boolean;
         CategoryTok: Label 'Shopify Integration', Locked = true;
         QueryParamTooLongTxt: Label 'Query param length exceeded 50000.', Locked = true;
         QueryParamTooLongErr: Label 'Request length exceeded Shopify API limit.';
@@ -31,8 +34,8 @@ codeunit 88004 "Shpfy Communication Mgt."
         MissingApiVersionExpiryDateTxt: Label 'The api version expiry date has not been initialized.', Locked = true;
         ApiVersionExpiryDateAKVSecretNameLbl: Label 'ShopifyApiVersionExpiryDate', Locked = true;
         CannotParseParametersTxt: Label 'Cannot parse parameters.', Locked = true;
-
         ApiVersionNotFoundTxt: Label 'Api version %1 is not found.', Comment = '%1 - api version', Locked = true;
+        GraphQLThrottledTxt: Label 'Shopify GraphQL request %1 was throttled.', Comment = '%1 - request ID', Locked = true;
 
     /// <summary> 
     /// Create Web Request URL.
@@ -48,11 +51,15 @@ codeunit 88004 "Shpfy Communication Mgt."
     /// Create Web Request URL.
     /// </summary>
     /// <param name="UrlPath">Parameter of type Text.</param>
-    /// <param name="ApiVersion">Parameter of type Text.</param>
+    /// <param name="Version">Parameter of type Text.</param>
     /// <returns>Return value of type Text.</returns>
-    internal procedure CreateWebRequestURL(UrlPath: Text; ApiVersion: Text): Text
+    internal procedure CreateWebRequestURL(UrlPath: Text; Version: Text): Text
+    var
+        AuthenticationMgt: Codeunit "Shpfy Authentication Mgt.";
     begin
         Shop.TestField("Shopify URL");
+        AuthenticationMgt.AssertValidShopUrl(Shop."Shopify URL");
+
         if UrlPath.StartsWith('gift_cards') then
             if Shop."Shopify URL".EndsWith('/') then
                 exit(Shop."Shopify URL" + 'admin/' + UrlPath)
@@ -60,9 +67,9 @@ codeunit 88004 "Shpfy Communication Mgt."
                 exit(Shop."Shopify URL" + '/admin/' + UrlPath)
         else
             if Shop."Shopify URL".EndsWith('/') then
-                exit(Shop."Shopify URL" + 'admin/api/' + ApiVersion + '/' + UrlPath)
+                exit(Shop."Shopify URL" + 'admin/api/' + Version + '/' + UrlPath)
             else
-                exit(Shop."Shopify URL" + '/admin/api/' + ApiVersion + '/' + UrlPath);
+                exit(Shop."Shopify URL" + '/admin/api/' + Version + '/' + UrlPath);
     end;
 
     /// <summary> 
@@ -84,12 +91,25 @@ codeunit 88004 "Shpfy Communication Mgt."
     /// <param name="Parameters">Parameter of type Dictionary of [Text, Text].</param>
     /// <returns>Return variable "JsonToken".</returns>
     internal procedure ExecuteGraphQL(GraphQLType: Enum "Shpfy GraphQL Type"; Parameters: Dictionary of [Text, Text]): JsonToken
+    begin
+        exit(ExecuteGraphQL(GraphQLType, Parameters, true));
+    end;
+
+    /// <summary> 
+    /// Execute GraphQL.
+    /// </summary>
+    /// <param name="GraphQLType">Parameter of type Enum "Shopify GraphQL Type".</param>
+    /// <param name="Parameters">Parameter of type Dictionary of [Text, Text].</param>
+    /// <param name="CheckOutgoingRequest">Parameter of type Boolean.</param>
+    /// <returns>Return variable "JsonToken".</returns>
+    internal procedure ExecuteGraphQL(GraphQLType: Enum "Shpfy GraphQL Type"; Parameters: Dictionary of [Text, Text]; CheckOutgoingRequest: Boolean): JsonToken
     var
         ExpectedCost: Integer;
         GraphQLQuery: Text;
+        ResponseHeaders: HttpHeaders;
     begin
         GraphQLQuery := GraphQLQueries.GetQuery(GraphQLType, Parameters, ExpectedCost);
-        exit(ExecuteGraphQL(GraphQLQuery, ExpectedCost));
+        exit(ExecuteGraphQL(GraphQLQuery, ResponseHeaders, ExpectedCost, CheckOutgoingRequest));
     end;
 
     /// <summary> 
@@ -112,18 +132,7 @@ codeunit 88004 "Shpfy Communication Mgt."
     var
         ResponseHeaders: HttpHeaders;
     begin
-        exit(ExecuteGraphQL(GraphQLQuery, ResponseHeaders, ExpectedCost));
-    end;
-
-    /// <summary> 
-    /// Execute GraphQL.
-    /// </summary>
-    /// <param name="GraphQLQuery">Parameter of type Text.</param>
-    /// <param name="ResponseHeaders">Parameter of type HttpHeaders.</param>
-    /// <returns>Return variable "JResponse" of type JsonToken.</returns>
-    internal procedure ExecuteGraphQL(GraphQLQuery: Text; var ResponseHeaders: HttpHeaders) JResponse: JsonToken
-    begin
-        exit(ExecuteGraphQL(GraphQLQuery, ResponseHeaders, 0));
+        exit(ExecuteGraphQL(GraphQLQuery, ResponseHeaders, ExpectedCost, true));
     end;
 
     /// <summary> 
@@ -133,7 +142,7 @@ codeunit 88004 "Shpfy Communication Mgt."
     /// <param name="ResponseHeaders">Parameter of type HttpHeaders.</param>
     /// <param name="ExpectedCost">Parameter of type Decimal.</param>
     /// <returns>Return variable JResponse of type JsonToken.</returns>
-    internal procedure ExecuteGraphQL(GraphQLQuery: Text; var ResponseHeaders: HttpHeaders; ExpectedCost: Decimal) JResponse: JsonToken
+    internal procedure ExecuteGraphQL(GraphQLQuery: Text; var ResponseHeaders: HttpHeaders; ExpectedCost: Decimal; CheckOutgoingRequest: Boolean) JResponse: JsonToken
     var
         ShpfyGraphQLRateLimit: Codeunit "Shpfy GraphQL Rate Limit";
         ShpfyJsonHelper: Codeunit "Shpfy Json Helper";
@@ -143,74 +152,19 @@ codeunit 88004 "Shpfy Communication Mgt."
     begin
         CheckQueryLength(GraphQLQuery);
         ShpfyGraphQLRateLimit.WaitForRequestAvailable(ExpectedCost);
-        ReceivedData := ExecuteWebRequest(CreateWebRequestURL('graphql.json'), 'POST', GraphQLQuery, ResponseHeaders, 3);
+        ReceivedData := ExecuteWebRequest(CreateWebRequestURL('graphql.json'), 'POST', GraphQLQuery, ResponseHeaders, 3, CheckOutgoingRequest);
         if JResponse.ReadFrom(ReceivedData) then begin
             ShpfyGraphQLRateLimit.SetQueryCost(ShpfyJsonHelper.GetJsonToken(JResponse, 'extensions.cost.throttleStatus'));
             while JResponse.AsObject().Contains('errors') and Format(JResponse).Contains('THROTTLED') do begin
+                LogGraphQLThrottledTelemetry(JResponse, ExpectedCost, ResponseHeaders);
                 ShpfyGraphQLRateLimit.WaitForRequestAvailable(ExpectedCost);
-                if JResponse.ReadFrom(ExecuteWebRequest(CreateWebRequestURL('graphql.json'), 'POST', GraphQLQuery, ResponseHeaders, 3)) then
+                if JResponse.ReadFrom(ExecuteWebRequest(CreateWebRequestURL('graphql.json'), 'POST', GraphQLQuery, ResponseHeaders, 3, CheckOutgoingRequest)) then
                     ShpfyGraphQLRateLimit.SetQueryCost(ShpfyJsonHelper.GetJsonToken(JResponse, 'extensions.cost.throttleStatus'));
             end;
             if JResponse.AsObject().Contains('errors') then
                 Error(ErrorOnShopifyErr, Format(ShpfyJsonHelper.GetJsonToken(JResponse, 'errors')));
         end else
             Error(NoJsonErr, GraphQLQuery, ReceivedData);
-    end;
-
-    /// <summary> 
-    /// Execute WebRequest.
-    /// </summary>
-    /// <param name="Url">Parameter of type Text.</param>
-    /// <param name="Method">Parameter of type Text.</param>
-    /// <param name="JRequest">Parameter of type JsonToken.</param>
-    /// <returns>Return value of type JsonToken.</returns>
-    internal procedure ExecuteWebRequest(Url: Text; Method: Text; JRequest: JsonToken): JsonToken
-    var
-        ResponseHeaders: HttpHeaders;
-    begin
-        exit(ExecuteWebRequest(Url, Method, JRequest, ResponseHeaders));
-    end;
-
-    /// <summary> 
-    /// Execute Web Request.
-    /// </summary>
-    /// <param name="Url">Parameter of type Text.</param>
-    /// <param name="Method">Parameter of type Text.</param>
-    /// <param name="JRequest">Parameter of type JsonToken.</param>
-    /// <param name="nextPageUrl">Parameter of type Text.</param>
-    /// <returns>Return variable "JResponse" of type JsonToken.</returns>
-    internal procedure ExecuteWebRequest(Url: Text; Method: Text; JRequest: JsonToken; var nextPageUrl: Text) JResponse: JsonToken
-    var
-        ResponseHeaders: HttpHeaders;
-        LinkInfo: List of [Text];
-        Links: array[1] of Text;
-    begin
-        JResponse := ExecuteWebRequest(Url, Method, JRequest, ResponseHeaders);
-        Clear(nextPageUrl);
-        if ResponseHeaders.Contains('Link') then
-            if ResponseHeaders.GetValues('Link', Links) then
-                if Links[1] <> '' then begin
-                    LinkInfo := Links[1].Split(', ');
-                    LinkInfo := LinkInfo.Get(LinkInfo.Count).Split('; ');
-                    if LinkInfo.Get(2) = 'rel="next"' then
-                        nextPageUrl := CopyStr(LinkInfo.Get(1), 2, StrLen(LinkInfo.Get(1)) - 2);
-                end;
-    end;
-
-    /// <summary> 
-    /// Execute Web Request.
-    /// </summary>
-    /// <param name="Url">Parameter of type Text.</param>
-    /// <param name="Method">Parameter of type Text.</param>
-    /// <param name="JRequest">Parameter of type JsonToken.</param>
-    /// <param name="ResponseHeaders">Parameter of type HttpHeaders.</param>
-    /// <returns>Return variable "JResponse" of type JsonToken.</returns>
-    internal procedure ExecuteWebRequest(Url: Text; Method: Text; JRequest: JsonToken; var ResponseHeaders: HttpHeaders) JResponse: JsonToken
-    var
-        Request: Text;
-    begin
-        JRequest.WriteTo(Request);
-        if JResponse.ReadFrom(ExecuteWebRequest(Url, Method, Request, ResponseHeaders)) then;
     end;
 
     /// <summary> 
@@ -237,7 +191,7 @@ codeunit 88004 "Shpfy Communication Mgt."
     /// <returns>Return variable "Response" of type Text.</returns>
     internal procedure ExecuteWebRequest(Url: Text; Method: Text; Request: Text; var ResponseHeaders: HttpHeaders) Response: Text
     begin
-        exit(ExecuteWebRequest(Url, Method, Request, ResponseHeaders, 5));
+        exit(ExecuteWebRequest(Url, Method, Request, ResponseHeaders, 5, true));
     end;
 
     /// <summary>
@@ -248,8 +202,9 @@ codeunit 88004 "Shpfy Communication Mgt."
     /// <param name="Request">Text.</param>
     /// <param name="ResponseHeaders">VAR HttpHeaders.</param>
     /// <param name="MaxRetries">Integer.</param>
+    /// <param name="CheckOutgoingRequest">Boolean.</param>
     /// <returns>Return variable Response of type Text.</returns>
-    internal procedure ExecuteWebRequest(Url: Text; Method: Text; Request: Text; var ResponseHeaders: HttpHeaders; MaxRetries: Integer) Response: Text
+    internal procedure ExecuteWebRequest(Url: Text; Method: Text; Request: Text; var ResponseHeaders: HttpHeaders; MaxRetries: Integer; CheckOutgoingRequest: Boolean) Response: Text
     var
         FeatureTelemetry: Codeunit "Feature Telemetry";
         Wait: Duration;
@@ -258,13 +213,9 @@ codeunit 88004 "Shpfy Communication Mgt."
         HttpResponseMessage: HttpResponseMessage;
         RetryCounter: Integer;
     begin
-        if G_OverwriteUrl <> '' then begin
-            url := G_OverwriteUrl;
-            G_OverwriteUrl := ''; //clear after because single instance
-        end;
         FeatureTelemetry.LogUptake('0000HUV', 'Shopify', Enum::"Feature Uptake Status"::Used);
-        FeatureTelemetry.LogUsage('0000IF5', 'Shopify', 'Shopify web request executed.');
-        CheckOutgoingRequests(Url, Method, Request);
+        if CheckOutgoingRequest then
+            CheckOutgoingRequests(Url, Method, Request);
 
         CreateHttpRequestMessage(Url, Method, Request, HttpRequestMessage);
 
@@ -279,22 +230,19 @@ codeunit 88004 "Shpfy Communication Mgt."
                 Sleep(Wait);
         end;
 
-        if IsTestInProgress then
-            CommunicationEvents.OnClientSend(HttpRequestMessage, HttpResponseMessage)
-        else
-            if HttpClient.Send(HttpRequestMessage, HttpResponseMessage) then begin
-                Clear(RetryCounter);
-                while (not HttpResponseMessage.IsBlockedByEnvironment) and (EvaluateResponse(HttpResponseMessage)) and (RetryCounter < MaxRetries) do begin
-                    RetryCounter += 1;
-                    Sleep(1000);
-                    LogShopifyRequest(Url, Method, Request, HttpResponseMessage, Response, RetryCounter);
-                    Clear(HttpClient);
-                    Clear(HttpRequestMessage);
-                    Clear(HttpResponseMessage);
-                    CreateHttpRequestMessage(Url, Method, Request, HttpRequestMessage);
-                    HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
-                end;
+        if HttpClient.Send(HttpRequestMessage, HttpResponseMessage) then begin
+            Clear(RetryCounter);
+            while (not HttpResponseMessage.IsBlockedByEnvironment) and (EvaluateResponse(HttpResponseMessage)) and (RetryCounter < MaxRetries) do begin
+                RetryCounter += 1;
+                Sleep(1000);
+                LogShopifyRequest(Url, Method, Request, HttpResponseMessage, Response, RetryCounter);
+                Clear(HttpClient);
+                Clear(HttpRequestMessage);
+                Clear(HttpResponseMessage);
+                CreateHttpRequestMessage(Url, Method, Request, HttpRequestMessage);
+                HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
             end;
+        end;
         if GetContent(HttpResponseMessage, Response) then;
         ResponseHeaders := HttpResponseMessage.Headers();
         LogShopifyRequest(Url, Method, Request, HttpResponseMessage, Response, RetryCounter);
@@ -304,28 +252,19 @@ codeunit 88004 "Shpfy Communication Mgt."
     [NonDebuggable]
     internal procedure Post(var Client: HttpClient; Url: Text; Content: HttpContent; var Response: HttpResponseMessage)
     begin
-        if IsTestInProgress then
-            CommunicationEvents.OnClientPost(Url, Content, Response)
-        else
-            Client.Post(Url, Content, Response);
+        Client.Post(Url, Content, Response);
     end;
 
     [NonDebuggable]
     internal procedure Get(var Client: HttpClient; Url: Text; var Response: HttpResponseMessage)
     begin
-        if IsTestInProgress then
-            CommunicationEvents.OnClientGet(Url, Response)
-        else
-            Client.Get(Url, Response);
+        Client.Get(Url, Response);
     end;
 
     [TryFunction]
     local procedure GetContent(HttpResponseMsg: HttpResponseMessage; var Response: Text)
     begin
-        if IsTestInProgress then
-            CommunicationEvents.OnGetContent(HttpResponseMsg, Response)
-        else
-            HttpResponseMsg.Content.ReadAs(Response);
+        HttpResponseMsg.Content.ReadAs(Response);
     end;
 
     /// <summary> 
@@ -358,8 +297,7 @@ codeunit 88004 "Shpfy Communication Mgt."
     /// <returns>Return value of type Text.</returns>
     local procedure ApiVersion(): Text
     begin
-        if not IsTestInProgress then
-            CheckApiVersion();
+        CheckApiVersion();
         exit(VersionTok);
     end;
 
@@ -398,19 +336,12 @@ codeunit 88004 "Shpfy Communication Mgt."
         HttpContent: HttpContent;
         ContentHttpHeaders: HttpHeaders;
         HttpHeaders: HttpHeaders;
-        ClearAccessToken: Text;
         AccessToken: SecretText;
     begin
         HttpRequestMsg.SetRequestUri(url);
         HttpRequestMsg.GetHeaders(HttpHeaders);
 
-
-        if IsTestInProgress then begin
-            CommunicationEvents.OnGetAccessToken(ClearAccessToken);
-            AccessToken := ClearAccessToken;
-        end
-        else
-            AccessToken := Shop.GetAccessToken();
+        AccessToken := GetAccessToken(Shop);
 
         HttpHeaders.Add('X-Shopify-Access-Token', AccessToken);
         HttpRequestMsg.Method := Method;
@@ -423,6 +354,36 @@ codeunit 88004 "Shpfy Communication Mgt."
             ContentHttpHeaders.Add('Content-Type', 'application/json');
             HttpRequestMsg.Content(HttpContent);
         end;
+    end;
+
+    local procedure GetAccessToken(var ShopifyShop: Record "Shpfy Shop"): SecretText
+    var
+        Store: Text;
+    begin
+        ShopifyShop.Testfield(Enabled, true);
+        Store := ShopifyShop.GetStoreName();
+        if Store <> '' then
+            exit(GetAccessToken(Store));
+    end;
+
+    local procedure GetAccessToken(Store: Text): SecretText
+    var
+        RegisteredStoreNew: Record "Shpfy Registered Store New";
+        AuthenticationMgt: Codeunit "Shpfy Authentication Mgt.";
+        AccessToken: SecretText;
+        NoAccessTokenErr: label 'No Access token for the store "%1".\Please request an access token for this store.', Comment = '%1 = Store';
+        ChangedScopeErr: Label 'The application scope is changed, please request a new access token for the store "%1".', Comment = '%1 = Store';
+    begin
+        if RegisteredStoreNew.Get(Store) then
+            if RegisteredStoreNew."Requested Scope" = AuthenticationMgt.GetScope() then begin
+                AccessToken := RegisteredStoreNew.GetAccessToken();
+                if not AccessToken.IsEmpty() then
+                    exit(AccessToken)
+                else
+                    Error(NoAccessTokenErr, Store);
+            end else
+                Error(ChangedScopeErr, Store);
+        Error(NoAccessTokenErr, Store);
     end;
 
     /// <summary> 
@@ -493,6 +454,39 @@ codeunit 88004 "Shpfy Communication Mgt."
         Session.LogMessage('0000K8W', StrSubstNo(RequestTelemetryLbl, Method, RequestId), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, CustomDimensions);
     end;
 
+    local procedure LogGraphQLThrottledTelemetry(JResponse: JsonToken; ExpectedCost: Decimal; ResponseHeaders: HttpHeaders)
+    var
+        ShpfyJsonHelper: Codeunit "Shpfy Json Helper";
+        CustomDimensions: Dictionary of [Text, Text];
+        Values: array[10] of Text;
+        AvailableTokens: Decimal;
+        RestoreRate: Decimal;
+        MaxAvailable: Decimal;
+        RequestedCost: Decimal;
+        ActualCost: Decimal;
+        RequestId: Text;
+    begin
+        AvailableTokens := ShpfyJsonHelper.GetValueAsDecimal(JResponse, 'extensions.cost.throttleStatus.currentlyAvailable');
+        RestoreRate := ShpfyJsonHelper.GetValueAsDecimal(JResponse, 'extensions.cost.throttleStatus.restoreRate');
+        MaxAvailable := ShpfyJsonHelper.GetValueAsDecimal(JResponse, 'extensions.cost.throttleStatus.maximumAvailable');
+        RequestedCost := ShpfyJsonHelper.GetValueAsDecimal(JResponse, 'extensions.cost.requestedQueryCost');
+        ActualCost := ShpfyJsonHelper.GetValueAsDecimal(JResponse, 'extensions.cost.actualQueryCost');
+        if ResponseHeaders.GetValues('X-Request-ID', Values) then
+            RequestId := Values[1];
+
+        CustomDimensions.Add('Category', CategoryTok);
+        CustomDimensions.Add('ShopId', Format(Shop."Shop Id"));
+        CustomDimensions.Add('RequestId', RequestId);
+        CustomDimensions.Add('ExpectedCost', Format(ExpectedCost, 0, 9));
+        CustomDimensions.Add('RequestedCost', Format(RequestedCost, 0, 9));
+        CustomDimensions.Add('ActualCost', Format(ActualCost, 0, 9));
+        CustomDimensions.Add('AvailableTokens', Format(AvailableTokens, 0, 9));
+        CustomDimensions.Add('MaxAvailable', Format(MaxAvailable, 0, 9));
+        CustomDimensions.Add('RestoreRate', Format(RestoreRate, 0, 9));
+
+        Session.LogMessage('0000QWH', StrSubstNo(GraphQLThrottledTxt, RequestId), Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, CustomDimensions);
+    end;
+
     local procedure GetQueryCost(Response: Text): Integer
     var
         JsonHelper: Codeunit "Shpfy Json Helper";
@@ -517,12 +511,7 @@ codeunit 88004 "Shpfy Communication Mgt."
     /// <returns>Return variable "Retry" of type Boolean.</returns>
     local procedure EvaluateResponse(HttpResponseMessage: HttpResponseMessage) Retry: Boolean
     var
-        BucketPerc: Decimal;
-        WaitTime: Duration;
-        BucketSize: Integer;
-        BucketUse: Integer;
         Status: Integer;
-        Values: array[10] of Text;
     begin
         Status := HttpResponseMessage.HttpStatusCode();
         case Status of
@@ -536,26 +525,6 @@ codeunit 88004 "Shpfy Communication Mgt."
                     Sleep(10000);
                     Retry := true;
                 end;
-            else
-                if HttpResponseMessage.Headers().GetValues('X-Shopify-Shop-Api-Call-Limit', Values) then
-                    if Evaluate(BucketUse, Values[1].Split('/').Get(1)) and Evaluate(BucketSize, Values[1].Split('/').Get(2)) then begin
-                        BucketPerc := 100 * BucketUse / BucketSize;
-                        if BucketPerc >= 90 then
-                            WaitTime := 1000
-                        else
-                            if BucketPerc >= 80 then
-                                WaitTime := 800
-                            else
-                                if BucketPerc >= 70 then
-                                    WaitTime := 600
-                                else
-                                    if BucketPerc >= 60 then
-                                        WaitTime := 400
-                                    else
-                                        if BucketPerc >= 50 then
-                                            WaitTime := 200;
-                    end;
-                NextExecutionTime := CurrentDateTime() + WaitTime;
         end;
     end;
 
@@ -572,20 +541,6 @@ codeunit 88004 "Shpfy Communication Mgt."
         Shop.Get(ShopCode);
         Dimensions.Add('ShopId', Format(Shop."Shop Id"));
         FeatureTelemetry.LogUsage('0000JW7', 'Shopify', 'A shop is set', Dimensions);
-    end;
-
-    /// <summary>
-    /// SetTestInProgress.
-    /// </summary>
-    /// <param name="TestInProgress">Boolean.</param>
-    internal procedure SetTestInProgress(TestInProgress: Boolean)
-    begin
-        IsTestInProgress := TestInProgress;
-    end;
-
-    internal procedure GetTestInProgress(): Boolean
-    begin
-        exit(IsTestInProgress);
     end;
 
     internal procedure GetShopRecord() ShopifyShop: Record "Shpfy Shop";
@@ -626,8 +581,6 @@ codeunit 88004 "Shpfy Communication Mgt."
     var
         ApiVersionExpiryDate: DateTime;
     begin
-        //#OBC exit
-        exit;
         ApiVersionExpiryDate := GetApiVersionExpiryDate();
 
         if CurrentDateTime() > ApiVersionExpiryDate then begin
@@ -651,34 +604,32 @@ codeunit 88004 "Shpfy Communication Mgt."
         Result: Text;
         ResultList: List of [Text];
     begin
-        // if not GetApiVersionCache(ApiVersionExpiryDate) then begin
-        //     Result := GetApiVersionExpiryDateFromAKV();
-        //     ResultList := Result.Split('-');
-        //     if ResultList.Count <> 3 then
-        //         ApiVersionExpiryDate := CreateDateTime(CalcDate('<+1Y>', Today()), 0T)
-        //     else begin
-        //         Evaluate(Day, ResultList.Get(3));
-        //         Evaluate(Month, ResultList.Get(2));
-        //         Evaluate(Year, ResultList.Get(1));
-        //         ApiVersionExpiryDate := CreateDateTime(DMY2Date(Day, Month, Year), 0T);
-        //     end;
-        //     SetApiVersionCache(Result);
-        // end;
+        if not GetApiVersionCache(ApiVersionExpiryDate) then begin
+            Result := GetApiVersionExpiryDateFromAKV();
+            ResultList := Result.Split('-');
+            if ResultList.Count <> 3 then
+                ApiVersionExpiryDate := CreateDateTime(CalcDate('<+1Y>', Today()), 0T)
+            else begin
+                Evaluate(Day, ResultList.Get(3));
+                Evaluate(Month, ResultList.Get(2));
+                Evaluate(Year, ResultList.Get(1));
+                ApiVersionExpiryDate := CreateDateTime(DMY2Date(Day, Month, Year), 0T);
+            end;
+            SetApiVersionCache(Result);
+        end;
 
         exit(ApiVersionExpiryDate);
     end;
 
     [NonDebuggable]
-    [Scope('OnPrem')]
-    internal procedure SetApiVersionCache(ApiVersionExpiryDate: Text)
+    local procedure SetApiVersionCache(ApiVersionExpiryDate: Text)
     begin
         IsolatedStorage.Set('ApiVersionExpiryDate(' + VersionTok + ')', ApiVersionExpiryDate, DataScope::Module);
         IsolatedStorage.Set('ApiVersionCache(' + VersionTok + ')', Format(CurrentDateTime(), 0, 9), DataScope::Module);
     end;
 
     [NonDebuggable]
-    [Scope('OnPrem')]
-    internal procedure GetApiVersionCache(var ApiVersionExpiryDate: DateTime): Boolean
+    local procedure GetApiVersionCache(var ApiVersionExpiryDate: DateTime): Boolean
     var
         Day: Integer;
         Month: Integer;
@@ -727,10 +678,10 @@ codeunit 88004 "Shpfy Communication Mgt."
         if not EnvironmentInformation.IsSaaS() then
             exit(Format(CalcDate('<+1M>', Today()), 0, 9));
 
-        // if not AzureKeyVault.GetAzureKeyVaultSecret(ApiVersionExpiryDateAKVSecretNameLbl, ApiVersionJsonTxt) then begin
-        //     Session.LogMessage('0000KO2', MissingApiVersionExpiryDateTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
-        //     exit;
-        // end;
+        if not AzureKeyVault.GetAzureKeyVaultSecret(ApiVersionExpiryDateAKVSecretNameLbl, ApiVersionJsonTxt) then begin
+            Session.LogMessage('0000KO2', MissingApiVersionExpiryDateTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+            exit;
+        end;
 
         if not JObject.ReadFrom(ApiVersionJsonTxt) then begin
             Session.LogMessage('0000KO3', CannotParseParametersTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
@@ -768,16 +719,5 @@ codeunit 88004 "Shpfy Communication Mgt."
     begin
         exit(50000);
     end;
-
-
-    //OTE Overwrite URL
-    procedure SetOverwriteURL(_url: text)
-    begin
-        G_OverwriteUrl := CreateWebRequestURL(_url);
-    end;
-
-    var
-        G_OverwriteUrl: text;
-    //OTE Overwrite URL ---
 }
 

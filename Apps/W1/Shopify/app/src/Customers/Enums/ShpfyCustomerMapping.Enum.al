@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Customer Mapping (ID 30106) implements Interface Shpfy ICustomer Mapping.
 /// </summary>
-enum 88014 "Shpfy Customer Mapping" implements "Shpfy ICustomer Mapping"
+enum 30106 "Shpfy Customer Mapping" implements "Shpfy ICustomer Mapping"
 {
     Caption = 'Shopify Customer Mapping';
     Extensible = true;

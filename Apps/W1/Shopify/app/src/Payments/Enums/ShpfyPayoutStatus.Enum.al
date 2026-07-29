@@ -1,9 +1,15 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Payout Status (ID 30128).
+/// Represented by shopify.dev/docs/api/admin-graphql/latest/enums/ShopifyPaymentsPayoutStatus
 /// </summary>
-enum 88058 "Shpfy Payout Status"
+enum 30128 "Shpfy Payout Status"
 {
     Caption = 'Payout Status';
     Extensible = false;

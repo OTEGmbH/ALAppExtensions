@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-enum 88003 "Shpfy Return Location Priority"
+namespace Microsoft.Integration.Shopify;
+
+enum 30162 "Shpfy Return Location Priority"
 {
     Access = Public;
     Extensible = false;

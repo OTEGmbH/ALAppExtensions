@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using System.Reflection;
 
-table 88042 "Shpfy Return Line"
+table 30141 "Shpfy Return Line"
 {
     Caption = 'Return Line';
     DataClassification = SystemMetadata;
@@ -44,7 +49,7 @@ table 88042 "Shpfy Return Line"
         }
         field(6; "Return Reason"; Enum "Shpfy Return Reason")
         {
-            Caption = 'Return Reason';
+            Caption = 'Return Reason (deprecated)';
             DataClassification = SystemMetadata;
             Editable = false;
         }
@@ -76,23 +81,61 @@ table 88042 "Shpfy Return Line"
             Caption = 'Weight';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 0;
         }
         field(12; "Discounted Total Amount"; Decimal)
         {
             Caption = 'Discounted Total Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = OrderCurrencyCode();
         }
         field(13; "Presentment Disc. Total Amt."; Decimal)
         {
             Caption = 'Presentment Discounted Total Amount';
+            ToolTip = 'Specifies the total line price in the presentment currency after all discounts on the line item, including both line item level discounts and code-based line item discounts, are applied.';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = OrderPresentmentCurrencyCode();
         }
         field(14; "Customer Note"; Blob)
         {
             Caption = 'Customer Note';
             DataClassification = SystemMetadata;
+        }
+        field(15; Type; Enum "Shpfy Return Line Type")
+        {
+            Caption = 'Type';
+            DataClassification = SystemMetadata;
+            Editable = false;
+        }
+        field(16; "Unit Price"; Decimal)
+        {
+            Caption = 'Unit Price';
+            DataClassification = SystemMetadata;
+            Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Unit Price Currency";
+        }
+        field(17; "Unit Price Currency"; Code[10])
+        {
+            Caption = 'Unit Price Currency';
+            DataClassification = SystemMetadata;
+            Editable = false;
+        }
+        field(18; "Return Reason Name"; Text[100])
+        {
+            Caption = 'Return Reason';
+            DataClassification = SystemMetadata;
+            Editable = false;
+        }
+        field(19; "Return Reason Handle"; Text[100])
+        {
+            Caption = 'Return Reason Handle';
+            DataClassification = SystemMetadata;
+            Editable = false;
         }
         field(101; "Item No."; Code[20])
         {
@@ -116,6 +159,13 @@ table 88042 "Shpfy Return Line"
         {
             Caption = 'Location Id';
             DataClassification = SystemMetadata;
+            Editable = false;
+        }
+        field(105; "Unit of Measure Code"; Code[10])
+        {
+            Caption = 'Unit of Measure Code';
+            FieldClass = FlowField;
+            CalcFormula = lookup("Shpfy Order Line"."Unit of Measure Code" where("Line Id" = field("Order Line Id")));
             Editable = false;
         }
     }
@@ -181,5 +231,25 @@ table 88042 "Shpfy Return Line"
         "Customer Note".CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(NewCustomerNote);
         Modify();
+    end;
+
+    local procedure OrderCurrencyCode(): Code[10]
+    var
+        OrderHeader: Record "Shpfy Order Header";
+        OrderLine: Record "Shpfy Order Line";
+    begin
+        if OrderLine.Get("Order Line Id") then
+            if OrderHeader.Get(OrderLine."Shopify Order Id") then
+                exit(OrderHeader."Currency Code");
+    end;
+
+    local procedure OrderPresentmentCurrencyCode(): Code[10]
+    var
+        OrderHeader: Record "Shpfy Order Header";
+        OrderLine: Record "Shpfy Order Line";
+    begin
+        if OrderLine.Get("Order Line Id") then
+            if OrderHeader.Get(OrderLine."Shopify Order Id") then
+                exit(OrderHeader."Presentment Currency Code");
     end;
 }

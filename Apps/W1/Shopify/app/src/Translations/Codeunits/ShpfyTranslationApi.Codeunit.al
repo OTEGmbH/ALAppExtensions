@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88294 "Shpfy Translation API"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30213 "Shpfy Translation API"
 {
 
     #region Shop Locales
@@ -27,7 +32,7 @@ codeunit 88294 "Shpfy Translation API"
         Shop.Get(ShopCode);
         CommunicationMgt.SetShop(Shop.Code);
 
-        GraphQLType := GraphQLType::ShopLocales;
+        GraphQLType := GraphQLType::Base_ShopLocales;
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType);
 
         CurrentLocales := CollectLocales(Shop.Code);
@@ -118,7 +123,7 @@ codeunit 88294 "Shpfy Translation API"
         Parameters.Add('ResourceId', Format(ResourceId));
         Parameters.Add('Translations', TranslationsQuery);
 
-        GraphQLType := GraphQLType::TranslationsRegister;
+        GraphQLType := GraphQLType::Base_TranslationsRegister;
         exit(CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters));
     end;
     #endregion
@@ -144,7 +149,7 @@ codeunit 88294 "Shpfy Translation API"
         Parameters.Add('ResourceType', GetResourceTypeName(ResourceType));
         Parameters.Add('ResourceId', Format(ResourceId));
 
-        GraphQLType := GraphQLType::GetTranslResource;
+        GraphQLType := GraphQLType::Base_GetTranslResource;
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
 
         if not JsonHelper.IsNull(JResponse, 'data.translatableResource') then begin

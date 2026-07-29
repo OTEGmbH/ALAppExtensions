@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Order Fulfillments (ID 30160).
 /// </summary>
-codeunit 88240 "Shpfy Order Fulfillments"
+codeunit 30160 "Shpfy Order Fulfillments"
 {
     Access = Internal;
 
@@ -28,11 +33,9 @@ codeunit 88240 "Shpfy Order Fulfillments"
         JFulfillments: JsonArray;
         JResponse: JsonToken;
     begin
-        if CommunicationMgt.GetTestInProgress() then
-            exit;
         CommunicationMgt.SetShop(Shop);
         Parameters.Add('OrderId', Format(OrderId));
-        GraphQLType := "Shpfy GraphQL Type"::GetOrderFulfillment;
+        GraphQLType := "Shpfy GraphQL Type"::Orders_GetOrderFulfillment;
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
         if JsonHelper.GetJsonObject(JResponse, JOrder, 'data.order') then
             if JsonHelper.GetValueAsBigInteger(JOrder, 'legacyResourceId') = OrderId then begin
@@ -130,7 +133,7 @@ codeunit 88240 "Shpfy Order Fulfillments"
                     Parameters.Set('After', JsonHelper.GetValueAsText(JFulfillment, 'fulfillmentLineItems.pageInfo.endCursor'))
                 else
                     Parameters.Add('After', JsonHelper.GetValueAsText(JFulfillment, 'fulfillmentLineItems.pageInfo.endCursor'));
-                GraphQLType := "Shpfy GraphQL Type"::GetNextOrderFulfillmentLines;
+                GraphQLType := "Shpfy GraphQL Type"::Orders_GetNextOrderFulfillmentLines;
                 JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
                 JFulfillment := JsonHelper.GetJsonToken(JResponse, 'data.fulfillment');
             end;

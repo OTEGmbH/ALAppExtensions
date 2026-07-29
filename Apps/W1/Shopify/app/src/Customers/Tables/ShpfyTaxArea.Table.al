@@ -1,4 +1,9 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Setup;
@@ -6,7 +11,7 @@ using Microsoft.Finance.VAT.Setup;
 /// <summary>
 /// Table Shpfy Tax Area (ID 30109).
 /// </summary>
-table 88015 "Shpfy Tax Area"
+table 30109 "Shpfy Tax Area"
 {
     Access = Internal;
     Caption = 'Shopify Tax Area';

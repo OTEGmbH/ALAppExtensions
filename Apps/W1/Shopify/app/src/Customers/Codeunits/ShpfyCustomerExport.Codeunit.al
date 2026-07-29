@@ -1,14 +1,18 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using OTE.Shopify;
-using Microsoft.Sales.Customer;
-using Microsoft.Foundation.Company;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy Customer Export (ID 30116).
 /// </summary>
-codeunit 88037 "Shpfy Customer Export"
+codeunit 30116 "Shpfy Customer Export"
 {
     Access = Internal;
     TableNo = Customer;
@@ -21,24 +25,26 @@ codeunit 88037 "Shpfy Customer Export"
         CustomerId: BigInteger;
     begin
         CustomerAPI.FillInMissingShopIds();
-        //OTE Customer sync 07.10.2025 JR START
-        //  Customer.CopyFilters(Rec); 
-        Customer.Copy(Rec);
-        //OTE Customer sync 07.10.2025 JR STOP 
+        Customer.CopyFilters(Rec);
         if Customer.FindSet(false) then begin
             CustomerMapping.SetShop(Shop);
             repeat
-                CustomerId := CustomerMapping.FindMapping(Customer, CreateCustomers);
-                if CustomerId = 0 then begin
-                    //OTE Force Customer Creation 08.10.2025 JR START
-                    // if CreateCustomers then 
-                    //OTE Force Customer Creation 08.10.2025 JR STOP 
-                    CreateShopifyCustomer(Customer);
+                if CreateCustomers then begin
+                    CustomerId := CustomerMapping.FindMapping(Customer, CreateCustomers);
+                    if CustomerId = 0 then
+                        CreateShopifyCustomer(Customer)
+                    else begin
+                        ShopifyCustomer.Get(CustomerId);
+                        if ShopifyCustomer."Customer SystemId" <> Customer.SystemId then
+                            SkippedRecord.LogSkippedRecord(Customer.RecordId, CustomerWithPhoneNoOrEmailExistsLbl, Shop)
+                        else
+                            if Shop."Can Update Shopify Customer" then
+                                UpdateShopifyCustomer(Customer, ShopifyCustomer);
+                    end;
                 end else begin
-                    ShopifyCustomer.Get(CustomerId);
-                    if ShopifyCustomer."Customer SystemId" <> Customer.SystemId then
-                        SkippedRecord.LogSkippedRecord(Customer.RecordId, CustomerWithPhoneNoOrEmailExistsLbl, Shop)
-                    else
+                    ShopifyCustomer.SetRange("Shop Id", Shop."Shop Id");
+                    ShopifyCustomer.SetRange("Customer SystemId", Customer.SystemId);
+                    if ShopifyCustomer.FindFirst() then
                         if Shop."Can Update Shopify Customer" then
                             UpdateShopifyCustomer(Customer, ShopifyCustomer);
                 end;
@@ -50,7 +56,6 @@ codeunit 88037 "Shpfy Customer Export"
     var
         Shop: Record "Shpfy Shop";
         CustomerApi: Codeunit "Shpfy Customer API";
-        MetafieldAPI: Codeunit "Shpfy Metafield API";
         SkippedRecord: Codeunit "Shpfy Skipped Record";
         CreateCustomers: Boolean;
         CountyCodeTooLongLbl: Label 'Can not export customer %1 %2. The length of the string is %3, but it must be less than or equal to %4 characters. Value: %5, field: %6', Comment = '%1 - Customer No., %2 - Customer Name, %3 - Length, %4 - Max Length, %5 - Value, %6 - Field Name';
@@ -66,17 +71,11 @@ codeunit 88037 "Shpfy Customer Export"
     var
         ShopifyCustomer: Record "Shpfy Customer";
         CustomerAddress: Record "Shpfy Customer Address";
-        ShpfyCustomerEvents: Codeunit "Shpfy Customer Events";
-        isHandled: boolean;
     begin
-        //OTE Customer sync 07.10.2025 JR START
-        ShpfyCustomerEvents.OnBeforeSkipCustomerCreation(Customer, Shop, SkippedRecord, isHandled);
-        if not isHandled then
-            //OTE Customer sync 07.10.2025 JR STOP 
-            if Customer."E-Mail" = '' then begin
-                SkippedRecord.LogSkippedRecord(Customer.RecordId, EmptyEmailAddressLbl, Shop);
-                exit;
-            end;
+        if Customer."E-Mail" = '' then begin
+            SkippedRecord.LogSkippedRecord(Customer.RecordId, EmptyEmailAddressLbl, Shop);
+            exit;
+        end;
 
         Clear(ShopifyCustomer);
         Clear(CustomerAddress);
@@ -110,6 +109,7 @@ codeunit 88037 "Shpfy Customer Export"
 #pragma warning restore AA0073
         TaxArea: Record "Shpfy Tax Area";
         CountyCodeTooLongErr: Text;
+        ISOCountryCode: Code[2];
     begin
         xShopifyCustomer := ShopifyCustomer;
         xCustomerAddress := CustomerAddress;
@@ -148,41 +148,48 @@ codeunit 88037 "Shpfy Customer Export"
         if (Customer."Country/Region Code" = '') and CompanyInformation.Get() then
             Customer."Country/Region Code" := CompanyInformation."Country/Region Code";
 
-        if Customer.County <> '' then
-            case Shop."County Source" of
-                Shop."County Source"::Code:
-                    begin
-                        if StrLen(Customer.County) > MaxStrLen(TaxArea."County Code") then begin
-                            CountyCodeTooLongErr := StrSubstNo(CountyCodeTooLongLbl, Customer."No.", Customer.Name, StrLen(Customer.County), MaxStrLen(TaxArea."County Code"), Customer.County, Customer.FieldCaption(County));
-                            Error(CountyCodeTooLongErr);
-                        end;
-                        TaxArea.SetRange("Country/Region Code", Customer."Country/Region Code");
-                        TaxArea.SetRange("County Code", Customer.County);
-                        if TaxArea.FindFirst() then begin
-                            CustomerAddress."Province Code" := TaxArea."County Code";
-                            CustomerAddress."Province Name" := TaxArea.County;
-                        end;
-                    end;
-                Shop."County Source"::Name:
-                    begin
-                        TaxArea.SetRange("Country/Region Code", Customer."Country/Region Code");
-                        TaxArea.SetRange(County, Customer.County);
-                        if TaxArea.FindFirst() then begin
-                            CustomerAddress."Province Code" := TaxArea."County Code";
-                            CustomerAddress."Province Name" := TaxArea.County;
-                        end else begin
-                            TaxArea.SetFilter(County, Customer.County + '*');
+        // Shpfy Tax Area is keyed by Shopify's ISO 3166-1 alpha-2 codes (e.g. "GR")
+        // which can differ from BC's Country/Region Code (e.g. "EL" used for EU/VIES).
+        // Resolve once and reuse for both Tax Area filtering and the Shopify-side address.
+        if CountryRegion.Get(Customer."Country/Region Code") then begin
+            CountryRegion.TestField("ISO Code");
+            ISOCountryCode := CountryRegion."ISO Code";
+            CustomerAddress."Country/Region Code" := ISOCountryCode;
+        end;
+
+        if Customer.County <> '' then begin
+            TaxArea.SetRange("Country/Region Code", ISOCountryCode);
+            if not TaxArea.IsEmpty() then
+                case Shop."County Source" of
+                    Shop."County Source"::Code:
+                        begin
+                            if StrLen(Customer.County) > MaxStrLen(TaxArea."County Code") then begin
+                                CountyCodeTooLongErr := StrSubstNo(CountyCodeTooLongLbl, Customer."No.", Customer.Name, StrLen(Customer.County), MaxStrLen(TaxArea."County Code"), Customer.County, Customer.FieldCaption(County));
+                                Error(CountyCodeTooLongErr);
+                            end;
+                            TaxArea.SetRange("Country/Region Code", ISOCountryCode);
+                            TaxArea.SetRange("County Code", Customer.County);
                             if TaxArea.FindFirst() then begin
                                 CustomerAddress."Province Code" := TaxArea."County Code";
                                 CustomerAddress."Province Name" := TaxArea.County;
                             end;
                         end;
-                    end;
-            end;
-
-        if CountryRegion.Get(Customer."Country/Region Code") then begin
-            CountryRegion.TestField("ISO Code");
-            CustomerAddress."Country/Region Code" := CountryRegion."ISO Code";
+                    Shop."County Source"::Name:
+                        begin
+                            TaxArea.SetRange("Country/Region Code", ISOCountryCode);
+                            TaxArea.SetRange(County, Customer.County);
+                            if TaxArea.FindFirst() then begin
+                                CustomerAddress."Province Code" := TaxArea."County Code";
+                                CustomerAddress."Province Name" := TaxArea.County;
+                            end else begin
+                                TaxArea.SetFilter(County, Customer.County + '*');
+                                if TaxArea.FindFirst() then begin
+                                    CustomerAddress."Province Code" := TaxArea."County Code";
+                                    CustomerAddress."Province Name" := TaxArea.County;
+                                end;
+                            end;
+                        end;
+                end;
         end;
 
         CustomerAddress.Phone := Customer."Phone No.";
@@ -232,7 +239,6 @@ codeunit 88037 "Shpfy Customer Export"
     begin
         Shop := ShopifyShop;
         CustomerApi.SetShop(Shop);
-        MetafieldAPI.SetShop(Shop)
     end;
 
     /// <summary> 
@@ -266,19 +272,12 @@ codeunit 88037 "Shpfy Customer Export"
     local procedure UpdateShopifyCustomer(Customer: Record Customer; var ShopifyCustomer: Record "Shpfy Customer")
     var
         CustomerAddress: Record "Shpfy Customer Address";
-        ShpfyCustomerEvents: Codeunit "Shpfy Customer Events";
-        Skipaddress: boolean;
     begin
-        //OTE Sometimes Customer Address can be empty 27.07.2026 JR START
-        shpfycustomerevents.OnBeforeUpdateShopifyCustomerBeforeFindCustomerAddress(Customer, ShopifyCustomer, Shop, CustomerAddress, Skipaddress);
-        //OTE Sometimes Customer Address can be empty 27.07.2026 JR STOP 
-        if not Skipaddress then begin
-            CustomerAddress.SetRange("Customer Id", ShopifyCustomer.Id);
-            CustomerAddress.SetRange(Default, true);
-            if not CustomerAddress.FindFirst() then begin
-                CustomerAddress.SetRange(Default);
-                CustomerAddress.FindFirst();
-            end;
+        CustomerAddress.SetRange("Customer Id", ShopifyCustomer.Id);
+        CustomerAddress.SetRange(Default, true);
+        if not CustomerAddress.FindFirst() then begin
+            CustomerAddress.SetRange(Default);
+            CustomerAddress.FindFirst();
         end;
 
         if FillInShopifyCustomerData(Customer, ShopifyCustomer, CustomerAddress) then begin
@@ -297,7 +296,9 @@ codeunit 88037 "Shpfy Customer Export"
     end;
 
     local procedure UpdateMetafields(CustomerId: BigInteger)
+    var
+        Metafields: Codeunit "Shpfy Metafields";
     begin
-        MetafieldAPI.CreateOrUpdateMetafieldsInShopify(Database::"Shpfy Customer", CustomerId);
+        Metafields.SyncMetafieldsToShopify(Database::"Shpfy Customer", CustomerId, Shop.Code);
     end;
 }

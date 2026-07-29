@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-table 88027 "Shpfy FulFillment Order Header"
+namespace Microsoft.Integration.Shopify;
+
+table 30143 "Shpfy FulFillment Order Header"
 {
     Caption = 'Fulfillment Order Header';
     DataClassification = CustomerContent;
@@ -39,7 +44,7 @@ table 88027 "Shpfy FulFillment Order Header"
         }
         field(7; "Updated At"; DateTime)
         {
-            Caption = 'Updated At';
+            Caption = 'Updated At (Shopify)';
             DataClassification = SystemMetadata;
         }
         field(8; "Shopify Order No."; Text[50])
@@ -55,6 +60,12 @@ table 88027 "Shpfy FulFillment Order Header"
             DataClassification = SystemMetadata;
             Editable = false;
         }
+        field(10; "Request Status"; Enum "Shpfy FF Request Status")
+        {
+            Caption = 'Request Status';
+            DataClassification = SystemMetadata;
+            Editable = false;
+        }
     }
     keys
     {
@@ -62,14 +73,24 @@ table 88027 "Shpfy FulFillment Order Header"
         {
             Clustered = true;
         }
+        key(Key2; "Shopify Order Id")
+        {
+        }
     }
 
     trigger OnDelete()
     var
         FulfillmentOrderLine: Record "Shpfy FulFillment Order Line";
+        DataCapture: Record "Shpfy Data Capture";
     begin
         FulfillmentOrderLine.Reset();
         FulfillmentOrderLine.SetRange("Shopify Fulfillment Order Id", Rec."Shopify Fulfillment Order Id");
         FulfillmentOrderLine.DeleteAll(true);
+
+        DataCapture.SetCurrentKey("Linked To Table", "Linked To Id");
+        DataCapture.SetRange("Linked To Table", Database::"Shpfy FulFillment Order Header");
+        DataCapture.SetRange("Linked To Id", Rec.SystemId);
+        if not DataCapture.IsEmpty then
+            DataCapture.DeleteAll(false);
     end;
 }

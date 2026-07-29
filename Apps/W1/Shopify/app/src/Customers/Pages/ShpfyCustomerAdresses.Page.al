@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Customer Adresses (ID 30105).
 /// </summary>
-page 88015 "Shpfy Customer Adresses"
+page 30105 "Shpfy Customer Adresses"
 {
     Caption = 'Addresses';
     Editable = false;
@@ -21,7 +26,7 @@ page 88015 "Shpfy Customer Adresses"
                 {
                     ApplicationArea = All;
                     Visible = false;
-                    ToolTip = 'The Shopify id of this address record.';
+                    ToolTip = 'Specifies the Shopify id of this address record.';
                 }
                 field(Default; Rec.Default)
                 {

@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-report 88013 "Shpfy Sync Disputes"
+namespace Microsoft.Integration.Shopify;
+
+report 30120 "Shpfy Sync Disputes"
 {
     ApplicationArea = All;
     Caption = 'Shopify Sync Disputes';

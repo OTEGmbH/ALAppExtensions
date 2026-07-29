@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Order Risk (ID 30123).
 /// </summary>
-table 88043 "Shpfy Order Risk"
+table 30123 "Shpfy Order Risk"
 {
     Access = Internal;
     Caption = 'Shopify Order Risk';
@@ -42,13 +47,8 @@ table 88043 "Shpfy Order Risk"
             DataClassification = SystemMetadata;
             Editable = false;
             ObsoleteReason = 'This field is not imported.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
         field(6; Provider; Text[512])

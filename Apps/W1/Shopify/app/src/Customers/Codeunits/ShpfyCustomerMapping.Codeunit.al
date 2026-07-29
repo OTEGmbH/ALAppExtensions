@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy Customer Mapping (ID 30118).
 /// </summary>
-codeunit 88039 "Shpfy Customer Mapping"
+codeunit 30118 "Shpfy Customer Mapping"
 {
     Access = Internal;
     Permissions = tabledata Customer = rim;

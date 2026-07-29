@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Remove Product Action (ID 30131) implements Interface Shpfy IRemoveProductAction.
 /// </summary>
-enum 88061 "Shpfy Remove Product Action" implements "Shpfy IRemoveProductAction"
+enum 30131 "Shpfy Remove Product Action" implements "Shpfy IRemoveProductAction"
 {
     Caption = 'Shopify Remove Product Action';
     Extensible = false;

@@ -1,12 +1,17 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Metafields (ID 30163).
 /// </summary>
-page 88031 "Shpfy Metafields"
+page 30163 "Shpfy Metafields"
 {
     Caption = 'Shopify Metafields';
-    // Extensible = false;
+    Extensible = false;
     PageType = List;
     SourceTable = "Shpfy Metafield";
     UsageCategory = None;
@@ -40,7 +45,6 @@ page 88031 "Shpfy Metafields"
 
                     trigger OnAssistEdit()
                     var
-                        ShpfyMetafieldValue: Record "Shpfy Metafield Value";
                         IMetafieldType: Interface "Shpfy IMetafield Type";
                     begin
                         if not IsPageEditable then
@@ -48,28 +52,10 @@ page 88031 "Shpfy Metafields"
 
                         IMetafieldType := Rec.Type;
 
-                        if IMetafieldType.HasAssistEdit() then begin
+                        if IMetafieldType.HasAssistEdit() then
                             if IMetafieldType.AssistEdit(Rec.Value) then
                                 Rec.Validate(Value);
-                        end else begin
-                            // case Rec.Type of
-                            //     rec.type::metaobject_reference:
-                            //         begin
-                            ShpfyMetafieldValue.SelectValues(Rec);
-                            // end;
-
-                            // end;
-                        end;
                     end;
-                }
-                field("Metafield Values"; Rec."Metafield Values")
-                {
-                    editable = false;
-                    ToolTip = 'Specifies the value of the Metafield Values field.';
-                }
-                field("List Metafield"; Rec."List Metafield")
-                {
-                    ToolTip = 'Specifies the value of the List Metafield field.';
                 }
             }
         }
@@ -92,24 +78,36 @@ page 88031 "Shpfy Metafields"
 
                 trigger OnAction()
                 var
-                    MetafieldAPI: Codeunit "Shpfy Metafield API";
+                    Metafields: Codeunit "Shpfy Metafields";
                     ParentTableNo: Integer;
                     OwnerId: BigInteger;
                 begin
                     Evaluate(ParentTableNo, Rec.GetFilter("Parent Table No."));
                     Evaluate(OwnerId, Rec.GetFilter("Owner Id"));
-                    MetafieldAPI.SetShop(Shop);
-                    MetafieldAPI.GetMetafieldDefinitions(ParentTableNo, OwnerId);
+                    Metafields.GetMetafieldDefinitions(ParentTableNo, OwnerId, Shop.Code);
                 end;
             }
-            action("Send Metafield To Shopify")
+            action(SyncToShopify)
             {
-                Image = Action;
-                Caption = 'Send Metafield to Shopify';
                 ApplicationArea = All;
+                Caption = 'Sync to Shopify';
+                Image = Export;
+                ToolTip = 'Send the selected metafields to Shopify.';
+                Visible = IsPageEditable;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+
                 trigger OnAction()
+                var
+                    Metafield: Record "Shpfy Metafield";
+                    Metafields: Codeunit "Shpfy Metafields";
                 begin
-                    Rec.Rename(SendMetafieldToShopify());
+                    CurrPage.SetSelectionFilter(Metafield);
+                    if Metafield.FindSet() then
+                        repeat
+                            Metafields.SyncMetafieldToShopify(Metafield, Shop.Code);
+                        until Metafield.Next() = 0;
                 end;
             }
         }
@@ -137,18 +135,19 @@ page 88031 "Shpfy Metafields"
         Rec.TestField(Name);
         Rec.Validate(Value);
 
-        Rec.Id := SendMetafieldToShopify();
+        Rec.Id := Metafields.SyncMetafieldToShopify(Rec, Shop.Code);
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
         if Rec.Id < 0 then
             if xRec.Value <> Rec.Value then
-                Rec.Rename(SendMetafieldToShopify());
+                Rec.Rename(Metafields.SyncMetafieldToShopify(Rec, Shop.Code));
     end;
 
     var
         Shop: Record "Shpfy Shop";
+        Metafields: Codeunit "Shpfy Metafields";
         IsPageEditable: Boolean;
         IsValueEditable: Boolean;
 
@@ -172,30 +171,5 @@ page 88031 "Shpfy Metafields"
 
         CurrPage.SetTableView(Metafield);
         CurrPage.RunModal();
-    end;
-
-    local procedure SendMetafieldToShopify(): BigInteger
-    var
-        JsonHelper: Codeunit "Shpfy Json Helper";
-        MetafieldAPI: Codeunit "Shpfy Metafield API";
-        UserErrorOnShopifyErr: Label 'Something went wrong while sending the metafield to Shopify. Check Shopify Log Entries for more details.';
-        GraphQuery: TextBuilder;
-        JResponse: JsonToken;
-        JMetafields: JsonArray;
-        JUserErrors: JsonArray;
-        JItem: JsonToken;
-    begin
-        MetafieldAPI.SetShop(Shop);
-        MetafieldAPI.CreateMetafieldQuery(Rec, GraphQuery);
-        JResponse := MetafieldAPI.UpdateMetafields(GraphQuery.ToText());
-
-        JsonHelper.GetJsonArray(JResponse, JUserErrors, 'data.metafieldsSet.userErrors');
-
-        if JUserErrors.Count() = 0 then begin
-            JsonHelper.GetJsonArray(JResponse, JMetafields, 'data.metafieldsSet.metafields');
-            JMetafields.Get(0, JItem);
-            exit(JsonHelper.GetValueAsBigInteger(JItem, 'legacyResourceId'));
-        end else
-            Error(UserErrorOnShopifyErr);
     end;
 }

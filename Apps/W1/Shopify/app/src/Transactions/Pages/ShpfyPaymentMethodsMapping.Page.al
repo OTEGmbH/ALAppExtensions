@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Payment Methods Mapping(ID 30132).
 /// </summary>
-page 88067 "Shpfy Payment Methods Mapping"
+page 30132 "Shpfy Payment Methods Mapping"
 {
 
     Caption = 'Shopify Payment Methods Mapping';

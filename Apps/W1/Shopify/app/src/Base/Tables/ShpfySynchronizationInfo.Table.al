@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Synchronization Info (ID 30103).
 /// </summary>
-table 88003 "Shpfy Synchronization Info"
+table 30103 "Shpfy Synchronization Info"
 {
     Access = Internal;
     Caption = 'Shopify Synchronization Info';

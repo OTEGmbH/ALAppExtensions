@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Finance.Currency;
 
-codeunit 88222 "Shpfy Mtfld Type Money" implements "Shpfy IMetafield Type"
+codeunit 30317 "Shpfy Mtfld Type Money" implements "Shpfy IMetafield Type"
 {
     var
         MoneyJsonTemplateTxt: Label '{"amount": "%1", "currency_code": "%2"}', Locked = true;

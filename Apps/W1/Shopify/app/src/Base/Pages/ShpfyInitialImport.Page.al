@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88002 "Shpfy Initial Import"
+namespace Microsoft.Integration.Shopify;
+
+page 30137 "Shpfy Initial Import"
 {
     Caption = 'Shopify Initial Import';
     PageType = Worksheet;
@@ -67,6 +72,5 @@ page 88002 "Shpfy Initial Import"
 
     var
         InitialImport: Codeunit "Shpfy Initial Import";
-        [InDataSet]
         JobStatusStyle: Text;
 }

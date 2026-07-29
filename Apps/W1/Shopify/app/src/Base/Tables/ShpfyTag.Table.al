@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Tag (ID 30104).
 /// </summary>
-table 88004 "Shpfy Tag"
+table 30104 "Shpfy Tag"
 {
     Caption = 'Shopify Tag';
     DataClassification = CustomerContent;
@@ -29,9 +34,6 @@ table 88004 "Shpfy Tag"
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
-
-
-
     }
 
     keys
@@ -44,11 +46,11 @@ table 88004 "Shpfy Tag"
 
     trigger OnInsert()
     var
-        Tag: Record "Shpfy Tag";
+        ShopifyTag: Record "Shpfy Tag";
         MaxTagsErr: Label 'You can only specify 250 tags.';
     begin
-        Tag.SetRange("Parent Id", "Parent Id");
-        if Tag.Count() >= 250 then
+        ShopifyTag.SetRange("Parent Id", "Parent Id");
+        if ShopifyTag.Count() >= 250 then
             Error(MaxTagsErr);
     end;
 
@@ -80,22 +82,22 @@ table 88004 "Shpfy Tag"
     /// <param name="CommaSeperatedTags">Parameter of type Text.</param>
     internal procedure UpdateTags(ParentTableNo: Integer; ParentId: BigInteger; CommaSeperatedTags: Text)
     var
-        Tag: Record "Shpfy Tag";
+        ShopifyTag: Record "Shpfy Tag";
         Tags: List of [Text];
         TagTxt: Text;
     begin
-        Tag.SetRange("Parent Id", ParentId);
-        if not Tag.IsEmpty() then
-            Tag.DeleteAll();
+        ShopifyTag.SetRange("Parent Id", ParentId);
+        if not ShopifyTag.IsEmpty() then
+            ShopifyTag.DeleteAll();
         Tags := CommaSeperatedTags.Split(',');
         foreach TagTxt in Tags do begin
             TagTxt := TagTxt.Trim();
             if TagTxt <> '' then begin
-                Clear(Tag);
-                Tag."Parent Table No." := ParentTableNo;
-                Tag."Parent Id" := ParentId;
-                Tag.Tag := CopyStr(TagTxt, 1, MaxStrLen(Tag.Tag));
-                Tag.Insert();
+                Clear(ShopifyTag);
+                ShopifyTag."Parent Table No." := ParentTableNo;
+                ShopifyTag."Parent Id" := ParentId;
+                ShopifyTag.Tag := CopyStr(TagTxt, 1, MaxStrLen(ShopifyTag.Tag));
+                ShopifyTag.Insert();
             end;
         end;
     end;

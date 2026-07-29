@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Shipment Methods Mapping (ID 30129).
 /// </summary>
-page 88064 "Shpfy Shipment Methods Mapping"
+page 30129 "Shpfy Shipment Methods Mapping"
 {
     Caption = 'Shopify Shipment Methods';
     PageType = List;

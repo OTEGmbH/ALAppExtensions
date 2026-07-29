@@ -1,4 +1,9 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Interface used for validating and editing values of a Shopify Metafield.
@@ -32,6 +37,4 @@ interface "Shpfy IMetafield Type"
     /// </summary>
     /// <returns>Example value.</returns>
     procedure GetExampleValue(): Text
-
-
 }

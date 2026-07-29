@@ -1,13 +1,18 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using Microsoft.Sales.Customer;
-using Microsoft.Foundation.Company;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy Company Export (ID 30284).
 /// </summary>
-codeunit 88018 "Shpfy Company Export"
+codeunit 30284 "Shpfy Company Export"
 {
     Access = Internal;
     TableNo = Customer;
@@ -36,12 +41,12 @@ codeunit 88018 "Shpfy Company Export"
         Shop: Record "Shpfy Shop";
         CompanyAPI: Codeunit "Shpfy Company API";
         CatalogAPI: Codeunit "Shpfy Catalog API";
-        MetafieldAPI: Codeunit "Shpfy Metafield API";
         SkippedRecord: Codeunit "Shpfy Skipped Record";
         CreateCustomers: Boolean;
         CountyCodeTooLongLbl: Label 'Can not export customer %1 %2. The length of the string is %3, but it must be less than or equal to %4 characters. Value: %5, field: %6', Comment = '%1 - Customer No., %2 - Customer Name, %3 - Length, %4 - Max Length, %5 - Value, %6 - Field Name';
         EmptyEmailAddressLbl: Label 'Customer (Company) has no e-mail address.';
         CompanyWithPhoneNoOrEmailExistsLbl: Label 'Company already exists with the same e-mail or phone.';
+        CompanyWithExternalIdExistsLbl: Label 'A company with the same external ID %1 already exists in Shopify.', Comment = '%1 - External ID';
 
     local procedure CreateShopifyCompany(Customer: Record Customer)
     var
@@ -54,8 +59,15 @@ codeunit 88018 "Shpfy Company Export"
             exit;
         end;
 
-        if CreateCompanyMainContact(Customer, ShopifyCustomer) then
-            if FillInShopifyCompany(Customer, ShopifyCompany, CompanyLocation) then
+        ShopifyCompany.SetRange("Shop Code", Shop.Code);
+        ShopifyCompany.SetRange("External Id", Customer."No.");
+        if not ShopifyCompany.IsEmpty() then begin
+            SkippedRecord.LogSkippedRecord(Customer.RecordId, StrSubstNo(CompanyWithExternalIdExistsLbl, Customer."No."), Shop);
+            exit;
+        end;
+
+        if CreateCompanyContact(Customer, ShopifyCustomer) then
+            if FillInShopifyCompany(Customer, ShopifyCompany) or FillInShopifyCompanyLocation(Customer, CompanyLocation) then
                 if CompanyAPI.CreateCompany(ShopifyCompany, CompanyLocation, ShopifyCustomer) then begin
                     ShopifyCompany."Main Contact Customer Id" := ShopifyCustomer.Id;
                     ShopifyCompany."Customer SystemId" := Customer.SystemId;
@@ -73,7 +85,7 @@ codeunit 88018 "Shpfy Company Export"
                 end;
     end;
 
-    local procedure CreateCompanyMainContact(Customer: Record Customer; var ShopifyCustomer: Record "Shpfy Customer"): Boolean
+    internal procedure CreateCompanyContact(Customer: Record Customer; var ShopifyCustomer: Record "Shpfy Customer"): Boolean
     var
         CustomerExport: Codeunit "Shpfy Customer Export";
     begin
@@ -87,22 +99,33 @@ codeunit 88018 "Shpfy Company Export"
         exit(ShopifyCustomer.FindFirst());
     end;
 
-    internal procedure FillInShopifyCompany(Customer: Record Customer; var ShopifyCompany: Record "Shpfy Company"; var CompanyLocation: Record "Shpfy Company Location"): Boolean
+    internal procedure FillInShopifyCompany(Customer: Record Customer; var ShopifyCompany: Record "Shpfy Company"): Boolean
+    var
+        TempShopifyCompany: Record "Shpfy Company" temporary;
+    begin
+        TempShopifyCompany := ShopifyCompany;
+
+        ShopifyCompany.Name := Customer.Name;
+        ShopifyCompany."External Id" := Customer."No.";
+
+        if HasDiff(ShopifyCompany, TempShopifyCompany) then begin
+            ShopifyCompany."Last Updated by BC" := CurrentDateTime;
+            exit(true);
+        end;
+    end;
+
+    internal procedure FillInShopifyCompanyLocation(Customer: Record Customer; var CompanyLocation: Record "Shpfy Company Location"): Boolean
     var
         CompanyInformation: Record "Company Information";
         CountryRegion: Record "Country/Region";
         TaxArea: Record "Shpfy Tax Area";
-        TempShopifyCompany: Record "Shpfy Company" temporary;
         TempCompanyLocation: Record "Shpfy Company Location" temporary;
         TaxRegistrationIdMapping: Interface "Shpfy Tax Registration Id Mapping";
         CountyCodeTooLongErr: Text;
         PaymentTermsId: BigInteger;
+        ISOCountryCode: Code[2];
     begin
-        TempShopifyCompany := ShopifyCompany;
         TempCompanyLocation := CompanyLocation;
-
-        ShopifyCompany.Name := Customer.Name;
-        ShopifyCompany."External Id" := Customer."No.";
 
         CompanyLocation.Name := Customer.Address;
         CompanyLocation.Address := Customer.Address;
@@ -111,44 +134,51 @@ codeunit 88018 "Shpfy Company Export"
         CompanyLocation.City := Customer.City;
         CompanyLocation.Recipient := Customer.Name;
 
-        if Customer.County <> '' then
-            case Shop."County Source" of
-                Shop."County Source"::Code:
-                    begin
-                        if StrLen(Customer.County) > MaxStrLen(TaxArea."County Code") then begin
-                            CountyCodeTooLongErr := StrSubstNo(CountyCodeTooLongLbl, Customer."No.", Customer.Name, StrLen(Customer.County), MaxStrLen(TaxArea."County Code"), Customer.County, Customer.FieldCaption(County));
-                            Error(CountyCodeTooLongErr);
-                        end;
-                        TaxArea.SetRange("Country/Region Code", Customer."Country/Region Code");
-                        TaxArea.SetRange("County Code", Customer.County);
-                        if TaxArea.FindFirst() then begin
-                            CompanyLocation."Province Code" := TaxArea."County Code";
-                            CompanyLocation."Province Name" := TaxArea.County;
-                        end;
-                    end;
-                Shop."County Source"::Name:
-                    begin
-                        TaxArea.SetRange("Country/Region Code", Customer."Country/Region Code");
-                        TaxArea.SetRange(County, Customer.County);
-                        if TaxArea.FindFirst() then begin
-                            CompanyLocation."Province Code" := TaxArea."County Code";
-                            CompanyLocation."Province Name" := TaxArea.County;
-                        end else begin
-                            TaxArea.SetFilter(County, Customer.County + '*');
+        if (Customer."Country/Region Code" = '') and CompanyInformation.Get() then
+            Customer."Country/Region Code" := CompanyInformation."Country/Region Code";
+
+        // Shpfy Tax Area is keyed by Shopify's ISO 3166-1 alpha-2 codes (e.g. "GR")
+        // which can differ from BC's Country/Region Code (e.g. "EL" used for EU/VIES).
+        // Resolve once and reuse for both Tax Area filtering and the Shopify-side location.
+        if CountryRegion.Get(Customer."Country/Region Code") then begin
+            CountryRegion.TestField("ISO Code");
+            ISOCountryCode := CountryRegion."ISO Code";
+            CompanyLocation."Country/Region Code" := ISOCountryCode;
+        end;
+
+        if Customer.County <> '' then begin
+            TaxArea.SetRange("Country/Region Code", ISOCountryCode);
+            if not TaxArea.IsEmpty() then
+                case Shop."County Source" of
+                    Shop."County Source"::Code:
+                        begin
+                            if StrLen(Customer.County) > MaxStrLen(TaxArea."County Code") then begin
+                                CountyCodeTooLongErr := StrSubstNo(CountyCodeTooLongLbl, Customer."No.", Customer.Name, StrLen(Customer.County), MaxStrLen(TaxArea."County Code"), Customer.County, Customer.FieldCaption(County));
+                                Error(CountyCodeTooLongErr);
+                            end;
+                            TaxArea.SetRange("Country/Region Code", ISOCountryCode);
+                            TaxArea.SetRange("County Code", Customer.County);
                             if TaxArea.FindFirst() then begin
                                 CompanyLocation."Province Code" := TaxArea."County Code";
                                 CompanyLocation."Province Name" := TaxArea.County;
                             end;
                         end;
-                    end;
-            end;
-
-        if (Customer."Country/Region Code" = '') and CompanyInformation.Get() then
-            Customer."Country/Region Code" := CompanyInformation."Country/Region Code";
-
-        if CountryRegion.Get(Customer."Country/Region Code") then begin
-            CountryRegion.TestField("ISO Code");
-            CompanyLocation."Country/Region Code" := CountryRegion."ISO Code";
+                    Shop."County Source"::Name:
+                        begin
+                            TaxArea.SetRange("Country/Region Code", ISOCountryCode);
+                            TaxArea.SetRange(County, Customer.County);
+                            if TaxArea.FindFirst() then begin
+                                CompanyLocation."Province Code" := TaxArea."County Code";
+                                CompanyLocation."Province Name" := TaxArea.County;
+                            end else begin
+                                TaxArea.SetFilter(County, Customer.County + '*');
+                                if TaxArea.FindFirst() then begin
+                                    CompanyLocation."Province Code" := TaxArea."County Code";
+                                    CompanyLocation."Province Name" := TaxArea.County;
+                                end;
+                            end;
+                        end;
+                end;
         end;
 
         CompanyLocation."Phone No." := Customer."Phone No.";
@@ -159,10 +189,7 @@ codeunit 88018 "Shpfy Company Export"
         if GetShopifyPaymentTermsIdFromCustomer(Customer, PaymentTermsId) then
             CompanyLocation."Shpfy Payment Terms Id" := PaymentTermsId;
 
-        if HasDiff(ShopifyCompany, TempShopifyCompany) or HasDiff(CompanyLocation, TempCompanyLocation) then begin
-            ShopifyCompany."Last Updated by BC" := CurrentDateTime;
-            exit(true);
-        end;
+        exit(HasDiff(CompanyLocation, TempCompanyLocation));
     end;
 
     local procedure HasDiff(RecAsVariant: Variant; xRecAsVariant: Variant): Boolean
@@ -191,11 +218,11 @@ codeunit 88018 "Shpfy Company Export"
         Shop := ShopifyShop;
         CompanyAPI.SetShop(Shop);
         CatalogAPI.SetShop(Shop);
-        MetafieldAPI.SetShop(Shop);
     end;
 
     local procedure UpdateShopifyCompany(Customer: Record Customer; CompanyId: BigInteger)
     var
+        CurrCustomer: Record Customer;
         ShopifyCompany: Record "Shpfy Company";
         CompanyLocation: Record "Shpfy Company Location";
     begin
@@ -205,22 +232,34 @@ codeunit 88018 "Shpfy Company Export"
             exit;
         end;
 
-        CompanyLocation.SetRange("Company SystemId", ShopifyCompany.SystemId);
-        CompanyLocation.FindFirst();
-
-        if FillInShopifyCompany(Customer, ShopifyCompany, CompanyLocation) then begin
-            CompanyAPI.UpdateCompany(ShopifyCompany, CompanyLocation);
+        if FillInShopifyCompany(Customer, ShopifyCompany) then begin
+            CompanyAPI.UpdateCompany(ShopifyCompany);
             ShopifyCompany.Modify();
-            CompanyLocation.Modify();
         end;
+
+        CompanyLocation.SetRange("Company SystemId", ShopifyCompany.SystemId);
+        CompanyLocation.FindSet();
+        repeat
+            if IsNullGuid(CompanyLocation."Customer Id") then
+                CurrCustomer := Customer
+            else
+                CurrCustomer.GetBySystemId(CompanyLocation."Customer Id");
+
+            if FillInShopifyCompanyLocation(CurrCustomer, CompanyLocation) then begin
+                CompanyAPI.UpdateCompanyLocation(CompanyLocation);
+                CompanyLocation.Modify();
+            end;
+        until CompanyLocation.Next() = 0;
 
         if Shop."Company Metafields To Shopify" then
             UpdateMetafields(ShopifyCompany.Id);
     end;
 
     local procedure UpdateMetafields(ComppanyId: BigInteger)
+    var
+        Metafields: Codeunit "Shpfy Metafields";
     begin
-        MetafieldAPI.CreateOrUpdateMetafieldsInShopify(Database::"Shpfy Company", ComppanyId);
+        Metafields.SyncMetafieldsToShopify(Database::"Shpfy Company", ComppanyId, Shop.Code);
     end;
 
     internal procedure SetCreateCompanies(NewCustomers: Boolean)

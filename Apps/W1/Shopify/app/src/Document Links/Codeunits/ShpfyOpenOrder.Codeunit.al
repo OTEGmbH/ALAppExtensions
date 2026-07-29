@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-codeunit 88051 "Shpfy Open Order" implements "Shpfy IOpenShopifyDocument"
+namespace Microsoft.Integration.Shopify;
+
+codeunit 30264 "Shpfy Open Order" implements "Shpfy IOpenShopifyDocument"
 {
 
     procedure OpenDocument(DocumentId: BigInteger)

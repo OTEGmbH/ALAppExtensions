@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy Sync Customers (ID 30123).
 /// </summary>
-codeunit 88045 "Shpfy Sync Customers"
+codeunit 30123 "Shpfy Sync Customers"
 {
     Access = Internal;
     TableNo = "Shpfy Shop";
@@ -18,7 +23,9 @@ codeunit 88045 "Shpfy Sync Customers"
         SetShop(Rec);
         SyncStartTime := CurrentDateTime;
         if Shop."Customer Import From Shopify" = Shop."Customer Import From Shopify"::AllCustomers then
-            ImportCustomersFromShopify();
+            ImportCustomersFromShopify(true);
+        if (Shop."Customer Import From Shopify" = Shop."Customer Import From Shopify"::WithOrderImport) and Shop."Shopify Can Update Customer" then
+            ImportCustomersFromShopify(false);
         if Shop."Can Update Shopify Customer" then
             SyncCustomersToShopify();
 
@@ -34,8 +41,6 @@ codeunit 88045 "Shpfy Sync Customers"
         CustomerExport: Codeunit "Shpfy Customer Export";
         CustomerImport: Codeunit "Shpfy Customer Import";
         ErrMsg: Text;
-        G_Customer: Record Customer;
-        G_CustomerSet: boolean;
 
     /// <summary> 
     /// Sync Customers To Shopify.
@@ -44,22 +49,14 @@ codeunit 88045 "Shpfy Sync Customers"
     var
         Customer: Record Customer;
     begin
-        if G_CustomerSet then
-            CustomerExport.SetCreateCustomers(true)
-        else
-            CustomerExport.SetCreateCustomers(false);
-        //OTE Customer sync 07.10.2025 JR START
-        if G_CustomerSet then
-            CustomerExport.Run(G_Customer)
-        else
-            //OTE Customer sync 07.10.2025 JR STOP 
-            CustomerExport.Run(Customer);
+        CustomerExport.SetCreateCustomers(false);
+        CustomerExport.Run(Customer);
     end;
 
     /// <summary> 
     /// Import Customers From Shopify.
     /// </summary>
-    local procedure ImportCustomersFromShopify()
+    local procedure ImportCustomersFromShopify(CreateCustomers: Boolean)
     var
         Customer: Record "Shpfy Customer";
         TempCustomer: Record "Shpfy Customer" temporary;
@@ -77,6 +74,8 @@ codeunit 88045 "Shpfy Sync Customers"
                     TempCustomer.Insert(false);
                 end;
             end else begin
+                if not CreateCustomers then
+                    continue;
                 Clear(TempCustomer);
                 TempCustomer.Id := Id;
                 TempCustomer."Shop Id" := Shop."Shop Id";
@@ -107,13 +106,4 @@ codeunit 88045 "Shpfy Sync Customers"
         CustomerImport.SetShop(Shop);
         CustomerExport.SetShop(Shop);
     end;
-
-
-    //OTE Customer Sync 07.10.2025 JR START
-    procedure SetCustomer(var _Customer: Record Customer)
-    begin
-        G_Customer.copy(_Customer);
-        G_CustomerSet := true;
-    end;
-    //OTE Customer Sync 07.10.2025 JR(Customer: Record Customer 
 }

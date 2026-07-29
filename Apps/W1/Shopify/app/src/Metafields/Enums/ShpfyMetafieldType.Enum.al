@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Metafield Type (ID 30159).
 /// </summary>
-enum 88027 "Shpfy Metafield Type" implements "Shpfy IMetafield Type"
+enum 30159 "Shpfy Metafield Type" implements "Shpfy IMetafield Type"
 {
     Caption = 'Shopify  Metafield Type';
     Extensible = false;
@@ -168,9 +173,9 @@ enum 88027 "Shpfy Metafield Type" implements "Shpfy IMetafield Type"
         Implementation = "Shpfy IMetafield Type" = "Shpfy Mtfld Type Company Ref";
     }
 
-    value(27; rich_text_field)
+    value(27; article_reference)
     {
-        Caption = 'Rich text';
-        Implementation = "Shpfy IMetafield Type" = "Shpfy Mtfld Type Multi Text";
+        Caption = 'Article';
+        Implementation = "Shpfy IMetafield Type" = "Shpfy Mtfld Type Article Ref";
     }
 }

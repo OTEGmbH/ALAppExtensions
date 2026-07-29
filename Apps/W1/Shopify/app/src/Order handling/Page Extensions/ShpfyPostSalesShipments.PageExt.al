@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
 /// <summary>
 /// PageExtension Shpfy Post. Sales Shipments (ID 30110) extends Record Posted Sales Shipments.
 /// </summary>
-pageextension 88007 "Shpfy Post. Sales Shipments" extends "Posted Sales Shipments"
+pageextension 30110 "Shpfy Post. Sales Shipments" extends "Posted Sales Shipments"
 {
     layout
     {
@@ -26,6 +31,22 @@ pageextension 88007 "Shpfy Post. Sales Shipments" extends "Posted Sales Shipment
                     VariantRec := Rec;
                     ShopifyOrderMgt.ShowShopifyOrder(VariantRec);
                 end;
+            }
+        }
+    }
+    views
+    {
+        addlast
+        {
+            view(UnprocessedShipments)
+            {
+                Caption = 'Unprocessed Shipments to Shopify';
+                Filters = where("Shpfy Order Id" = filter(<> 0), "Shpfy Fulfillment Id" = filter(= 0));
+            }
+            view(SkippedShipments)
+            {
+                Caption = 'Skipped Shipments to Shopify';
+                Filters = where("Shpfy Order Id" = filter(<> 0), "Shpfy Fulfillment Id" = filter(= -1 | -2));
             }
         }
     }

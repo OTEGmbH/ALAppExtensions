@@ -1,12 +1,12 @@
-namespace OTE.Shopify;
+namespace Microsoft.Integration.Shopify;
 
+using Microsoft.Finance.RoleCenters;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Globalization;
+using System.Media;
 using System.Reflection;
 using System.Telemetry;
-using Microsoft.Finance.RoleCenters;
-using System.Media;
 
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -16,7 +16,7 @@ using System.Media;
 /// <summary>
 /// A codeunit for setting up Shopify guided experience.
 /// </summary>
-codeunit 88006 "Shpfy Guided Experience"
+codeunit 30201 "Shpfy Guided Experience"
 {
     Access = Internal;
 

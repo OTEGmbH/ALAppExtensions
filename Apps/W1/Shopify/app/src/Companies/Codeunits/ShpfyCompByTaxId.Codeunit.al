@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy Comp. By Tax Id (ID 30398) implements Interface Shpfy ICompany Mapping.
 /// </summary>
-codeunit 88023 "Shpfy Comp. By Tax Id" implements "Shpfy ICompany Mapping", "Shpfy IFind Company Mapping"
+codeunit 30398 "Shpfy Comp. By Tax Id" implements "Shpfy ICompany Mapping", "Shpfy IFind Company Mapping"
 {
     Access = Internal;
 

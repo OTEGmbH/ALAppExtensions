@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Math (ID 30158).
 /// </summary>
-codeunit 88192 "Shpfy Math"
+codeunit 30158 "Shpfy Math"
 {
     Access = Internal;
     SingleInstance = true;

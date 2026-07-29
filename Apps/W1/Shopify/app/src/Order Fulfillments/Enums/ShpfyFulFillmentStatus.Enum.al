@@ -1,9 +1,15 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy FulFillment Status (ID 30112).
+/// Represented by shopify.dev/docs/api/admin-graphql/latest/enums/FulfillmentStatus
 /// </summary>
-enum 88032 "Shpfy Fulfillment Status"
+enum 30112 "Shpfy Fulfillment Status"
 {
     Access = Internal;
     Caption = 'Shopify Fulfillment Status';

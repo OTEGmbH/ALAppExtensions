@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Codeunit Shpfy CreateProdStatusActive (ID 30172) implements Interface Shpfy.ICreateProductStatusValue.
 /// </summary>
-codeunit 88266 "Shpfy CreateProdStatusActive" implements "Shpfy ICreateProductStatusValue"
+codeunit 30172 "Shpfy CreateProdStatusActive" implements "Shpfy ICreateProductStatusValue"
 {
     Access = Internal;
 

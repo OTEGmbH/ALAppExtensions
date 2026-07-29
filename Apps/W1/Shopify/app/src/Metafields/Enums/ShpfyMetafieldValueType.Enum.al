@@ -1,10 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 #if not CLEANSCHEMA29
-namespace OTE.Shopify;
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Metafield Value Type (ID 30102).
 /// </summary>
-enum 88028 "Shpfy Metafield Value Type"
+enum 30102 "Shpfy Metafield Value Type"
 {
     Access = Internal;
     Caption = 'Shopify  Metafield Value Type';

@@ -1,4 +1,9 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 using System.Utilities;
@@ -6,7 +11,7 @@ using System.Utilities;
 /// <summary>
 /// Table Shpfy Customer Address (ID 30106).
 /// </summary>
-table 88012 "Shpfy Customer Address"
+table 30106 "Shpfy Customer Address"
 {
     Caption = 'Shopify Customer Address';
     DataClassification = CustomerContent;
@@ -107,6 +112,9 @@ table 88012 "Shpfy Customer Address"
         key(PK; Id)
         {
             Clustered = true;
+        }
+        key(Key2; "Customer Id", Default)
+        {
         }
     }
 

@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-table 88026 "Shpfy Fulfillment Line"
+namespace Microsoft.Integration.Shopify;
+
+table 30139 "Shpfy Fulfillment Line"
 {
     Caption = 'Fulfillment Line';
     DataClassification = SystemMetadata;
@@ -53,6 +58,11 @@ table 88026 "Shpfy Fulfillment Line"
         {
             Clustered = true;
         }
-        key(Indx001; "Fulfillment Id", "Is Gift Card") { }
+        key(Indx001; "Fulfillment Id", "Is Gift Card")
+        {
+        }
+        key(Key3; "Order Id", "Is Gift Card")
+        {
+        }
     }
 }

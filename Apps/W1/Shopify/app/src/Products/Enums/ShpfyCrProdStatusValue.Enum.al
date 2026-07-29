@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Create Product Status Value (ID 30129) implements Interface Shpfy ICreateProductStatusValue.
 /// </summary>
-enum 88059 "Shpfy Cr. Prod. Status Value" implements "Shpfy ICreateProductStatusValue"
+enum 30129 "Shpfy Cr. Prod. Status Value" implements "Shpfy ICreateProductStatusValue"
 {
     Caption = 'Shopify Create Product Status Value';
     Extensible = false;
@@ -18,5 +23,10 @@ enum 88059 "Shpfy Cr. Prod. Status Value" implements "Shpfy ICreateProductStatus
     {
         Caption = 'Draft';
         Implementation = "Shpfy ICreateProductStatusValue" = "Shpfy CreateProdStatusDraft";
+    }
+    value(2; Unlisted)
+    {
+        Caption = 'Unlisted';
+        Implementation = "Shpfy ICreateProductStatusValue" = "Shpfy CreateProdStatusUnlisted";
     }
 }

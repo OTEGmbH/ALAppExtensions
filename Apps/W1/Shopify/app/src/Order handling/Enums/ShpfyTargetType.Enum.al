@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Target Type (ID 30121).
 /// </summary>
-enum 88041 "Shpfy Target Type"
+enum 30121 "Shpfy Target Type"
 {
     Access = Internal;
     Caption = 'Shopify Target Type';

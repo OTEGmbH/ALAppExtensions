@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-enum 88053 "Shpfy Dispute Reason"
+namespace Microsoft.Integration.Shopify;
+
+enum 30153 "Shpfy Dispute Reason"
 {
     Caption = 'Shopify Dispute Reason';
     Extensible = false;

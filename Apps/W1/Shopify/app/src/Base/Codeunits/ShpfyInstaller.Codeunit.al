@@ -1,4 +1,9 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Foundation.Company;
 using System.DataAdministration;
@@ -6,7 +11,7 @@ using System.Environment.Configuration;
 using System.Upgrade;
 using System.Visualization;
 
-codeunit 88008 "Shpfy Installer"
+codeunit 30273 "Shpfy Installer"
 {
     Subtype = Install;
     Access = Internal;
@@ -171,16 +176,6 @@ codeunit 88008 "Shpfy Installer"
 
     [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', false, false)]
     local procedure ShpfyOnAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
-    var
-        Shop: Record "Shpfy Shop";
-    begin
-        Shop.ChangeCompany(NewCompanyName);
-        Shop.ModifyAll(Enabled, false);
-    end;
-
-
-    [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', false, false)]
-    local procedure HandleOnAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
     var
         Shop: Record "Shpfy Shop";
     begin

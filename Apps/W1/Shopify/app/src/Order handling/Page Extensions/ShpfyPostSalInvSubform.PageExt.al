@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
 /// <summary>
 /// PageExtension Shpfy Post. Sal. Inv. Subform (ID 30111) extends Record Posted Sales Invoice Subform.
 /// </summary>
-pageextension 88009 "Shpfy Post. Sal. Inv. Subform" extends "Posted Sales Invoice Subform"
+pageextension 30111 "Shpfy Post. Sal. Inv. Subform" extends "Posted Sales Invoice Subform"
 {
     layout
     {

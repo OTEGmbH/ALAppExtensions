@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88049 "Shpfy Refund Shipping Lines"
+namespace Microsoft.Integration.Shopify;
+
+page 30169 "Shpfy Refund Shipping Lines"
 {
     Caption = 'Refund Shipping Lines';
     PageType = List;
@@ -23,10 +28,20 @@ page 88049 "Shpfy Refund Shipping Lines"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the subtotal price of a refund shipping line.';
                 }
+                field("Presentment Subtotal Amount"; Rec."Presentment Subtotal Amount")
+                {
+                    ApplicationArea = All;
+                    Visible = PresentmentCurrencyVisible;
+                }
                 field("Tax Amount"; Rec."Tax Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the total tax amount of a refund shipping line.';
+                }
+                field("Presentment Tax Amount"; Rec."Presentment Tax Amount")
+                {
+                    ApplicationArea = All;
+                    Visible = PresentmentCurrencyVisible;
                 }
             }
         }
@@ -59,4 +74,26 @@ page 88049 "Shpfy Refund Shipping Lines"
             actionref(PromotedRetrievedShopifyData; RetrievedShopifyData) { }
         }
     }
+
+    var
+        PresentmentCurrencyVisible: Boolean;
+
+    trigger OnAfterGetRecord()
+    begin
+        SetPresentmentCurrencyVisibility();
+    end;
+
+    local procedure SetPresentmentCurrencyVisibility()
+    var
+        OrderHeader: Record "Shpfy Order Header";
+        RefundHeader: Record "Shpfy Refund Header";
+    begin
+        if not RefundHeader.Get(Rec."Refund Id") then
+            exit;
+
+        if not OrderHeader.Get(RefundHeader."Order Id") then
+            exit;
+
+        PresentmentCurrencyVisible := OrderHeader.IsPresentmentCurrencyOrder();
+    end;
 }

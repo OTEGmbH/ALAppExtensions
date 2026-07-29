@@ -1,16 +1,21 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using System.IO;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Sales.Customer;
+using System.IO;
 
 /// <summary>
 /// Table Shpfy Customer Template (ID 30107).
 /// </summary>
-table 88013 "Shpfy Customer Template"
+table 30107 "Shpfy Customer Template"
 {
     Access = Internal;
     DataClassification = CustomerContent;
-    Caption = 'Shopify Customer Template';
+    Caption = 'Shopify Customer Setup by Country/Region';
 
     fields
     {

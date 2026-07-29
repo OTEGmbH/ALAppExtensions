@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Document;
 
-codeunit 88255 "Shpfy RetRefProc Cr.Memo" implements "Shpfy IReturnRefund Process"
+codeunit 30243 "Shpfy RetRefProc Cr.Memo" implements "Shpfy IReturnRefund Process"
 {
     procedure IsImportNeededFor(SourceDocumentType: Enum "Shpfy Source Document Type"): Boolean
     begin
@@ -57,8 +62,11 @@ codeunit 88255 "Shpfy RetRefProc Cr.Memo" implements "Shpfy IReturnRefund Proces
 
     procedure CreateSalesDocument(SourceDocumentType: Enum "Shpfy Source Document Type"; SourceDocumentId: BigInteger) SalesHeader: Record "Sales Header"
     var
+        RefundHeader: Record "Shpfy Refund Header";
         RefundLine: Record "Shpfy Refund Line";
-        CreateSalesDocRefund: codeunit "Shpfy Create Sales Doc. Refund";
+        Shop: Record "Shpfy Shop";
+        CreateSalesDocRefund: Codeunit "Shpfy Create Sales Doc. Refund";
+        RefundsAPI: Codeunit "Shpfy Refunds API";
         IDocumentSource: Interface "Shpfy IDocument Source";
         ErrorInfo: ErrorInfo;
         TextBuilder: TextBuilder;
@@ -77,14 +85,23 @@ codeunit 88255 "Shpfy RetRefProc Cr.Memo" implements "Shpfy IReturnRefund Proces
         if not RefundLine.IsEmpty() then
             exit;
 
+        if (SourceDocumentType = "Shpfy Source Document Type"::Refund) and RefundsAPI.HasPendingRefundTransactions(SourceDocumentId) then
+            exit;
+
+        RefundHeader.Get(SourceDocumentId);
+        Shop.Get(RefundHeader."Shop Code");
+        
         CreateSalesDocRefund.SetSource(SourceDocumentId);
-        CreateSalesDocRefund.SetTargetDocumentType(SalesHeader."Document Type"::"Credit Memo");
+        CreateSalesDocRefund.SetTargetDocumentType(Shop."Process Returns As");
         Commit();
         if CreateSalesDocRefund.Run() then begin
             SalesHeader := CreateSalesDocRefund.GetSalesHeader();
             IDocumentSource.SetErrorInfo(SourceDocumentId, '');
-        end else
+        end else begin
             IDocumentSource.SetErrorInfo(SourceDocumentId, GetLastErrorText(false));
+            if IDocumentSource is "Shpfy Extended IDocument Source" then
+                (IDocumentSource as "Shpfy Extended IDocument Source").SetErrorCallStack(SourceDocumentId, GetLastErrorCallStack());
+        end;
         Commit();
     end;
 }

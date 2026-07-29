@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy SKU Mapping (ID 30132).
 /// </summary>
-enum 88062 "Shpfy SKU Mapping"
+enum 30132 "Shpfy SKU Mapping"
 {
     Caption = 'Shopify SKU Mapping';
     Extensible = false;

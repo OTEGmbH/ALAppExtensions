@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.History;
 
 /// <summary>
 /// Table Shpfy Payment Transaction (ID 30124).
 /// </summary>
-table 88046 "Shpfy Payment Transaction"
+table 30124 "Shpfy Payment Transaction"
 {
     Caption = 'Shopify Payment Transaction';
     DataClassification = CustomerContent;
@@ -41,16 +46,22 @@ table 88046 "Shpfy Payment Transaction"
         {
             Caption = 'Amount';
             DataClassification = CustomerContent;
+            AutoFormatType = 1;
+            AutoFormatExpression = Currency;
         }
         field(7; Fee; Decimal)
         {
             Caption = 'Fee';
             DataClassification = CustomerContent;
+            AutoFormatType = 1;
+            AutoFormatExpression = Currency;
         }
         field(8; "Net Amount"; Decimal)
         {
             Caption = 'Net Amount';
             DataClassification = CustomerContent;
+            AutoFormatType = 1;
+            AutoFormatExpression = Currency;
         }
         field(9; "Source Id"; BigInteger)
         {
@@ -77,7 +88,7 @@ table 88046 "Shpfy Payment Transaction"
         }
         field(13; "Processed At"; DateTime)
         {
-            Caption = 'Processed At';
+            Caption = 'Processed At (Shopify)';
             DataClassification = CustomerContent;
         }
         field(101; "Shop Code"; Code[20])

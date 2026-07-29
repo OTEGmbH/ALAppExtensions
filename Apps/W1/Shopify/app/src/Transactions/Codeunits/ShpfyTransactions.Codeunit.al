@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Transactions (ID 30194).
 /// </summary>
-codeunit 88292 "Shpfy Transactions"
+codeunit 30194 "Shpfy Transactions"
 {
     Access = Internal;
 
@@ -46,7 +51,7 @@ codeunit 88292 "Shpfy Transactions"
         Parameters: Dictionary of [Text, Text];
     begin
         CommunicationMgt.SetShop(OrderHeader."Shop Code");
-        GraphQLType := "Shpfy GraphQL Type"::GetOrderTransactions;
+        GraphQLType := "Shpfy GraphQL Type"::Payments_GetOrderTransactions;
         Parameters.Add('OrderId', Format(OrderHeader."Shopify Order Id"));
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
         if JsonHelper.GetJsonArray(JResponse, JOrderTransactions, 'data.order.transactions') then
@@ -61,6 +66,7 @@ codeunit 88292 "Shpfy Transactions"
         OrderTransaction: Record "Shpfy Order Transaction";
         PaymentMethodMapping: Record "Shpfy Payment Method Mapping";
         TransactionGateway: Record "Shpfy Transaction Gateway";
+        ImportOrder: Codeunit "Shpfy Import Order";
         RecordRef: RecordRef;
         Id: BigInteger;
         IsNew: Boolean;
@@ -76,9 +82,11 @@ codeunit 88292 "Shpfy Transactions"
         OrderTransaction.Status := ConvertToTransactionStatus(JsonHelper.GetValueAsText(JOrderTransaction, 'status'));
         OrderTransaction.Type := ConvertToTransactionType(JsonHelper.GetValueAsText(JOrderTransaction, 'kind'));
         OrderTransaction."Shopify Order Id" := OrderHeader."Shopify Order Id";
+        OrderTransaction."Shop" := OrderHeader."Shop Code";
         RecordRef.GetTable(OrderTransaction);
         JsonHelper.GetValueIntoField(JOrderTransaction, 'gateway', RecordRef, OrderTransaction.FieldNo(Gateway));
         JsonHelper.GetValueIntoField(JOrderTransaction, 'formattedGateway', RecordRef, OrderTransaction.FieldNo(Message));
+        JsonHelper.GetValueIntoField(JOrderTransaction, 'manualPaymentGateway', RecordRef, OrderTransaction.FieldNo("Manual Payment Gateway"));
         JsonHelper.GetValueIntoField(JOrderTransaction, 'createdAt', RecordRef, OrderTransaction.FieldNo("Created At"));
         JsonHelper.GetValueIntoField(JOrderTransaction, 'test', RecordRef, OrderTransaction.FieldNo(Test));
         JsonHelper.GetValueIntoField(JOrderTransaction, 'authorizationCode', RecordRef, OrderTransaction.FieldNo(Authorization));
@@ -86,6 +94,12 @@ codeunit 88292 "Shpfy Transactions"
         JsonHelper.GetValueIntoField(JOrderTransaction, 'paymentId', RecordRef, OrderTransaction.FieldNo("Payment Id"));
         JsonHelper.GetValueIntoField(JOrderTransaction, 'amountSet.shopMoney.amount', RecordRef, OrderTransaction.FieldNo(Amount));
         JsonHelper.GetValueIntoField(JOrderTransaction, 'amountSet.shopMoney.currencyCode', RecordRef, OrderTransaction.FieldNo(Currency));
+        JsonHelper.GetValueIntoField(JOrderTransaction, 'amountSet.presentmentMoney.amount', RecordRef, OrderTransaction.FieldNo("Presentment Amount"));
+        JsonHelper.GetValueIntoField(JOrderTransaction, 'amountSet.presentmentMoney.currencyCode', RecordRef, OrderTransaction.FieldNo("Presentment Currency"));
+        JsonHelper.GetValueIntoField(JOrderTransaction, 'amountRoundingSet.shopMoney.amount', RecordRef, OrderTransaction.FieldNo("Rounding Amount"));
+        JsonHelper.GetValueIntoField(JOrderTransaction, 'amountRoundingSet.shopMoney.currencyCode', RecordRef, OrderTransaction.FieldNo("Rounding Currency"));
+        JsonHelper.GetValueIntoField(JOrderTransaction, 'amountRoundingSet.presentmentMoney.amount', RecordRef, OrderTransaction.FieldNo("Presentment Rounding Amount"));
+        JsonHelper.GetValueIntoField(JOrderTransaction, 'amountRoundingSet.presentmentMoney.currencyCode', RecordRef, OrderTransaction.FieldNo("Presentment Rounding Currency"));
 
         ReceiptJson := JsonHelper.GetValueAsText(JOrderTransaction, 'receiptJson');
         if JObject.ReadFrom(ReceiptJson) then
@@ -98,16 +112,17 @@ codeunit 88292 "Shpfy Transactions"
             JsonHelper.GetValueIntoField(JOrderTransaction, 'paymentDetails.number', RecordRef, OrderTransaction.FieldNo("Credit Card Number"));
             JsonHelper.GetValueIntoField(JOrderTransaction, 'paymentDetails.company', RecordRef, OrderTransaction.FieldNo("Credit Card Company"));
         end;
-
-        //OTE JR 2025-09-16 JR START
-        OnBeforeInsertOrModifyOrderTransaction(OrderTransaction, JOrderTransaction, JObject, IsNew, RecordRef, CreditCardCompany, TransactionGateway, PaymentMethodMapping);
-        //OTE JR 2025-09-16 JR STOP 
         if IsNew then
             RecordRef.Insert()
         else
             RecordRef.Modify();
         RecordRef.SetTable(OrderTransaction);
         RecordRef.Close();
+        OrderTransaction.Currency := ImportOrder.TranslateCurrencyCode(OrderTransaction.Currency);
+        OrderTransaction."Presentment Currency" := ImportOrder.TranslateCurrencyCode(OrderTransaction."Presentment Currency");
+        OrderTransaction."Rounding Currency" := ImportOrder.TranslateCurrencyCode(OrderTransaction."Rounding Currency");
+        OrderTransaction."Presentment Rounding Currency" := ImportOrder.TranslateCurrencyCode(OrderTransaction."Presentment Rounding Currency");
+        OrderTransaction.Modify();
         if OrderTransaction.Gateway <> '' then begin
             Clear(TransactionGateway);
             TransactionGateway.SetRange(Name, OrderTransaction.Gateway);
@@ -129,14 +144,10 @@ codeunit 88292 "Shpfy Transactions"
             PaymentMethodMapping."Shop Code" := OrderHeader."Shop Code";
             PaymentMethodMapping.Gateway := OrderTransaction.Gateway;
             PaymentMethodMapping."Credit Card Company" := CopyStr(OrderTransaction."Credit Card Company", 1, MaxStrLen(PaymentMethodMapping."Credit Card Company"));
+            PaymentMethodMapping."Manual Payment Gateway" := OrderTransaction."Manual Payment Gateway";
             PaymentMethodMapping.Insert();
         end;
 
         DataCapture.Add(Database::"Shpfy Order Transaction", OrderTransaction.SystemId, JOrderTransaction);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertOrModifyOrderTransaction(var OrderTransaction: Record "Shpfy Order Transaction"; JOrderTransaction: JsonToken; JObject: JsonObject; IsNew: Boolean; RecordRef: RecordRef; CreditCardCompany: Record "Shpfy Credit Card Company"; TransactionGateway: Record "Shpfy Transaction Gateway"; PaymentMethodMapping: Record "Shpfy Payment Method Mapping")
-    begin
     end;
 }

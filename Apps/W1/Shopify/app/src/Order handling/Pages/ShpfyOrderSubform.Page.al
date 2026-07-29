@@ -1,9 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Page Shpfy Order Subform (ID 30122).
 /// </summary>
-page 88044 "Shpfy Order Subform"
+page 30122 "Shpfy Order Subform"
 {
     Caption = 'Shopify Order Lines';
     DeleteAllowed = false;
@@ -36,6 +43,17 @@ page 88044 "Shpfy Order Subform"
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the item number.';
+
+                    trigger OnValidate()
+                    var
+                        Item: Record Item;
+                    begin
+                        if Item.Get(Rec."Item No.") then
+                            if Item."Sales Unit of Measure" <> '' then
+                                Rec."Unit of Measure Code" := Item."Sales Unit of Measure"
+                            else
+                                Rec."Unit of Measure Code" := Item."Base Unit of Measure";
+                    end;
                 }
                 field(UnitOfMeasureCode; Rec."Unit of Measure Code")
                 {
@@ -60,11 +78,6 @@ page 88044 "Shpfy Order Subform"
                     Editable = false;
                     ToolTip = 'Specifies the description of the variant to be sold.';
                 }
-                field("Skip Item Mapping"; Rec."Skip Item Mapping")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Skip Item Mapping field.';
-                }
                 field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
@@ -77,17 +90,36 @@ page 88044 "Shpfy Order Subform"
                     Editable = false;
                     ToolTip = 'Specifies the prices for one unit on the line.';
                 }
+                field("Presentment Unit Price"; Rec."Presentment Unit Price")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    Visible = PresentmentCurrencyVisible;
+                }
                 field(DiscountAmount; Rec."Discount Amount")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the discount amount that is granted for the item on the line.';
+
+                }
+                field("Presentment Discount Amount"; Rec."Presentment Discount Amount")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    Visible = PresentmentCurrencyVisible;
                 }
                 field(FullfillableQuantity; Rec."Fulfillable Quantity")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the quantity available to fulfill.';
+                }
+                field("Is Exchange Item"; Rec."Is Exchange Item")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    ToolTip = 'Specifies whether this line was added as the new item in a return-with-exchange. Exchange items are not included in the BC sales document created from the Shopify order; their value is offset on the credit memo by a negative-quantity refund line.';
                 }
             }
         }
@@ -116,4 +148,12 @@ page 88044 "Shpfy Order Subform"
             }
         }
     }
+
+    var
+        PresentmentCurrencyVisible: Boolean;
+
+    internal procedure SetShowPresentmentCurrency(Show: Boolean)
+    begin
+        PresentmentCurrencyVisible := Show;
+    end;
 }

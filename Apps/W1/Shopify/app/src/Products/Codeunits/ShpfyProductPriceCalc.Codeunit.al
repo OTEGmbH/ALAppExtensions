@@ -1,14 +1,20 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using Microsoft.Inventory.Item;
-using Microsoft.Sales.Document;
-using Microsoft.Sales.Customer;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
 
 /// <summary>
 /// Codeunit Shpfy Product Price Calc. (ID 30182).
 /// </summary>
-codeunit 88276 "Shpfy Product Price Calc."
+codeunit 30182 "Shpfy Product Price Calc."
 {
     Access = Internal;
     SingleInstance = true;
@@ -34,11 +40,13 @@ codeunit 88276 "Shpfy Product Price Calc."
         CustomerNo: Code[20];
         CustomerDiscGroup: Code[20];
         CustomerPostingGroup: Code[20];
+        CurrencyCode: Code[10];
         PricesIncludingVAT: Boolean;
         AllowLineDisc: Boolean;
+        ItemPriceNotSyncedUoMLbl: Label 'Item price is not synchronized because the unit of measure %1 is not valid for item %2.', Comment = '%1 - Unit of Measure Code, %2 - Item No.';
 
 
-    /// <summary> 
+    /// <summary>
     /// Calc Price.
     /// </summary>
     /// <param name="Item">Parameter of type Record Item.</param>
@@ -51,9 +59,14 @@ codeunit 88276 "Shpfy Product Price Calc."
     var
         ItemUnitofMeasure: Record "Item Unit of Measure";
         TempSalesLine: Record "Sales Line" temporary;
+        SkippedRecord: Codeunit "Shpfy Skipped Record";
         ShpfyUpdatePriceSouce: codeunit "Shpfy Update Price Source";
         IsHandled: Boolean;
     begin
+        if not IsValidUoM(Item."No.", UnitOfMeasure) then begin
+            SkippedRecord.LogSkippedRecord(Item.RecordId, StrSubstNo(ItemPriceNotSyncedUoMLbl, UnitOfMeasure, Item."No."), Shop);
+            exit;
+        end;
         ProductEvents.OnBeforeCalculateUnitPrice(Item, ItemVariant, UnitOfMeasure, Shop, Catalog, UnitCost, Price, ComparePrice, IsHandled);
         if not IsHandled then begin
             BindSubscription(ShpfyUpdatePriceSouce);
@@ -123,13 +136,13 @@ codeunit 88276 "Shpfy Product Price Calc."
         TempSalesHeader."Prices Including VAT" := PricesIncludingVAT;
         TempSalesHeader.Validate("Document Date", WorkDate());
         TempSalesHeader.Validate("Order Date", WorkDate());
-        TempSalesHeader.Validate("Currency Code", Shop."Currency Code");
+        TempSalesHeader.Validate("Currency Code", CurrencyCode);
         TempSalesHeader.Insert(false);
     end;
 
     internal procedure GetCurrencyCode(): Code[10]
     begin
-        exit(Shop."Currency Code");
+        exit(CurrencyCode);
     end;
 
     internal procedure GetAllowLineDisc(): Boolean
@@ -153,7 +166,7 @@ codeunit 88276 "Shpfy Product Price Calc."
     /// <param name="ShopifyShop">Parameter of type Record "Shopify Shop".</param>
     internal procedure SetShop(ShopifyShop: Record "Shpfy Shop")
     begin
-        if (Shop.Code <> ShopifyShop.Code) or (Shop.SystemModifiedAt < ShopifyShop.SystemModifiedAt) then begin
+        if (Shop.Code <> ShopifyShop.Code) or (Shop.SystemModifiedAt < ShopifyShop.SystemModifiedAt) or (TempSalesHeader."Document Date" <> WorkDate()) then begin
             Shop := ShopifyShop;
             SetParameters(Shop);
             Clear(TempSalesHeader);
@@ -199,6 +212,7 @@ codeunit 88276 "Shpfy Product Price Calc."
                     CustomerPostingGroup := ShopifyShop."Customer Posting Group";
                     PricesIncludingVAT := ShopifyShop."Prices Including VAT";
                     AllowLineDisc := ShopifyShop."Allow Line Disc.";
+                    CurrencyCode := ShopifyShop."Currency Code";
                 end;
             Database::"Shpfy Catalog":
                 begin
@@ -214,7 +228,23 @@ codeunit 88276 "Shpfy Product Price Calc."
                     PricesIncludingVAT := ShopifyCatalog."Prices Including VAT";
                     AllowLineDisc := ShopifyCatalog."Allow Line Disc.";
                     CustomerNo := ShopifyCatalog."Customer No.";
+                    CurrencyCode := ShopifyCatalog."Currency Code";
                 end;
         end;
+    end;
+
+    local procedure IsValidUoM(ItemNo: Code[20]; UoMCode: Code[20]): Boolean
+    var
+        UnitofMeasure: Record "Unit of Measure";
+        ItemUnitofMeasure: Record "Item Unit of Measure";
+    begin
+        if UoMCode = '' then
+            exit(true);
+        UnitofMeasure.SetRange(Code, UoMCode);
+        if UnitofMeasure.IsEmpty() then
+            exit(false);
+        ItemUnitofMeasure.SetRange("Item No.", ItemNo);
+        ItemUnitofMeasure.SetRange(Code, UoMCode);
+        exit(not ItemUnitofMeasure.IsEmpty());
     end;
 }

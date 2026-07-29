@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Orders to Import (ID 30121).
 /// </summary>
-page 88043 "Shpfy Orders to Import"
+page 30121 "Shpfy Orders to Import"
 {
 
     ApplicationArea = All;
@@ -78,28 +83,22 @@ page 88043 "Shpfy Orders to Import"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the status of payments associated with the order. Valid values are: pending, authorized, partially_paid, paid, partially_refunded, refunded, voided.';
                 }
-#if not CLEAN25
-                field(RiskLevel; Rec."Risk Level")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the risk level from the Shopify order.';
-                    Visible = false;
-                    ObsoleteReason = 'This field is not imported.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-#endif
                 field(FulfillmentStatus; Rec."Fulfillment Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the order''s status in terms of fulfilled line items. Valid values are: Fulfilled, null, partial, restocked.';
+                }
+                field("Channel Liable Taxes"; Rec."Channel Liable Taxes")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if any tax line on the order is liable to be collected by the sales channel.';
                 }
                 field(ChannelName; Rec."Channel Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
-                    ToolTip = 'The name of the channel where you sell your products. A channel can be a platform or a marketplace such as an online store or POS.';
+                    ToolTip = 'Specifies the name of the channel where you sell your products. A channel can be a platform or a marketplace such as an online store or POS.';
                 }
                 field(Confirmed; Rec.Confirmed)
                 {
@@ -119,7 +118,7 @@ page 88043 "Shpfy Orders to Import"
                 field(UpdatedAt; Rec."Updated At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time when the order was last modified.';
+                    ToolTip = 'Specifies the date and time when the order was last modified in Shopify.';
                 }
                 field(Test; Rec.Test)
                 {
@@ -168,7 +167,7 @@ page 88043 "Shpfy Orders to Import"
     {
         area(Processing)
         {
-            Action(GetOrdersToImport)
+            action(GetOrdersToImport)
             {
                 Caption = 'Get Orders to Import';
                 ApplicationArea = All;
@@ -185,7 +184,7 @@ page 88043 "Shpfy Orders to Import"
                 end;
             }
 
-            Action(StartImport)
+            action(StartImport)
             {
                 Caption = 'Import Selected Orders';
                 ApplicationArea = All;

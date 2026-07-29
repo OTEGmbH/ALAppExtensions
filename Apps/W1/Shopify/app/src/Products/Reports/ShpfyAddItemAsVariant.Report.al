@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
 
 /// <summary>
 /// A report to add items as variants to a parent product.
 /// </summary>
-report 88015 "Shpfy Add Item As Variant"
+report 30117 "Shpfy Add Item As Variant"
 {
     ApplicationArea = All;
     Caption = 'Add Item as Shopify Variant';
@@ -109,5 +114,13 @@ report 88015 "Shpfy Add Item As Variant"
         ParentProductNo := NewParentProductNo;
         ShopifyProduct.Get(ParentProductNo);
         ShopCode := ShopifyProduct."Shop Code";
+    end;
+
+    /// <summary> 
+    /// Returns the Shop value selected on request page.
+    /// </summary>
+    procedure GetShop(): Code[20]
+    begin
+        exit(ShopCode);
     end;
 }

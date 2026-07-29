@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Processing Method (ID 30118).
 /// </summary>
-enum 88038 "Shpfy Processing Method"
+enum 30118 "Shpfy Processing Method"
 {
     Caption = 'Shopify Processing Method';
     Extensible = false;

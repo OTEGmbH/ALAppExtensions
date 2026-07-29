@@ -1,14 +1,19 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using Microsoft.Foundation.Shipping;
-using Microsoft.Sales.Document;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Inventory.Item;
+using Microsoft.Sales.Document;
 
 /// <summary>
 /// Table Shpfy Shipment Method Mapping (ID 30131).
 /// </summary>
-table 88054 "Shpfy Shipment Method Mapping"
+table 30131 "Shpfy Shipment Method Mapping"
 {
     Access = Internal;
     Caption = 'Shopify Shipment Method';

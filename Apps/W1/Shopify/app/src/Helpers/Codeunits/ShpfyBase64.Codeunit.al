@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using System.Utilities;
 
 /// <summary>
 /// Codeunit Shpfy Base64 (ID 30155).
 /// </summary>
-codeunit 88189 "Shpfy Base64"
+codeunit 30155 "Shpfy Base64"
 {
     Access = Internal;
 

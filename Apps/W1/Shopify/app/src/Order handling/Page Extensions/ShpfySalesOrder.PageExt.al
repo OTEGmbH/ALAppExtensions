@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Document;
 
 /// <summary>
 /// PageExtension Shpfy Sales Order (ID 30115) extends Record Sales Order.
 /// </summary>
-pageextension 88013 "Shpfy Sales Order" extends "Sales Order"
+pageextension 30115 "Shpfy Sales Order" extends "Sales Order"
 {
     layout
     {
@@ -28,17 +33,6 @@ pageextension 88013 "Shpfy Sales Order" extends "Sales Order"
                     ShopifyOrderMgt.ShowShopifyOrder(VariantRec);
                 end;
             }
-#if not CLEAN25
-            field("ShpfyShopify Risk Level"; Rec."Shpfy Risk Level")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the risk level from the Shopify order.';
-                Visible = false;
-                ObsoleteReason = 'This field is not imported.';
-                ObsoleteState = Pending;
-                ObsoleteTag = '25.0';
-            }
-#endif
         }
     }
 }

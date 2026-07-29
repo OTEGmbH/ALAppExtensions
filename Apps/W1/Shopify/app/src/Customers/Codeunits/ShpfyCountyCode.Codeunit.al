@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy County Code (ID 30108) implements Interface Shpfy ICounty.
 /// </summary>
-codeunit 88027 "Shpfy County Code" implements "Shpfy ICounty"
+codeunit 30108 "Shpfy County Code" implements "Shpfy ICounty"
 {
     Access = Internal;
 

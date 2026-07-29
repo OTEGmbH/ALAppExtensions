@@ -1,8 +1,12 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-enum 88049 "Shpfy Return Reason"
+namespace Microsoft.Integration.Shopify;
+
+enum 30138 "Shpfy Return Reason"
 {
-
     value(0; " ")
     {
         Caption = ' ';

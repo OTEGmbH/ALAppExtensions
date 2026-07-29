@@ -1,13 +1,17 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using OTE.Shopify;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
 
 /// <summary>
 /// Codeunit Shpfy Create Product (ID 30174).
 /// </summary>
-codeunit 88268 "Shpfy Create Product"
+codeunit 30174 "Shpfy Create Product"
 {
     Access = Internal;
     Permissions =
@@ -27,8 +31,6 @@ codeunit 88268 "Shpfy Create Product"
         Getlocations: Boolean;
         ProductId: BigInteger;
         ItemVariantIsBlockedLbl: Label 'Item variant is blocked or sales blocked.';
-        G_ShpfyOTEItemBuffer: Record "Shpfy OTE Item Buffer";
-        GroupByBufferTable: boolean;
 
     trigger OnRun()
     var
@@ -39,27 +41,10 @@ codeunit 88268 "Shpfy Create Product"
             Commit();
             Getlocations := false;
         end;
-
-        //OTE JR 26.09.2025 JR START
-        if GroupByBufferTable then begin
-            ShopifyProduct.SetRange("Shop Code", Shop.Code);
-            ShopifyProduct.SetRange("Item SystemId", Rec.SystemId);
-            ShopifyProduct.SetRange("Group Code 1", G_ShpfyOTEItemBuffer."Group Code 1");
-            ShopifyProduct.SetRange("Group Code 2", G_ShpfyOTEItemBuffer."Group Code 2");
-            ShopifyProduct.SetRange("Group Code 3", G_ShpfyOTEItemBuffer."Group Code 3");
-            if ShopifyProduct.IsEmpty then
-                CreateProduct(Rec);
-        end else begin
-            ShopifyProduct.SetRange("Shop Code", Shop.Code);
-            ShopifyProduct.SetRange("Item SystemId", Rec.SystemId);
-            if ShopifyProduct.IsEmpty then
-                CreateProduct(Rec);
-        end;
-        // ShopifyProduct.SetRange("Shop Code", Shop.Code);
-        //     ShopifyProduct.SetRange("Item SystemId", Rec.SystemId);
-        //     if ShopifyProduct.IsEmpty then
-        //         CreateProduct(Rec); 
-        //OTE JR 26.09.2025 JR STOP 
+        ShopifyProduct.SetRange("Shop Code", Shop.Code);
+        ShopifyProduct.SetRange("Item SystemId", Rec.SystemId);
+        if ShopifyProduct.IsEmpty then
+            CreateProduct(Rec);
     end;
 
     /// <summary> 
@@ -71,19 +56,17 @@ codeunit 88268 "Shpfy Create Product"
         TempShopifyProduct: Record "Shpfy Product" temporary;
         TempShopifyVariant: Record "Shpfy Variant" temporary;
         TempShopifyTag: Record "Shpfy Tag" temporary;
-        ShpfyProductExport: Codeunit "Shpfy Product Export";
     begin
+        if not ProductExport.CheckItemAttributesCompatibleForProductOptions(Item) then
+            exit;
+
         CreateTempProduct(Item, TempShopifyProduct, TempShopifyVariant, TempShopifyTag);
+        if TempShopifyProduct.IsEmpty() then
+            exit;
         if not VariantApi.FindShopifyProductVariant(TempShopifyProduct, TempShopifyVariant) then
             ProductId := ProductApi.CreateProduct(TempShopifyProduct, TempShopifyVariant, TempShopifyTag)
         else
             ProductId := TempShopifyProduct.Id;
-
-        //OTE Metafields 10.07.2025 JR START
-        OnAfterCreateProduct(ProductId, Shop);
-        if Shop."Product Metafields To Shopify" then
-            ShpfyProductExport.UpdateMetafields(ProductId);
-        //OTE Metafields 10.07.2025 JR STOP 
 
         if ProductId <> 0 then
             ProductExport.UpdateProductTranslations(ProductId, Item);
@@ -94,36 +77,20 @@ codeunit 88268 "Shpfy Create Product"
         ItemUnitofMeasure: Record "Item Unit of Measure";
         ItemVariant: Record "Item Variant";
         SkippedRecord: Codeunit "Shpfy Skipped Record";
-        Skip: boolean;
         Id: Integer;
         ICreateProductStatus: Interface "Shpfy ICreateProductStatusValue";
     begin
         Clear(TempShopifyProduct);
         TempShopifyProduct."Shop Code" := Shop.Code;
         TempShopifyProduct."Item SystemId" := Item.SystemId;
-        //OTE Grouping 26.09.2025 JR START
-        TempShopifyProduct."Group Code 1" := G_ShpfyOTEItemBuffer."Group Code 1";
-        TempShopifyProduct."Group Code 2" := G_ShpfyOTEItemBuffer."Group Code 2";
-        TempShopifyProduct."Group Code 3" := G_ShpfyOTEItemBuffer."Group Code 3";
-        TempShopifyProduct."Group Description 1" := G_ShpfyOTEItemBuffer."Group Description 1";
-        TempShopifyProduct."Group Description 2" := G_ShpfyOTEItemBuffer."Group Description 2";
-        TempShopifyProduct."Group Description 3" := G_ShpfyOTEItemBuffer."Group Description 3";
-        //OTE Grouping 26.09.2025 JR STOP 
         ProductExport.FillInProductFields(Item, TempShopifyProduct);
         ICreateProductStatus := Shop."Status for Created Products";
         TempShopifyProduct.Status := ICreateProductStatus.GetStatus(Item);
+        if not ProductExport.CheckItemVariantCount(Item) then
+            exit;
         ItemVariant.SetRange("Item No.", Item."No.");
-        //OTE Grouping 26.09.2025 JR START
-        OnBeforeLoopItemVariant(ItemVariant, TempShopifyProduct, Shop);
-        //OTE Grouping 26.09.2025 JR STOP 
         if ItemVariant.FindSet(false) then
             repeat
-                //OTE Skip other variants 08.07.2025 JR START
-                skip := false;
-                OnBeforeProcessItemVariant(ItemVariant, TempShopifyProduct, Shop, Skip);
-                //OTE Skip other variants 08.07.2025 JR STOP 
-                if Skip then
-                    continue;
                 if ItemVariant.Blocked or ItemVariant."Sales Blocked" then
                     SkippedRecord.LogSkippedRecord(ItemVariant.RecordId, ItemVariantIsBlockedLbl, Shop)
                 else begin
@@ -141,9 +108,12 @@ codeunit 88268 "Shpfy Create Product"
                                 TempShopifyVariant.Title := ItemVariant.Description;
                                 TempShopifyVariant."Inventory Policy" := Shop."Default Inventory Policy";
                                 TempShopifyVariant.SKU := GetVariantSKU(TempShopifyVariant.Barcode, Item."No.", ItemVariant.Code, Item."Vendor Item No.");
-                                TempShopifyVariant."Tax Code" := Item."Tax Group Code";
                                 TempShopifyVariant.Taxable := true;
-                                TempShopifyVariant.Weight := Item."Gross Weight";
+                                TempShopifyVariant.Weight := ItemUnitofMeasure."Qty. per Unit of Measure" > 0 ? Item."Gross Weight" * ItemUnitofMeasure."Qty. per Unit of Measure" : Item."Gross Weight";
+                                if Shop."Sync HS Code and Country" then begin
+                                    TempShopifyVariant."Tariff No." := Item."Tariff No.";
+                                    TempShopifyVariant."Country/Region of Origin Code" := ProductExport.GetCountryISOCode(Item."Country/Region of Origin Code");
+                                end;
                                 TempShopifyVariant."Option 1 Name" := 'Variant';
                                 TempShopifyVariant."Option 1 Value" := ItemVariant.Code;
                                 TempShopifyVariant."Option 2 Name" := Shop."Option Name for UoM";
@@ -153,11 +123,6 @@ codeunit 88268 "Shpfy Create Product"
                                 TempShopifyVariant."Item Variant SystemId" := ItemVariant.SystemId;
                                 TempShopifyVariant."UoM Option Id" := 2;
                                 TempShopifyVariant.Insert(false);
-
-                                //OTE Variant Options overwrite 09.07.2025 JR START
-                                OnAfterInsertShopifyVariant(TempShopifyVariant, ItemVariant, TempShopifyProduct, Shop);
-                            //OTE Variant Options overwrite 09.07.2025 JR STOP 
-
                             until ItemUnitofMeasure.Next() = 0;
                     end else begin
                         Id += 1;
@@ -169,18 +134,18 @@ codeunit 88268 "Shpfy Create Product"
                         TempShopifyVariant.Title := ItemVariant.Description;
                         TempShopifyVariant."Inventory Policy" := Shop."Default Inventory Policy";
                         TempShopifyVariant.SKU := GetVariantSKU(TempShopifyVariant.Barcode, Item."No.", ItemVariant.Code, GetVendorItemNo(Item."No.", ItemVariant.Code, Item."Sales Unit of Measure"));
-                        TempShopifyVariant."Tax Code" := Item."Tax Group Code";
                         TempShopifyVariant.Taxable := true;
                         TempShopifyVariant.Weight := Item."Gross Weight";
+                        if Shop."Sync HS Code and Country" then begin
+                            TempShopifyVariant."Tariff No." := Item."Tariff No.";
+                            TempShopifyVariant."Country/Region of Origin Code" := ProductExport.GetCountryISOCode(Item."Country/Region of Origin Code");
+                        end;
                         TempShopifyVariant."Option 1 Name" := 'Variant';
                         TempShopifyVariant."Option 1 Value" := ItemVariant.Code;
                         TempShopifyVariant."Shop Code" := Shop.Code;
                         TempShopifyVariant."Item SystemId" := Item.SystemId;
                         TempShopifyVariant."Item Variant SystemId" := ItemVariant.SystemId;
                         TempShopifyVariant.Insert(false);
-                        //OTE Variant Options overwrite 09.07.2025 JR START
-                        OnAfterInsertShopifyVariant(TempShopifyVariant, ItemVariant, TempShopifyProduct, Shop);
-                        //OTE Variant Options overwrite 09.07.2025 JR STOP 
                     end;
                 end;
             until ItemVariant.Next() = 0
@@ -199,22 +164,23 @@ codeunit 88268 "Shpfy Create Product"
                         TempShopifyVariant.Title := Item.Description;
                         TempShopifyVariant."Inventory Policy" := Shop."Default Inventory Policy";
                         TempShopifyVariant.SKU := GetVariantSKU(TempShopifyVariant.Barcode, Item."No.", '', Item."Vendor Item No.");
-                        TempShopifyVariant."Tax Code" := Item."Tax Group Code";
                         TempShopifyVariant.Taxable := true;
-                        TempShopifyVariant.Weight := Item."Gross Weight";
+                        TempShopifyVariant.Weight := ItemUnitofMeasure."Qty. per Unit of Measure" > 0 ? Item."Gross Weight" * ItemUnitofMeasure."Qty. per Unit of Measure" : Item."Gross Weight";
+                        if Shop."Sync HS Code and Country" then begin
+                            TempShopifyVariant."Tariff No." := Item."Tariff No.";
+                            TempShopifyVariant."Country/Region of Origin Code" := ProductExport.GetCountryISOCode(Item."Country/Region of Origin Code");
+                        end;
                         TempShopifyVariant."Option 1 Name" := Shop."Option Name for UoM";
                         TempShopifyVariant."Option 1 Value" := ItemUnitofMeasure.Code;
                         TempShopifyVariant."Shop Code" := Shop.Code;
                         TempShopifyVariant."Item SystemId" := Item.SystemId;
                         TempShopifyVariant."UoM Option Id" := 1;
                         TempShopifyVariant.Insert(false);
-                        //OTE Variant Options overwrite 09.07.2025 JR START
-                        OnAfterInsertShopifyVariant(TempShopifyVariant, ItemVariant, TempShopifyProduct, Shop);
-                    //OTE Variant Options overwrite 09.07.2025 JR STOP 
                     until ItemUnitofMeasure.Next() = 0;
             end else
                 CreateTempShopifyVariantFromItem(Item, TempShopifyVariant);
 
+        ProductExport.FillProductOptionsForShopifyVariants(Item, TempShopifyVariant, TempShopifyProduct);
         TempShopifyProduct.Insert(false);
         Events.OnAfterCreateTempShopifyProduct(Item, TempShopifyProduct, TempShopifyVariant, TempShopifyTag);
     end;
@@ -283,9 +249,12 @@ codeunit 88268 "Shpfy Create Product"
         TempShopifyVariant.Title := ''; // Title will be assigned to "Default Title" in Shopify as no Options are set.
         TempShopifyVariant."Inventory Policy" := Shop."Default Inventory Policy";
         TempShopifyVariant.SKU := GetVariantSKU(TempShopifyVariant.Barcode, Item."No.", '', Item."Vendor Item No.");
-        TempShopifyVariant."Tax Code" := Item."Tax Group Code";
         TempShopifyVariant.Taxable := true;
         TempShopifyVariant.Weight := Item."Gross Weight";
+        if Shop."Sync HS Code and Country" then begin
+            TempShopifyVariant."Tariff No." := Item."Tariff No.";
+            TempShopifyVariant."Country/Region of Origin Code" := ProductExport.GetCountryISOCode(Item."Country/Region of Origin Code");
+        end;
         TempShopifyVariant."Shop Code" := Shop.Code;
         TempShopifyVariant."Item SystemId" := Item.SystemId;
         TempShopifyVariant.Insert(false);
@@ -333,43 +302,4 @@ codeunit 88268 "Shpfy Create Product"
         end;
     end;
 
-    /*
-
-      #######  ######## ######## 
-     ##     ##    ##    ##       
-     ##     ##    ##    ##       
-     ##     ##    ##    ######   
-     ##     ##    ##    ##       
-     ##     ##    ##    ##       
-      #######     ##    ######## 
-
-    */
-    //OTE BC 08.07.2025 JR START
-    [BusinessEvent(false)]
-    local procedure OnBeforeProcessItemVariant(var ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop"; var Skip: boolean)
-    begin
-    end;
-
-    [BusinessEvent(false)]
-    local procedure OnBeforeLoopItemVariant(var ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertShopifyVariant(var TempShopifyVariant: Record "Shpfy Variant" temporary; ItemVariant: Record "Item Variant"; var TempShopifyProduct: Record "Shpfy Product" temporary; Shop: Record "Shpfy Shop")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateProduct(ProductId: BigInteger; Shop: Record "Shpfy Shop")
-    begin
-    end;
-    //OTE BC 08.07.2025 JR STOP 
-
-    //This method is needed to group shopify items not only by the item number / item systemid
-    procedure SetItemBufferEntry(var _ShpfyOTEItemBuffer: Record "Shpfy OTE Item Buffer")
-    begin
-        G_ShpfyOTEItemBuffer := _ShpfyOTEItemBuffer;
-        GroupByBufferTable := true;
-    end;
 }

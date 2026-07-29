@@ -1,12 +1,17 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using Microsoft.Inventory.Item.Catalog;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
 
 /// <summary>
 /// Codeunit Shpfy Item Reference Mgt. (ID 30175).
 /// </summary>
-codeunit 88269 "Shpfy Item Reference Mgt."
+codeunit 30175 "Shpfy Item Reference Mgt."
 {
     Access = Internal;
 

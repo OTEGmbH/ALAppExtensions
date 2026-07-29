@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Codeunit Shpfy Skipped Record (ID 30313).
 /// </summary>
-codeunit 88208 "Shpfy Skipped Record"
+codeunit 30313 "Shpfy Skipped Record"
 {
     Access = Internal;
     Permissions = tabledata "Shpfy Skipped Record" = rimd;

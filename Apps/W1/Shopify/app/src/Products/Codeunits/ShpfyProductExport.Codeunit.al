@@ -1,17 +1,22 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using OTE.Shopify;
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Foundation.Address;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Attribute;
-using System.Text;
-using Microsoft.Purchases.Vendor;
 using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Purchases.Vendor;
+using System.Text;
 
 /// <summary>
 /// Codeunit Shpfy Product Export (ID 30178).
 /// </summary>
-codeunit 88272 "Shpfy Product Export"
+codeunit 30178 "Shpfy Product Export"
 {
     Access = Internal;
     Permissions =
@@ -23,6 +28,7 @@ codeunit 88272 "Shpfy Product Export"
         tabledata "Item Attribute Translation" = r,
         tabledata "Item Attribute Value" = r,
         tabledata "Item Attribute Value Mapping" = r,
+        tabledata "Item Var. Attr. Value Mapping" = r,
         tabledata "Item Category" = r,
         tabledata "Item Reference" = r,
         tabledata "Item Unit of Measure" = rim,
@@ -30,29 +36,19 @@ codeunit 88272 "Shpfy Product Export"
         tabledata Vendor = r;
     TableNo = "Shpfy Shop";
 
-    var
-        g_shpfyproduct: record "Shpfy Product";
-
-    procedure SetShopifyProductFilter(var _ShpfyProduct: Record "Shpfy Product")
-    begin
-        g_shpfyproduct.Copy(_ShpfyProduct);
-    end;
-
     trigger OnRun()
     var
         ShopifyProduct: Record "Shpfy Product";
         BulkOperationMgt: Codeunit "Shpfy Bulk Operation Mgt.";
         BulkOperationType: Enum "Shpfy Bulk Operation Type";
         VariantId: BigInteger;
+        SendPricesIndividually: Boolean;
     begin
         ShopifyProduct.SetFilter("Item SystemId", '<>%1', NullGuid);
         ShopifyProduct.SetFilter("Shop Code", Rec.GetFilter(Code));
-        if g_shpfyproduct.GetFilters <> '' then
-            ShopifyProduct.copy(g_shpfyproduct);
 
         ProductEvents.OnAfterProductsToSynchronizeFiltersSet(ShopifyProduct, Shop, OnlyUpdatePrice);
 
-        RecordCount := ShopifyProduct.Count();
         if ShopifyProduct.FindSet(false) then
             repeat
                 SetShop(ShopifyProduct."Shop Code");
@@ -61,11 +57,15 @@ codeunit 88272 "Shpfy Product Export"
             until ShopifyProduct.Next() = 0;
 
         if OnlyUpdatePrice then
-            if BulkOperationInput.Length > 0 then
-                if not BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::UpdateProductPrice, BulkOperationInput.ToText(), JRequestData) then
+            if GraphQueryList.Count() > 0 then begin
+                SendPricesIndividually := true;
+                if GraphQueryList.Count() >= BulkOperationMgt.GetBulkOperationThreshold() then
+                    SendPricesIndividually := not BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::UpdateProductPrice, BulkOperationInput.ToText(), JRequestData);
+                if SendPricesIndividually then
                     foreach VariantId in GraphQueryList.Keys do
-                        if not VariantAPI.UpdateProductPrice(GraphQueryList.Get(VariantId)) then
+                        if not VariantAPI.UpdateProductPrice(VariantId, GraphQueryList.Get(VariantId)) then
                             RevertVariantChanges(VariantId);
+            end;
     end;
 
     var
@@ -74,19 +74,19 @@ codeunit 88272 "Shpfy Product Export"
         ProductEvents: Codeunit "Shpfy Product Events";
         ProductPriceCalc: Codeunit "Shpfy Product Price Calc.";
         VariantApi: Codeunit "Shpfy Variant API";
-        MetafieldAPI: Codeunit "Shpfy Metafield API";
         SkippedRecord: Codeunit "Shpfy Skipped Record";
         OnlyUpdatePrice: Boolean;
-        RecordCount: Integer;
         NullGuid: Guid;
         BulkOperationInput: TextBuilder;
         GraphQueryList: Dictionary of [BigInteger, TextBuilder];
         JRequestData: JsonArray;
-        VariantPriceCalcSkippedLbl: Label 'Variant price is not synchronized because the item is blocked or sales blocked.';
+        VariantPriceCalcSkippedLbl: Label 'Variant price is not synchronized because the %1 is blocked or sales blocked.', Comment = '%1 - item or item variant.';
         ItemIsBlockedLbl: Label 'Item is blocked.';
         ItemIsDraftLbl: Label 'Shopify product is in draft status.';
         ItemIsArchivedLbl: Label 'Shopify product is archived.';
         ItemVariantIsBlockedLbl: Label 'Item variant is blocked or sales blocked.';
+        ItemLbl: Label 'item';
+        ItemVariantLbl: Label 'item variant';
 
     /// <summary> 
     /// Creates html body for a product from extended text, marketing text and attributes.
@@ -246,18 +246,11 @@ codeunit 88272 "Shpfy Product Export"
     /// </summary>
     /// <param name="Item">Parameter of type Record Item.</param>
     /// <param name="ItemVariant">Parameter of type Record "Item Variant".</param>
-    local procedure CreateProductVariant(ProductId: BigInteger; Item: Record Item; ItemVariant: Record "Item Variant")
+    local procedure CreateProductVariant(ProductId: BigInteger; Item: Record Item; ItemVariant: Record "Item Variant"; TempShopifyProduct: Record "Shpfy Product" temporary)
     var
         TempShopifyVariant: Record "Shpfy Variant" temporary;
-        ShpfyProductEvents: Codeunit "Shpfy Product Events";
-        Skip: boolean;
+        ItemAttributeIds: List of [Integer];
     begin
-        //OTE Skip other variants 08.07.2025 JR START
-        Skip := false;
-        ShpfyProductEvents.OnBeforeUpdateProductCreateProductVariant(ItemVariant, ProductId, Shop, Item, Skip);
-        if skip then
-            exit;
-        //OTE Skip other variants 08.07.2025 JR STOP 
         if ItemVariant.Blocked or ItemVariant."Sales Blocked" then begin
             SkippedRecord.LogSkippedRecord(ItemVariant.RecordId, ItemVariantIsBlockedLbl, Shop);
             exit;
@@ -267,6 +260,12 @@ codeunit 88272 "Shpfy Product Export"
             exit;
         Clear(TempShopifyVariant);
         FillInProductVariantData(TempShopifyVariant, Item, ItemVariant);
+
+        GetItemAttributeIDsMarkedAsOption(Item, ItemAttributeIds);
+        if ItemAttributeIds.Count() > 0 then
+            if not ValidateItemAttributesAsProductOptionsForNewVariant(TempShopifyVariant, Item, ItemVariant.Code, TempShopifyProduct.Id) then
+                exit;
+
         TempShopifyVariant.Insert(false);
         VariantApi.AddProductVariant(TempShopifyVariant, ProductId, "Shpfy Variant Create Strategy"::DEFAULT);
     end;
@@ -342,7 +341,7 @@ codeunit 88272 "Shpfy Product Export"
         Tab: Text[1];
     begin
         Tab[1] := 9;
-        Exit(Source.Replace(Tab, ' '));
+        exit(Source.Replace(Tab, ' '));
     end;
 
     /// <summary> 
@@ -357,7 +356,7 @@ codeunit 88272 "Shpfy Product Export"
             if (not Item.Blocked) and (not Item."Sales Blocked") then
                 ProductPriceCalc.CalcPrice(Item, '', ItemUnitofMeasure.Code, ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price")
             else
-                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, VariantPriceCalcSkippedLbl, Shop);
+                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemLbl), Shop);
         if not OnlyUpdatePrice then begin
             ShopifyVariant."Available For Sales" := (not Item.Blocked) and (not Item."Sales Blocked");
             ShopifyVariant.Barcode := CopyStr(GetBarcode(Item."No.", '', ItemUnitofMeasure.Code), 1, MaxStrLen(ShopifyVariant.Barcode));
@@ -371,9 +370,12 @@ codeunit 88272 "Shpfy Product Export"
                 Shop."SKU Mapping"::"Vendor Item No.":
                     ShopifyVariant.SKU := Item."Vendor Item No.";
             end;
-            ShopifyVariant."Tax Code" := Item."Tax Group Code";
             ShopifyVariant.Taxable := true;
-            ShopifyVariant.Weight := Item."Gross Weight";
+            ShopifyVariant.Weight := ItemUnitofMeasure."Qty. per Unit of Measure" > 0 ? Item."Gross Weight" * ItemUnitofMeasure."Qty. per Unit of Measure" : Item."Gross Weight";
+            if Shop."Sync HS Code and Country" then begin
+                ShopifyVariant."Tariff No." := Item."Tariff No.";
+                ShopifyVariant."Country/Region of Origin Code" := GetCountryISOCode(Item."Country/Region of Origin Code");
+            end;
             ShopifyVariant."Option 1 Name" := Shop."Option Name for UoM";
             ShopifyVariant."Option 1 Value" := ItemUnitofMeasure.Code;
             ShopifyVariant."Shop Code" := Shop.Code;
@@ -394,10 +396,13 @@ codeunit 88272 "Shpfy Product Export"
         ItemAsVariant: Boolean;
     begin
         if Shop."Sync Prices" or OnlyUpdatePrice then
-            if (not Item.Blocked) and (not Item."Sales Blocked") then
-                ProductPriceCalc.CalcPrice(Item, ItemVariant.Code, Item."Sales Unit of Measure", ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price")
+            if Item.Blocked or Item."Sales Blocked" then
+                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemLbl), Shop)
             else
-                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, VariantPriceCalcSkippedLbl, Shop);
+                if ItemVariant.Blocked or ItemVariant."Sales Blocked" then
+                    SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, ItemVariant.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemVariantLbl), Shop)
+                else
+                    ProductPriceCalc.CalcPrice(Item, ItemVariant.Code, Item."Sales Unit of Measure", ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price");
         if not OnlyUpdatePrice then begin
             if Product.Get(ShopifyVariant."Product Id") then
                 if Product."Has Variants" then
@@ -425,19 +430,24 @@ codeunit 88272 "Shpfy Product Export"
                 Shop."SKU Mapping"::"Vendor Item No.":
                     ShopifyVariant.SKU := Item."Vendor Item No.";
             end;
-            ShopifyVariant."Tax Code" := Item."Tax Group Code";
             ShopifyVariant.Taxable := true;
             ShopifyVariant.Weight := Item."Gross Weight";
+            if Shop."Sync HS Code and Country" then begin
+                ShopifyVariant."Tariff No." := Item."Tariff No.";
+                ShopifyVariant."Country/Region of Origin Code" := GetCountryISOCode(Item."Country/Region of Origin Code");
+            end;
             if ShopifyVariant."Option 1 Name" = '' then
                 ShopifyVariant."Option 1 Name" := 'Variant';
-            if ItemAsVariant then
-                ShopifyVariant."Option 1 Value" := Item."No."
-            else
-                ShopifyVariant."Option 1 Value" := ItemVariant.Code;
+            if ShopifyVariant."Option 1 Name" = 'Variant' then
+                if ItemAsVariant then
+                    ShopifyVariant."Option 1 Value" := Item."No."
+                else
+                    ShopifyVariant."Option 1 Value" := ItemVariant.Code;
             ShopifyVariant."Shop Code" := Shop.Code;
             ShopifyVariant."Item SystemId" := Item.SystemId;
             ShopifyVariant."Item Variant SystemId" := ItemVariant.SystemId;
             ShopifyVariant."UoM Option Id" := 2;
+            ProductEvents.OnAfterFillInProductVariantData(ShopifyVariant, Item, ItemVariant, Shop);
         end;
     end;
 
@@ -451,14 +461,17 @@ codeunit 88272 "Shpfy Product Export"
     internal procedure FillInProductVariantData(var ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant"; ItemUnitofMeasure: Record "Item Unit of Measure")
     begin
         if Shop."Sync Prices" or OnlyUpdatePrice then
-            if (not Item.Blocked) and (not Item."Sales Blocked") then
-                ProductPriceCalc.CalcPrice(Item, ItemVariant.Code, ItemUnitofMeasure.Code, ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price")
+            if Item.Blocked or Item."Sales Blocked" then
+                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemLbl), Shop)
             else
-                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, VariantPriceCalcSkippedLbl, Shop);
+                if ItemVariant.Blocked or ItemVariant."Sales Blocked" then
+                    SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, ItemVariant.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemVariantLbl), Shop)
+                else
+                    ProductPriceCalc.CalcPrice(Item, ItemVariant.Code, ItemUnitofMeasure.Code, ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price");
         if not OnlyUpdatePrice then begin
             ShopifyVariant."Available For Sales" := (not Item.Blocked) and (not Item."Sales Blocked");
             ShopifyVariant.Barcode := CopyStr(GetBarcode(Item."No.", ItemVariant.Code, ItemUnitofMeasure.Code), 1, MaxStrLen(ShopifyVariant.Barcode));
-            ShopifyVariant.Title := RemoveTabChars(ItemVariant.Description);
+            ShopifyVariant.Title := CopyStr(RemoveTabChars(ItemVariant.Description), 1, MaxStrLen(ShopifyVariant.Title));
             ShopifyVariant."Inventory Policy" := Shop."Default Inventory Policy";
             case Shop."SKU Mapping" of
                 Shop."SKU Mapping"::"Bar Code":
@@ -476,9 +489,12 @@ codeunit 88272 "Shpfy Product Export"
                 Shop."SKU Mapping"::"Vendor Item No.":
                     ShopifyVariant.SKU := Item."Vendor Item No.";
             end;
-            ShopifyVariant."Tax Code" := Item."Tax Group Code";
             ShopifyVariant.Taxable := true;
-            ShopifyVariant.Weight := Item."Gross Weight";
+            ShopifyVariant.Weight := ItemUnitofMeasure."Qty. per Unit of Measure" > 0 ? Item."Gross Weight" * ItemUnitofMeasure."Qty. per Unit of Measure" : Item."Gross Weight";
+            if Shop."Sync HS Code and Country" then begin
+                ShopifyVariant."Tariff No." := Item."Tariff No.";
+                ShopifyVariant."Country/Region of Origin Code" := GetCountryISOCode(Item."Country/Region of Origin Code");
+            end;
             ShopifyVariant."Option 1 Name" := 'Variant';
             ShopifyVariant."Option 1 Value" := ItemVariant.Code;
             ShopifyVariant."Option 2 Name" := Shop."Option Name for UoM";
@@ -487,6 +503,7 @@ codeunit 88272 "Shpfy Product Export"
             ShopifyVariant."Item SystemId" := Item.SystemId;
             ShopifyVariant."Item Variant SystemId" := ItemVariant.SystemId;
             ShopifyVariant."UoM Option Id" := 2;
+            ProductEvents.OnAfterFillInProductVariantDataFromVariant(ShopifyVariant, Item, ItemVariant, ItemUnitofMeasure, Shop);
         end;
     end;
 
@@ -556,7 +573,7 @@ codeunit 88272 "Shpfy Product Export"
     end;
 
 
-    procedure SetOnlyUpdatePriceOn()
+    internal procedure SetOnlyUpdatePriceOn()
     begin
         OnlyUpdatePrice := true;
     end;
@@ -584,7 +601,6 @@ codeunit 88272 "Shpfy Product Export"
         ProductApi.SetShop(Shop);
         VariantApi.SetShop(Shop);
         ProductPriceCalc.SetShop(Shop);
-        MetafieldAPI.SetShop(Shop);
     end;
 
     /// <summary> 
@@ -597,9 +613,9 @@ codeunit 88272 "Shpfy Product Export"
         ItemUnitofMeasure: Record "Item Unit of Measure";
         ItemVariant: Record "Item Variant";
         ShopifyProduct: Record "Shpfy Product";
-        ShpfyProductEvents: Codeunit "Shpfy Product Events";
         TempShopifyProduct: Record "Shpfy Product" temporary;
         ShopifyVariant: Record "Shpfy Variant";
+        TempCurrVariant: Record "Shpfy Variant" temporary;
         RecordRef1: RecordRef;
         RecordRef2: RecordRef;
         VariantAction: Option " ",Create,Update;
@@ -622,9 +638,6 @@ codeunit 88272 "Shpfy Product Export"
                         exit;
                     end;
             end;
-            //OTE Ticket 19.09.2025 JR START
-            ProductEvents.OnBeforeFillInProductFields(ShopifyProduct, Item);
-            //OTE Ticket 19.09.2025 JR STOP 
             TempShopifyProduct := ShopifyProduct;
             FillInProductFields(Item, ShopifyProduct);
             RecordRef1.GetTable(ShopifyProduct);
@@ -634,7 +647,6 @@ codeunit 88272 "Shpfy Product Export"
                 ProductApi.UpdateProduct(ShopifyProduct, TempShopifyProduct);
                 ShopifyProduct.Modify();
             end;
-
             ShopifyVariant.SetRange("Product Id", ProductId);
             if ShopifyVariant.FindSet(false) then
                 repeat
@@ -656,15 +668,16 @@ codeunit 88272 "Shpfy Product Export"
                                         if ItemUnitofMeasure.Get(Item."No.", ShopifyVariant."Option 3 Value") then
                                             ;
                                 end;
-                                UpdateProductVariant(ShopifyVariant, Item, ItemVariant, ItemUnitofMeasure);
+                                UpdateProductVariant(ShopifyVariant, Item, ItemVariant, ItemUnitofMeasure, TempCurrVariant);
                             end else
-                                UpdateProductVariant(ShopifyVariant, Item, ItemVariant);
+                                UpdateProductVariant(ShopifyVariant, Item, ItemVariant, TempCurrVariant);
                         end;
                 until ShopifyVariant.Next() = 0;
+            // Re-fetch the parent product's item, as the loop above may have overwritten
+            // the Item variable with a child item from "Add Item as Shopify Variant".
+            if not Item.GetBySystemId(ShopifyProduct."Item SystemId") then
+                exit;
             ItemVariant.SetRange("Item No.", Item."No.");
-            //OTE JR 29.09.2025 JR START
-            ProductEvents.OnBeforeLoopItemVariant(ItemVariant, Shop, ShopifyProduct);
-            //OTE JR 29.09.2025 JR STOP
             ItemUnitofMeasure.SetRange("Item No.", Item."No.");
             if ItemVariant.FindSet(false) then
                 repeat
@@ -710,14 +723,14 @@ codeunit 88272 "Shpfy Product Export"
                                     VariantAction::Create:
                                         CreateProductVariant(ProductId, Item, ItemVariant, ItemUnitofMeasure);
                                     VariantAction::Update:
-                                        UpdateProductVariant(ShopifyVariant, Item, ItemVariant, ItemUnitofMeasure);
+                                        UpdateProductVariant(ShopifyVariant, Item, ItemVariant, ItemUnitofMeasure, TempCurrVariant);
                                 end;
                             until ItemUnitofMeasure.Next() = 0;
                     end else
                         if ShopifyVariant.FindFirst() then
-                            UpdateProductVariant(ShopifyVariant, Item, ItemVariant)
+                            UpdateProductVariant(ShopifyVariant, Item, ItemVariant, TempCurrVariant)
                         else
-                            CreateProductVariant(ProductId, Item, ItemVariant);
+                            CreateProductVariant(ProductId, Item, ItemVariant, TempShopifyProduct);
                 until ItemVariant.Next() = 0
             else begin
                 Clear(ShopifyVariant);
@@ -761,37 +774,37 @@ codeunit 88272 "Shpfy Product Export"
                                 VariantAction::Create:
                                     CreateProductVariant(ProductId, Item, ItemUnitofMeasure);
                                 VariantAction::Update:
-                                    UpdateProductVariant(ShopifyVariant, Item, ItemUnitofMeasure);
+                                    UpdateProductVariant(ShopifyVariant, Item, ItemUnitofMeasure, TempCurrVariant);
                             end;
                         until ItemUnitofMeasure.Next() = 0;
             end;
 
+            if not TempCurrVariant.IsEmpty() then
+                VariantApi.UpdateProductVariants(TempCurrVariant);
 
-            //if (Shop."Product Metafields To Shopify")
-            if (Shop."Product Metafields To Shopify") and (not ShopifyProduct."Skip Metafields") then
+            if Shop."Product Metafields To Shopify" then
                 UpdateMetafields(ShopifyProduct.Id);
-
-            //OTE ProductSet Color+Size Values 21.10.25 JR START
-            ShpfyProductEvents.OnAfterUpdateProduct(ShopifyProduct, Shop);
-            //OTE ProductSet Color+Size Values 21.10.25 JR START
             UpdateProductTranslations(ShopifyProduct.Id, Item)
         end;
     end;
 
-    procedure UpdateMetafields(ProductId: BigInteger)
+    local procedure UpdateMetafields(ProductId: BigInteger)
     var
         ShpfyVariant: Record "Shpfy Variant";
+        Metafields: Codeunit "Shpfy Metafields";
     begin
         if OnlyUpdatePrice then
             exit;
 
-        MetafieldAPI.CreateOrUpdateMetafieldsInShopify(Database::"Shpfy Product", ProductId);
+        ProductEvents.OnBeforeUpdateProductMetafields(ProductId);
+
+        Metafields.SyncMetafieldsToShopify(Database::"Shpfy Product", ProductId, Shop.Code);
 
         ShpfyVariant.SetRange("Product Id", ProductId);
         ShpfyVariant.ReadIsolation := IsolationLevel::ReadCommitted;
         if ShpfyVariant.FindSet() then
             repeat
-                MetafieldAPI.CreateOrUpdateMetafieldsInShopify(Database::"Shpfy Variant", ShpfyVariant.Id);
+                Metafields.SyncMetafieldsToShopify(Database::"Shpfy Variant", ShpfyVariant.Id, Shop.Code);
             until ShpfyVariant.Next() = 0;
     end;
 
@@ -801,7 +814,7 @@ codeunit 88272 "Shpfy Product Export"
     /// <param name="ShopifyVariant">Shopify variant to update.</param>
     /// <param name="Item">Item where information is taken from.</param>
     /// <param name="ItemUnitofMeasure">Item unit of measure where information is taken from.</param>
-    local procedure UpdateProductVariant(ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemUnitofMeasure: Record "Item Unit of Measure")
+    local procedure UpdateProductVariant(ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemUnitofMeasure: Record "Item Unit of Measure"; var TempCurrVariant: Record "Shpfy Variant" temporary)
     var
         TempShopifyVariant: Record "Shpfy Variant" temporary;
     begin
@@ -809,9 +822,15 @@ codeunit 88272 "Shpfy Product Export"
         TempShopifyVariant := ShopifyVariant;
         FillInProductVariantData(ShopifyVariant, Item, ItemUnitofMeasure);
         if OnlyUpdatePrice then
-            VariantApi.UpdateProductPrice(ShopifyVariant, TempShopifyVariant, BulkOperationInput, GraphQueryList, RecordCount, JRequestData)
+            VariantApi.UpdateProductPrice(ShopifyVariant, TempShopifyVariant, BulkOperationInput, GraphQueryList, JRequestData)
         else
-            VariantApi.UpdateProductVariant(ShopifyVariant, TempShopifyVariant);
+            if TempCurrVariant.Get(ShopifyVariant.Id) then begin
+                TempCurrVariant := ShopifyVariant;
+                TempCurrVariant.Modify();
+            end else begin
+                TempCurrVariant := ShopifyVariant;
+                TempCurrVariant.Insert();
+            end;
     end;
 
     /// <summary> 
@@ -820,7 +839,7 @@ codeunit 88272 "Shpfy Product Export"
     /// <param name="ShopifyVariant">Parameter of type Record "Shopify Variant".</param>
     /// <param name="Item">Parameter of type Record Item.</param>
     /// <param name="ItemVariant">Parameter of type Record "Item Variant".</param>
-    local procedure UpdateProductVariant(var ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant")
+    local procedure UpdateProductVariant(var ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant"; var TempCurrVariant: Record "Shpfy Variant" temporary)
     var
         TempShopifyVariant: Record "Shpfy Variant" temporary;
     begin
@@ -828,9 +847,15 @@ codeunit 88272 "Shpfy Product Export"
         TempShopifyVariant := ShopifyVariant;
         FillInProductVariantData(ShopifyVariant, Item, ItemVariant);
         if OnlyUpdatePrice then
-            VariantApi.UpdateProductPrice(ShopifyVariant, TempShopifyVariant, BulkOperationInput, GraphQueryList, RecordCount, JRequestData)
+            VariantApi.UpdateProductPrice(ShopifyVariant, TempShopifyVariant, BulkOperationInput, GraphQueryList, JRequestData)
         else
-            VariantApi.UpdateProductVariant(ShopifyVariant, TempShopifyVariant);
+            if TempCurrVariant.Get(ShopifyVariant.Id) then begin
+                TempCurrVariant := ShopifyVariant;
+                TempCurrVariant.Modify();
+            end else begin
+                TempCurrVariant := ShopifyVariant;
+                TempCurrVariant.Insert();
+            end;
     end;
 
     /// <summary> 
@@ -840,7 +865,7 @@ codeunit 88272 "Shpfy Product Export"
     /// <param name="Item">Parameter of type Record Item.</param>
     /// <param name="ItemVariant">Parameter of type Record "Item Variant".</param>
     /// <param name="ItemUnitofMeasure">Parameter of type Record "Item Unit of Measure".</param>
-    local procedure UpdateProductVariant(ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant"; ItemUnitofMeasure: Record "Item Unit of Measure")
+    local procedure UpdateProductVariant(ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant"; ItemUnitofMeasure: Record "Item Unit of Measure"; var TempCurrVariant: Record "Shpfy Variant" temporary)
     var
         TempShopifyVariant: Record "Shpfy Variant" temporary;
     begin
@@ -848,9 +873,15 @@ codeunit 88272 "Shpfy Product Export"
         TempShopifyVariant := ShopifyVariant;
         FillInProductVariantData(ShopifyVariant, Item, ItemVariant, ItemUnitofMeasure);
         if OnlyUpdatePrice then
-            VariantApi.UpdateProductPrice(ShopifyVariant, TempShopifyVariant, BulkOperationInput, GraphQueryList, RecordCount, JRequestData)
+            VariantApi.UpdateProductPrice(ShopifyVariant, TempShopifyVariant, BulkOperationInput, GraphQueryList, JRequestData)
         else
-            VariantApi.UpdateProductVariant(ShopifyVariant, TempShopifyVariant);
+            if TempCurrVariant.Get(ShopifyVariant.Id) then begin
+                TempCurrVariant := ShopifyVariant;
+                TempCurrVariant.Modify();
+            end else begin
+                TempCurrVariant := ShopifyVariant;
+                TempCurrVariant.Insert();
+            end;
     end;
 
     local procedure RevertVariantChanges(VariantId: BigInteger)
@@ -866,6 +897,8 @@ codeunit 88272 "Shpfy Product Export"
                     ShopifyVariant.Price := JVariant.GetDecimal('price');
                     ShopifyVariant."Compare at Price" := JVariant.GetDecimal('compareAtPrice');
                     ShopifyVariant."Updated At" := JVariant.GetDateTime('updatedAt');
+                    if JVariant.Contains('unitCost') then
+                        ShopifyVariant."Unit Cost" := JVariant.GetDecimal('unitCost');
                     ShopifyVariant.Modify();
                 end;
                 exit;
@@ -907,7 +940,455 @@ codeunit 88272 "Shpfy Product Export"
                 ICreateTranslation.CreateTranslation(RecVariant, ShopifyLanguage, TempTranslation, Digests);
             until ShopifyLanguage.Next() = 0;
     end;
-
-
     #endregion
+
+    /// <summary>
+    /// Checks if the item can be exported to Shopify. Validates that the item is not blocked, has a description, and does not exceed the variant limit.
+    /// </summary>
+    /// <param name="Item">The item to check.</param>
+    /// <returns>True if the item can be exported, false otherwise.</returns>
+    internal procedure CheckItemCanBeExported(Item: Record Item): Boolean
+    var
+        ItemIsBlockedOrSalesBlockedLbl: Label 'Item is blocked or sales blocked.';
+        ItemDescriptionIsEmptyLbl: Label 'Item description is empty.';
+    begin
+        if Item.Blocked or Item."Sales Blocked" then begin
+            SkippedRecord.LogSkippedRecord(Item.RecordId, ItemIsBlockedOrSalesBlockedLbl, Shop);
+            exit(false);
+        end;
+
+        if Item.Description = '' then begin
+            SkippedRecord.LogSkippedRecord(Item.RecordId, ItemDescriptionIsEmptyLbl, Shop);
+            exit(false);
+        end;
+
+        exit(CheckItemVariantCount(Item));
+    end;
+
+    /// <summary>
+    /// Checks if the item's expected variant count does not exceed the Shopify maximum of 2048 variants per product.
+    /// </summary>
+    /// <param name="Item">The item to check.</param>
+    /// <returns>True if the variant count is within limits, false otherwise.</returns>
+    internal procedure CheckItemVariantCount(Item: Record Item): Boolean
+    var
+        ItemVariant: Record "Item Variant";
+        ItemUnitofMeasure: Record "Item Unit of Measure";
+        ExpectedVariantCount: Integer;
+        MaxVariantCount: Integer;
+        TooManyVariantsLbl: Label 'Item has more than %1 variants. Shopify allows a maximum of %1 variants per product.', Comment = '%1 = Maximum number of variants';
+    begin
+        MaxVariantCount := 2048;
+        ItemVariant.SetRange("Item No.", Item."No.");
+        ItemVariant.SetRange(Blocked, false);
+        ItemVariant.SetRange("Sales Blocked", false);
+        ExpectedVariantCount := ItemVariant.Count();
+        if Shop."UoM as Variant" then begin
+            ItemUnitofMeasure.SetRange("Item No.", Item."No.");
+            ExpectedVariantCount := ExpectedVariantCount * ItemUnitofMeasure.Count();
+        end;
+        if ExpectedVariantCount > MaxVariantCount then begin
+            SkippedRecord.LogSkippedRecord(Item.RecordId, StrSubstNo(TooManyVariantsLbl, MaxVariantCount), Shop);
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+
+    #region Shopify Product Options as Item/Variant Attributes
+    /// <summary>
+    /// Checks if item/item variant attributes marked as "As Option" are compatible to be used as product options in Shopify.
+    /// </summary>  
+    /// <param name="Item">The item to check.</param>
+    /// <returns>True if the item attributes are compatible, false otherwise.</returns>
+    internal procedure CheckItemAttributesCompatibleForProductOptions(Item: Record Item): Boolean
+    var
+        ItemAttributeIds: List of [Integer];
+        SkippedReason: Text[250];
+        TooManyAttributesAsOptionErr: Label 'Item %1 has %2 attributes marked as "As Option". Shopify supports a maximum of 3 product options.', Comment = '%1 = Item No., %2 = Number of attributes';
+        DuplicateOptionCombinationErr: Label 'Item %1 has duplicate item variant attribute value combinations. Each variant must have a unique combination of option values.', Comment = '%1 = Item No.';
+    begin
+        if Shop."UoM as Variant" then
+            exit(true);
+
+        GetItemAttributeIDsMarkedAsOption(Item, ItemAttributeIds);
+
+        if ItemAttributeIds.Count() = 0 then
+            exit(true);
+
+        if ItemAttributeIds.Count() > 3 then begin
+            SkippedRecord.LogSkippedRecord(Item.RecordId, StrSubstNo(TooManyAttributesAsOptionErr, Item."No.", ItemAttributeIds.Count()), Shop);
+            exit(false);
+        end;
+
+        if CheckMissingItemAttributeValues(Item, ItemAttributeIds, SkippedReason) then begin
+            SkippedRecord.LogSkippedRecord(Item.RecordId, SkippedReason, Shop);
+            exit(false);
+        end;
+
+        if CheckProductOptionDuplicatesExists(Item, ItemAttributeIds) then begin
+            SkippedRecord.LogSkippedRecord(Item.RecordId, StrSubstNo(DuplicateOptionCombinationErr, Item."No."), Shop);
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+
+    internal procedure GetItemAttributeIDsMarkedAsOption(Item: Record Item; var ItemAttributeIds: List of [Integer])
+    var
+        ItemAttribute: Record "Item Attribute";
+        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
+    begin
+        ItemAttributeValueMapping.SetLoadFields("Item Attribute ID");
+        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
+        ItemAttributeValueMapping.SetRange("No.", Item."No.");
+        if ItemAttributeValueMapping.FindSet() then
+            repeat
+                if ItemAttribute.Get(ItemAttributeValueMapping."Item Attribute ID") then
+                    if (not ItemAttribute.Blocked) and (ItemAttribute."Shpfy Incl. in Product Sync" = ItemAttribute."Shpfy Incl. in Product Sync"::"As Option") then
+                        if not ItemAttributeIds.Contains(ItemAttribute.ID) then
+                            ItemAttributeIds.Add(ItemAttribute.ID);
+            until ItemAttributeValueMapping.Next() = 0;
+    end;
+
+    local procedure CheckProductOptionDuplicatesExists(Item: Record Item; ItemAttributeIds: List of [Integer]): Boolean
+    var
+        ItemAttributeValue: Record "Item Attribute Value";
+        ItemVariant: Record "Item Variant";
+        ItemVarAttrValueMapping: Record "Item Var. Attr. Value Mapping";
+        VariantCombinations: Dictionary of [Text, Code[10]];
+        CombinationKey: Text;
+        VariantCode: Code[10];
+        AttributeId: Integer;
+        CombinationKeyTok: Label '%1:%2|', Locked = true, Comment = '%1 = Attribute ID, %2 = Attribute Value';
+    begin
+        ItemVariant.SetRange("Item No.", Item."No.");
+        if not ItemVariant.FindSet() then
+            exit(false);
+
+        repeat
+            VariantCode := ItemVariant.Code;
+
+            CombinationKey := '';
+            foreach AttributeId in ItemAttributeIds do begin
+                ItemVarAttrValueMapping.SetRange("Item No.", Item."No.");
+                ItemVarAttrValueMapping.SetRange("Variant Code", VariantCode);
+                ItemVarAttrValueMapping.SetRange("Item Attribute ID", AttributeId);
+                if ItemVarAttrValueMapping.FindFirst() then
+                    if ItemAttributeValue.Get(ItemVarAttrValueMapping."Item Attribute ID", ItemVarAttrValueMapping."Item Attribute Value ID") then
+                        CombinationKey += StrSubstNo(CombinationKeyTok, ItemAttributeValue."Attribute ID", ItemAttributeValue.Value);
+            end;
+
+            if CombinationKey <> '' then
+                if VariantCombinations.ContainsKey(CombinationKey) then
+                    exit(true)
+                else
+                    VariantCombinations.Add(CombinationKey, VariantCode);
+        until ItemVariant.Next() = 0;
+    end;
+
+    local procedure CheckMissingItemAttributeValues(Item: Record Item; ItemAttributeIds: List of [Integer]; var SkippedReason: Text[250]): Boolean
+    var
+        ItemAttribute: Record "Item Attribute";
+        ItemVariant: Record "Item Variant";
+        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
+        ItemVarAttrValueMapping: Record "Item Var. Attr. Value Mapping";
+        ItemAttributeValue: Record "Item Attribute Value";
+        AttributeId: Integer;
+        MissingVariantCode: Code[10];
+        MissingAttributeName: Text[250];
+        MissingAttributeErr: Label 'Item %1 Variant %2 is missing an attribute "%3". All item variants must have must have item attributes marked as "As Option".', Comment = '%1 = Item No., %2 = Variant Code, %3 = Attribute Name';
+        MissingItemAttributeValueErr: Label 'Item %1 is missing a value for attribute "%2". Item must have values for attributes marked as "As Option".', Comment = '%1 = Item No., %2 = Attribute Name';
+        MissingItemVarAttributeValueErr: Label 'Item %1 Variant %2 is missing a value for attribute "%3". All item variants must have values for attributes marked as "As Option".', Comment = '%1 = Item No., %2 = Variant Code, %3 = Attribute Name';
+    begin
+        ItemVariant.SetRange("Item No.", Item."No.");
+        if ItemVariant.FindSet() then
+            repeat
+                foreach AttributeId in ItemAttributeIds do begin
+                    ItemVarAttrValueMapping.SetRange("Item No.", Item."No.");
+                    ItemVarAttrValueMapping.SetRange("Variant Code", ItemVariant.Code);
+                    ItemVarAttrValueMapping.SetRange("Item Attribute ID", AttributeId);
+                    if not ItemVarAttrValueMapping.FindFirst() then begin
+                        MissingVariantCode := ItemVariant.Code;
+                        if ItemAttribute.Get(AttributeId) then
+                            MissingAttributeName := ItemAttribute.Name;
+                        SkippedReason := StrSubstNo(MissingAttributeErr, Item."No.", MissingVariantCode, MissingAttributeName);
+                        exit(true);
+                    end else
+                        if ItemAttributeValue.Get(ItemVarAttrValueMapping."Item Attribute ID", ItemVarAttrValueMapping."Item Attribute Value ID") then
+                            if ItemAttributeValue.Value = '' then begin
+                                MissingVariantCode := ItemVariant.Code;
+                                if ItemAttribute.Get(AttributeId) then
+                                    MissingAttributeName := ItemAttribute.Name;
+                                SkippedReason := StrSubstNo(MissingItemVarAttributeValueErr, Item."No.", MissingVariantCode, MissingAttributeName);
+                                exit(true);
+                            end;
+                end;
+            until ItemVariant.Next() = 0
+        else
+            foreach AttributeId in ItemAttributeIds do begin
+                ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
+                ItemAttributeValueMapping.SetRange("No.", Item."No.");
+                ItemAttributeValueMapping.SetRange("Item Attribute ID", AttributeId);
+                if ItemAttributeValueMapping.FindFirst() then
+                    if ItemAttributeValue.Get(ItemAttributeValueMapping."Item Attribute ID", ItemAttributeValueMapping."Item Attribute Value ID") then
+                        if ItemAttributeValue.Value = '' then begin
+                            if ItemAttribute.Get(AttributeId) then
+                                MissingAttributeName := ItemAttribute.Name;
+                            SkippedReason := StrSubstNo(MissingItemAttributeValueErr, Item."No.", MissingAttributeName);
+                            exit(true);
+                        end;
+            end;
+    end;
+
+    /// <summary> 
+    /// Fills product options for Shopify variants based on item attributes marked as "As Option".
+    /// </summary>
+    /// <param name="Item">The item to process.</param>
+    /// <param name="TempShopifyVariant">Parameter of Shopify Variants to fill.</param>
+    /// <param name="TempShopifyProduct">Parameter of Shopify Product.</param>
+    internal procedure FillProductOptionsForShopifyVariants(Item: Record Item; var TempShopifyVariant: Record "Shpfy Variant" temporary; var TempShopifyProduct: Record "Shpfy Product" temporary)
+    var
+        ItemVariant: Record "Item Variant";
+        ItemAttributeIds: List of [Integer];
+        VariantCode: Code[10];
+    begin
+        if Shop."UoM as Variant" then
+            exit;
+
+        GetItemAttributeIDsMarkedAsOption(Item, ItemAttributeIds);
+
+        if ItemAttributeIds.Count() = 0 then
+            exit;
+
+        if TempShopifyVariant.FindSet() then
+            repeat
+                VariantCode := '';
+                if not IsNullGuid(TempShopifyVariant."Item Variant SystemId") then
+                    if ItemVariant.GetBySystemId(TempShopifyVariant."Item Variant SystemId") then
+                        VariantCode := ItemVariant.Code;
+
+                FillProductOptionsFromItemAttributes(Item."No.", VariantCode, ItemAttributeIds, TempShopifyVariant);
+                TempShopifyVariant.Modify(false);
+            until TempShopifyVariant.Next() = 0;
+
+        TempShopifyProduct."Has Variants" := true;
+    end;
+
+    local procedure FillProductOptionsFromItemAttributes(ItemNo: Code[20]; VariantCode: Code[10]; ItemAttributeIds: List of [Integer]; var TempShopifyVariant: Record "Shpfy Variant" temporary)
+    var
+        ItemAttribute: Record "Item Attribute";
+        ItemAttributeValue: Record "Item Attribute Value";
+        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
+        ItemVarAttrValueMapping: Record "Item Var. Attr. Value Mapping";
+        OptionIndex: Integer;
+        AttributeId: Integer;
+    begin
+        OptionIndex := 1;
+        foreach AttributeId in ItemAttributeIds do
+            if ItemAttribute.Get(AttributeId) then begin
+                if VariantCode <> '' then begin
+                    ItemVarAttrValueMapping.SetRange("Item No.", ItemNo);
+                    ItemVarAttrValueMapping.SetRange("Variant Code", VariantCode);
+                    ItemVarAttrValueMapping.SetRange("Item Attribute ID", AttributeId);
+                    if ItemVarAttrValueMapping.FindFirst() then
+                        if ItemAttributeValue.Get(ItemVarAttrValueMapping."Item Attribute ID", ItemVarAttrValueMapping."Item Attribute Value ID") then
+                            AssignProductOptionValues(TempShopifyVariant, OptionIndex, ItemAttribute.Name, ItemAttributeValue.Value);
+                end else begin
+                    ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
+                    ItemAttributeValueMapping.SetRange("No.", ItemNo);
+                    ItemAttributeValueMapping.SetRange("Item Attribute ID", AttributeId);
+                    if ItemAttributeValueMapping.FindFirst() then
+                        if ItemAttributeValue.Get(ItemAttributeValueMapping."Item Attribute ID", ItemAttributeValueMapping."Item Attribute Value ID") then
+                            AssignProductOptionValues(TempShopifyVariant, OptionIndex, ItemAttribute.Name, ItemAttributeValue.Value);
+                end;
+                OptionIndex += 1;
+            end;
+    end;
+
+    local procedure AssignProductOptionValues(var TempShopifyVariant: Record "Shpfy Variant" temporary; OptionIndex: Integer; AttributeName: Text[250]; AttributeValue: Text[250])
+    begin
+        case OptionIndex of
+            1:
+                begin
+                    TempShopifyVariant."Option 1 Name" := CopyStr(AttributeName, 1, MaxStrLen(TempShopifyVariant."Option 1 Name"));
+                    TempShopifyVariant."Option 1 Value" := CopyStr(AttributeValue, 1, MaxStrLen(TempShopifyVariant."Option 1 Value"));
+                end;
+            2:
+                begin
+                    TempShopifyVariant."Option 2 Name" := CopyStr(AttributeName, 1, MaxStrLen(TempShopifyVariant."Option 2 Name"));
+                    TempShopifyVariant."Option 2 Value" := CopyStr(AttributeValue, 1, MaxStrLen(TempShopifyVariant."Option 2 Value"));
+                end;
+            3:
+                begin
+                    TempShopifyVariant."Option 3 Name" := CopyStr(AttributeName, 1, MaxStrLen(TempShopifyVariant."Option 3 Name"));
+                    TempShopifyVariant."Option 3 Value" := CopyStr(AttributeValue, 1, MaxStrLen(TempShopifyVariant."Option 3 Value"));
+                end;
+        end;
+    end;
+
+
+    /// <summary> 
+    /// Validates item attributes and prepares temporary Shopify variant by assigning product option values from Item/Item Variant.
+    /// </summary>
+    /// <param name="TempShopifyVariant">Parameter of type Record "Shpfy Variant" temporary.</param>
+    /// <param name="Item">Parameter of type Record Item.</param>   
+    /// <param name="ItemVariant">Parameter of type Record "Item Variant".</param>
+    /// <param name="ShopifyProductId">Parameter of type BigInteger.</param>
+    internal procedure ValidateItemAttributesAsProductOptionsForNewVariant(var TempShopifyVariant: Record "Shpfy Variant" temporary; Item: Record Item; ItemVariantCode: Code[10]; ShopifyProductId: BigInteger): Boolean
+    var
+        ProductOptions: Dictionary of [Integer, Text];
+        ExistingProductOptionValues: Dictionary of [Text, Text];
+        ProductOptionIndex: Integer;
+    begin
+        if Shop."UoM as Variant" then
+            exit(true);
+
+        CollectExistingProductVariantOptionValues(ProductOptions, ExistingProductOptionValues, ShopifyProductId);
+
+        for ProductOptionIndex := 1 to ProductOptions.Count() do
+            if not AssignProductOptionValuesToTempProductVariant(TempShopifyVariant, Item, ItemVariantCode, ProductOptions, ProductOptionIndex) then
+                exit(false);
+
+        if not CheckProductOptionsCombinationUnique(TempShopifyVariant, ExistingProductOptionValues, Item, ItemVariantCode) then
+            exit(false);
+
+        exit(true);
+    end;
+
+    local procedure CollectExistingProductVariantOptionValues(var ProductOptions: Dictionary of [Integer, Text]; var ExistingProductOptionValues: Dictionary of [Text, Text]; ShopifyProductId: BigInteger)
+    var
+        ShopifyVariant: Record "Shpfy Variant";
+        ItemAttribute: Record "Item Attribute";
+        CombinationKey: Text;
+    begin
+        ShopifyVariant.SetAutoCalcFields("Variant Code");
+        ShopifyVariant.SetRange("Product Id", ShopifyProductId);
+        if ShopifyVariant.FindSet() then
+            repeat
+                CombinationKey := BuildCombinationKey(
+                    ShopifyVariant."Option 1 Name", ShopifyVariant."Option 1 Value",
+                    ShopifyVariant."Option 2 Name", ShopifyVariant."Option 2 Value",
+                    ShopifyVariant."Option 3 Name", ShopifyVariant."Option 3 Value");
+
+                if not ExistingProductOptionValues.ContainsKey(CombinationKey) then
+                    ExistingProductOptionValues.Add(CombinationKey, ShopifyVariant."Variant Code");
+            until ShopifyVariant.Next() = 0;
+
+        if ShopifyVariant."Option 1 Name" <> '' then begin
+            ItemAttribute.SetRange(Name, ShopifyVariant."Option 1 Name");
+            if ItemAttribute.FindFirst() then
+                ProductOptions.Add(ItemAttribute.ID, ShopifyVariant."Option 1 Name");
+        end;
+        if ShopifyVariant."Option 2 Name" <> '' then begin
+            ItemAttribute.SetRange(Name, ShopifyVariant."Option 2 Name");
+            if ItemAttribute.FindFirst() then
+                ProductOptions.Add(ItemAttribute.ID, ShopifyVariant."Option 2 Name");
+        end;
+        if ShopifyVariant."Option 3 Name" <> '' then begin
+            ItemAttribute.SetRange(Name, ShopifyVariant."Option 3 Name");
+            if ItemAttribute.FindFirst() then
+                ProductOptions.Add(ItemAttribute.ID, ShopifyVariant."Option 3 Name");
+        end;
+    end;
+
+    local procedure BuildCombinationKey(Option1Name: Text; Option1Value: Text; Option2Name: Text; Option2Value: Text; Option3Name: Text; Option3Value: Text): Text
+    var
+        CombinationKey: Text;
+        KeyPartTok: Label '%1:%2|', Locked = true, Comment = '%1 = Option Name, %2 = Option Value';
+    begin
+        if Option1Name <> '' then
+            CombinationKey += StrSubstNo(KeyPartTok, Option1Name, Option1Value);
+        if Option2Name <> '' then
+            CombinationKey += StrSubstNo(KeyPartTok, Option2Name, Option2Value);
+        if Option3Name <> '' then
+            CombinationKey += StrSubstNo(KeyPartTok, Option3Name, Option3Value);
+
+        exit(CombinationKey);
+    end;
+
+    local procedure AssignProductOptionValuesToTempProductVariant(var TempShopifyVariant: Record "Shpfy Variant" temporary; Item: Record "Item"; ItemVariantCode: Code[10]; ProductOptions: Dictionary of [Integer, Text]; ProductOptionIndex: Integer): Boolean
+    var
+        ItemVariant: Record "Item Variant";
+        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
+        ItemVarAttrValueMapping: Record "Item Var. Attr. Value Mapping";
+        ItemAttributeValue: Record "Item Attribute Value";
+        ItemWithoutRequiredAttributeErr: Label 'Item %1 cannot be added as a product variant because it does not have required attributes.', Comment = '%1 = Item No.';
+        ItemWithoutRequiredAttributeValueErr: Label 'Item %1 cannot be added as a product variant because it does not have a value for the required attributes.', Comment = '%1 = Item No.';
+        ItemVariantWithoutRequiredAttributeErr: Label 'Item Variant %1 cannot be added as a product variant because it does not have required attributes.', Comment = '%1 = Item No.';
+        ItemVariantWithoutRequiredAttributeValueErr: Label 'Item Variant %1 cannot be added as a product variant because it does not have a value for the required attributes.', Comment = '%1 = Item No.';
+    begin
+        ItemVariant.SetRange("Item No.", Item."No.");
+        ItemVariant.SetRange("Code", ItemVariantCode);
+        if ItemVariant.FindFirst() then begin
+            ItemVarAttrValueMapping.SetRange("Item No.", Item."No.");
+            ItemVarAttrValueMapping.SetRange("Variant Code", ItemVariant."Code");
+            ItemVarAttrValueMapping.SetRange("Item Attribute ID", ProductOptions.Keys.Get(ProductOptionIndex));
+            if ItemVarAttrValueMapping.FindFirst() then begin
+                if ItemAttributeValue.Get(ItemVarAttrValueMapping."Item Attribute ID", ItemVarAttrValueMapping."Item Attribute Value ID") then begin
+                    ItemAttributeValue.CalcFields("Attribute Name");
+                    AssignProductOptionValues(TempShopifyVariant, ProductOptionIndex, ItemAttributeValue."Attribute Name", ItemAttributeValue.Value);
+                end else begin
+                    SkippedRecord.LogSkippedRecord(Item.RecordId(), StrSubstNo(ItemVariantWithoutRequiredAttributeValueErr, Item."No."), Shop);
+                    exit(false);
+                end;
+            end else begin
+                SkippedRecord.LogSkippedRecord(Item.RecordId(), StrSubstNo(ItemVariantWithoutRequiredAttributeErr, Item."No."), Shop);
+                exit(false);
+            end;
+        end else begin
+            ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
+            ItemAttributeValueMapping.SetRange("No.", Item."No.");
+            ItemAttributeValueMapping.SetRange("Item Attribute ID", ProductOptions.Keys.Get(ProductOptionIndex));
+            if ItemAttributeValueMapping.FindFirst() then begin
+                if ItemAttributeValue.Get(ItemAttributeValueMapping."Item Attribute ID", ItemAttributeValueMapping."Item Attribute Value ID") then begin
+                    ItemAttributeValue.CalcFields("Attribute Name");
+                    AssignProductOptionValues(TempShopifyVariant, ProductOptionIndex, ItemAttributeValue."Attribute Name", ItemAttributeValue.Value);
+                end else begin
+                    SkippedRecord.LogSkippedRecord(Item.RecordId(), StrSubstNo(ItemWithoutRequiredAttributeValueErr, Item."No."), Shop);
+                    exit(false);
+                end;
+            end else begin
+                SkippedRecord.LogSkippedRecord(Item.RecordId(), StrSubstNo(ItemWithoutRequiredAttributeErr, Item."No."), Shop);
+                exit(false);
+            end;
+        end;
+
+        exit(true);
+    end;
+
+    local procedure CheckProductOptionsCombinationUnique(var TempShopifyVariant: Record "Shpfy Variant" temporary; ExistingProductOptionValues: Dictionary of [Text, Text]; Item: Record "Item"; ItemVariantCode: Code[10]): Boolean
+    var
+        ItemVariant: Record "Item Variant";
+        CombinationKey: Text;
+        DuplicateItemCombinationErr: Label 'Item %1 cannot be added as a product variant because another variant already has the same option values.', Comment = '%1 = Item No.';
+        DuplicateItemVarCombinationErr: Label 'Item %1 cannot be added as a product variant because another variant already has the same option values.', Comment = '%1 = Item No.';
+    begin
+        CombinationKey := BuildCombinationKey(
+            TempShopifyVariant."Option 1 Name", TempShopifyVariant."Option 1 Value",
+            TempShopifyVariant."Option 2 Name", TempShopifyVariant."Option 2 Value",
+            TempShopifyVariant."Option 3 Name", TempShopifyVariant."Option 3 Value");
+
+        if ExistingProductOptionValues.ContainsKey(CombinationKey) then begin
+            if ItemVariant.Get(Item."No.", ItemVariantCode) then
+                SkippedRecord.LogSkippedRecord(ItemVariant.RecordId(), StrSubstNo(DuplicateItemVarCombinationErr, Item."No."), Shop)
+            else
+                SkippedRecord.LogSkippedRecord(Item.RecordId(), StrSubstNo(DuplicateItemCombinationErr, Item."No."), Shop);
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+    #endregion
+
+    internal procedure GetCountryISOCode(CountryRegionCode: Code[10]): Code[10]
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        if CountryRegionCode = '' then
+            exit('');
+        if CountryRegion.Get(CountryRegionCode) then
+            exit(CountryRegion."ISO Code");
+        exit(CountryRegionCode);
+    end;
 }

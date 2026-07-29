@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-enum 88066 "Shpfy Resource Type" implements "Shpfy ICreate Translation"
+namespace Microsoft.Integration.Shopify;
+
+enum 30161 "Shpfy Resource Type" implements "Shpfy ICreate Translation"
 {
     Access = Internal;
     Caption = 'Shopify  Resource Type';

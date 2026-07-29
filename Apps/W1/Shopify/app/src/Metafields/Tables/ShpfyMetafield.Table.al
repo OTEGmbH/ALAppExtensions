@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Finance.GeneralLedger.Setup;
 
 /// <summary>
 /// Table Shpfy Metafield (ID 30101).
 /// </summary>
-table 88025 "Shpfy Metafield"
+table 30101 "Shpfy Metafield"
 {
     Caption = 'Shopify Metafield';
     DataClassification = CustomerContent;
@@ -20,13 +25,11 @@ table 88025 "Shpfy Metafield"
             DataClassification = SystemMetadata;
             Editable = false;
         }
-#pragma warning disable AS0086 // false positive on extending the field length on internal table
         field(2; Namespace; Text[255])
         {
             Caption = 'Namespace';
             DataClassification = SystemMetadata;
         }
-#pragma warning restore AS0086
 
 #if not CLEANSCHEMA28
         field(3; "Owner Resource"; Text[50])
@@ -34,26 +37,8 @@ table 88025 "Shpfy Metafield"
             Caption = 'Owner Resource';
             DataClassification = SystemMetadata;
             ObsoleteReason = 'Owner Resource is obsolete. Use Owner Type instead.';
-#if CLEAN25
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#endif
-#if not CLEAN25
-            trigger OnValidate()
-            begin
-                case "Owner Resource" of
-                    'Customer':
-                        Validate("Owner Type", "Owner Type"::Customer);
-                    'Product':
-                        Validate("Owner Type", "Owner Type"::Product);
-                    'Variant':
-                        Validate("Owner Type", "Owner Type"::ProductVariant);
-                end;
-            end;
-#endif
         }
 #endif
 
@@ -69,25 +54,19 @@ table 88025 "Shpfy Metafield"
             Caption = 'Key';
             DataClassification = CustomerContent;
         }
-#pragma warning restore AS0086
 
 #if not CLEANSCHEMA28
-#pragma warning disable AS0105
+#pragma warning disable AS0105,AL0432
         field(6; "Value Type"; Enum "Shpfy Metafield Value Type")
         {
             Caption = 'Value Type';
             DataClassification = CustomerContent;
             ObsoleteReason = 'Value Type is obsolete in Shopify API. Use Type instead.';
-#if CLEAN25
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#endif
         }
 #endif
-#pragma warning restore AS0105
+#pragma warning restore AS0105,AL0432
 
 #pragma warning disable AS0086 // false positive on extending the field length on internal table
         field(7; Value; Text[2048])
@@ -108,7 +87,6 @@ table 88025 "Shpfy Metafield"
                     CheckShopCurrency(Value);
             end;
         }
-#pragma warning restore AS0086
         field(8; Type; Enum "Shpfy Metafield Type")
         {
             Caption = 'Type';
@@ -152,19 +130,6 @@ table 88025 "Shpfy Metafield"
                 "Owner Type" := GetOwnerType("Parent Table No.");
             end;
         }
-        //OTE Metafield 13.10.2025 JR START
-        field(88000; "Metafield Values"; text[1024])
-        {
-
-        }
-        field(88001; "List Metafield"; boolean)
-        {
-            Caption = 'List Metafield';
-            DataClassification = CustomerContent;
-            Editable = false;
-            InitValue = false;
-        }
-        //OTE Metafield 13.10.2025 JR STOP 
     }
 
     keys

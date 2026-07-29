@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Transaction Gateways (ID 30133).
 /// </summary>
-page 88068 "Shpfy Transaction Gateways"
+page 30133 "Shpfy Transaction Gateways"
 {
 
     Caption = 'Shopify Transaction Gateways';

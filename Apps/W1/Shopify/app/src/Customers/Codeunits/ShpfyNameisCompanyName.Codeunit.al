@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy Name is CompanyName (ID 30120) implements Interface Shpfy ICustomer Name.
 /// </summary>
-codeunit 88040 "Shpfy Name is CompanyName" implements "Shpfy ICustomer Name"
+codeunit 30120 "Shpfy Name is CompanyName" implements "Shpfy ICustomer Name"
 {
     Access = Internal;
 

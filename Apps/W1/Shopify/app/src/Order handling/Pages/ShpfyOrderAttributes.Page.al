@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Order Attributes (ID 30114).
 /// </summary>
-page 88040 "Shpfy Order Attributes"
+page 30114 "Shpfy Order Attributes"
 {
 
     Caption = 'Shopify Order Attributes';

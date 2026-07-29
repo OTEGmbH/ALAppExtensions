@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using System.Reflection;
 
-table 88038 "Shpfy Refund Header"
+table 30142 "Shpfy Refund Header"
 {
     Caption = 'Refund Header';
     DataClassification = SystemMetadata;
@@ -25,13 +30,13 @@ table 88038 "Shpfy Refund Header"
         }
         field(3; "Created At"; DateTime)
         {
-            Caption = 'Created At';
+            Caption = 'Created At (Shopify)';
             DataClassification = SystemMetadata;
             Editable = false;
         }
         field(4; "Updated At"; DateTime)
         {
-            Caption = 'Updated At';
+            Caption = 'Updated At (Shopify)';
             DataClassification = SystemMetadata;
             Editable = false;
         }
@@ -46,12 +51,17 @@ table 88038 "Shpfy Refund Header"
             Caption = 'Total Refunded Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = OrderCurrencyCode();
         }
         field(7; "Pres. Tot. Refunded Amount"; Decimal)
         {
             Caption = 'Presentment Total Refunded Amount';
             DataClassification = SystemMetadata;
             Editable = false;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Presentment Currency Code";
+            ToolTip = 'Specifies the total amount in presentment currency across all transactions for the refund.';
         }
         field(8; Note; Blob)
         {
@@ -73,6 +83,11 @@ table 88038 "Shpfy Refund Header"
         field(51; "Last Error Description"; Blob)
         {
             Caption = 'Last Error Description';
+            DataClassification = SystemMetadata;
+        }
+        field(52; "Last Error Call Stack"; Blob)
+        {
+            Caption = 'Last Error Call Stack';
             DataClassification = SystemMetadata;
         }
         field(101; "Sell-to Customer No."; Code[20])
@@ -124,12 +139,24 @@ table 88038 "Shpfy Refund Header"
             CalcFormula = exist("Shpfy Doc. Link To Doc." where("Shopify Document Type" = const("Shopify Shop Refund"), "Shopify Document Id" = field("Refund Id")));
             Editable = false;
         }
+        field(108; "Currency Code"; Code[10])
+        {
+            Caption = 'Currency Code';
+        }
+        field(109; "Presentment Currency Code"; Code[10])
+        {
+            Caption = 'Presentment Currency Code';
+            ToolTip = 'Specifies the presentment currency code for the refund.';
+        }
     }
     keys
     {
         key(PK; "Refund Id")
         {
             Clustered = true;
+        }
+        key(Key1; "Created At")
+        {
         }
     }
 
@@ -139,11 +166,11 @@ table 88038 "Shpfy Refund Header"
         RefundShippingLine: Record "Shpfy Refund Shipping Line";
         DataCapture: Record "Shpfy Data Capture";
     begin
-        RefundLine.SetRange("Refund Id");
+        RefundLine.SetRange("Refund Id", Rec."Refund Id");
         if not RefundLine.IsEmpty() then
             RefundLine.DeleteAll(true);
 
-        RefundShippingLine.SetRange("Refund Id");
+        RefundShippingLine.SetRange("Refund Id", Rec."Refund Id");
         if not RefundShippingLine.IsEmpty() then
             RefundShippingLine.DeleteAll(true);
 
@@ -184,6 +211,16 @@ table 88038 "Shpfy Refund Header"
         exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator()));
     end;
 
+    internal procedure GetLastErrorCallStack(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStream: InStream;
+    begin
+        CalcFields("Last Error Call Stack");
+        "Last Error Call Stack".CreateInStream(InStream, TextEncoding::UTF8);
+        exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator()));
+    end;
+
     internal procedure SetLastErrorDescription(NewLastErrorDescription: Text)
     var
         OutStream: OutStream;
@@ -195,6 +232,16 @@ table 88038 "Shpfy Refund Header"
         Modify();
     end;
 
+    internal procedure SetLastErrorCallStack(NewLastErrorCallStack: Text)
+    var
+        OutStream: OutStream;
+    begin
+        Clear("Last Error Call Stack");
+        "Last Error Call Stack".CreateOutStream(OutStream, TextEncoding::UTF8);
+        OutStream.WriteText(NewLastErrorCallStack);
+        Modify();
+    end;
+
     internal procedure CheckCanCreateDocument(): Boolean
     var
         DocLinkToBCDoc: Record "Shpfy Doc. Link To Doc.";
@@ -203,5 +250,13 @@ table 88038 "Shpfy Refund Header"
         DocLinkToBCDoc.SetRange("Shopify Document Id", Rec."Refund Id");
         DocLinkToBCDoc.SetCurrentKey("Shopify Document Type", "Shopify Document Id");
         exit(DocLinkToBCDoc.IsEmpty);
+    end;
+
+    local procedure OrderCurrencyCode(): Code[10]
+    var
+        OrderHeader: Record "Shpfy Order Header";
+    begin
+        if OrderHeader.Get("Order Id") then
+            exit(OrderHeader."Currency Code");
     end;
 }

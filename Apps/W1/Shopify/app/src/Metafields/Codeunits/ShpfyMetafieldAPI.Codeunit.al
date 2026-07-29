@@ -1,8 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using OTE.Shopify;
+namespace Microsoft.Integration.Shopify;
 
-codeunit 88238 "Shpfy Metafield API"
+codeunit 30316 "Shpfy Metafield API"
 {
     Access = Internal;
 
@@ -10,8 +13,6 @@ codeunit 88238 "Shpfy Metafield API"
         Shop: Record "Shpfy Shop";
         JsonHelper: Codeunit "Shpfy Json Helper";
         CommunicationMgt: Codeunit "Shpfy Communication Mgt.";
-        G_ShpfyMetafield: Record "Shpfy Metafield";
-        G_MetafieldViewSet: boolean;
 
 
     internal procedure SetShop(ShopifyShop: Record "Shpfy Shop")
@@ -20,7 +21,42 @@ codeunit 88238 "Shpfy Metafield API"
         CommunicationMgt.SetShop(Shop);
     end;
 
+    local procedure SetShop(ShopCode: Code[20])
+    begin
+        Shop.Get(ShopCode);
+        SetShop(Shop);
+    end;
+
     #region To Shopify
+    internal procedure SyncMetafieldToShopify(var Metafield: Record "Shpfy Metafield"; ShopCode: Code[20]): BigInteger
+    var
+        UserErrorOnShopifyErr: Label 'Something went wrong while sending the metafield to Shopify. Check Shopify Log Entries for more details.';
+        GraphQuery: TextBuilder;
+        JResponse: JsonToken;
+        JMetafields: JsonArray;
+        JUserErrors: JsonArray;
+        JItem: JsonToken;
+    begin
+        SetShop(ShopCode);
+        CreateMetafieldQuery(Metafield, GraphQuery);
+        JResponse := UpdateMetafields(GraphQuery.ToText());
+
+        JsonHelper.GetJsonArray(JResponse, JUserErrors, 'data.metafieldsSet.userErrors');
+
+        if JUserErrors.Count() = 0 then begin
+            JsonHelper.GetJsonArray(JResponse, JMetafields, 'data.metafieldsSet.metafields');
+            JMetafields.Get(0, JItem);
+            exit(JsonHelper.GetValueAsBigInteger(JItem, 'legacyResourceId'));
+        end else
+            Error(UserErrorOnShopifyErr);
+    end;
+
+    internal procedure SyncMetafieldsToShopify(ParentTableNo: Integer; OwnerId: BigInteger; ShopCode: Code[20])
+    begin
+        SetShop(ShopCode);
+        CreateOrUpdateMetafieldsInShopify(ParentTableNo, OwnerId);
+    end;
+
     /// <summary>
     /// Creates or updates the metafields in Shopify.
     /// </summary>
@@ -38,22 +74,8 @@ codeunit 88238 "Shpfy Metafield API"
         Count: Integer;
         GraphQuery: TextBuilder;
     begin
-        //OTE Update marked Metafields 28.08.2025 JR START
-
-        if (G_MetafieldViewSet) and (G_ShpfyMetafield.GetFilters <> '') then begin
-            if G_ShpfyMetafield.findset(false) then
-                repeat
-                    TempMetafieldSet := G_ShpfyMetafield;
-                    TempMetafieldSet.Insert(false);
-                until G_ShpfyMetafield.Next() = 0;
-            //OTE Update marked Metafields 28.08.2025 JR STOP 
-        end else begin
-            MetafieldIds := RetrieveMetafieldsFromShopify(ParentTableId, OwnerId);
-            //OTE Auto Update Metafields by mapping 10.07.2025 JR START
-            OnAfterRetrieveMetafieldsFromShopify(ParentTableId, OwnerId, MetafieldIds);
-            //OTE Auto Update Metafields by mapping 10.07.2025 JR STOP 
-            CollectMetafieldsInBC(ParentTableId, OwnerId, TempMetafieldSet, MetafieldIds);
-        end;
+        MetafieldIds := RetrieveMetafieldsFromShopify(ParentTableId, OwnerId);
+        CollectMetafieldsInBC(ParentTableId, OwnerId, TempMetafieldSet, MetafieldIds);
 
         // MetafieldsSet mutation only accepts 25 metafields at a time
         Continue := true;
@@ -77,14 +99,6 @@ codeunit 88238 "Shpfy Metafield API"
                 UpdateMetafields(GraphQuery.ToText());
             end;
     end;
-
-    //OTE JR 28.08.2025 JR START
-    procedure SetMetafieldFilterView(var _ShpfyMetafield: Record "Shpfy Metafield")
-    begin
-        G_ShpfyMetafield.Copy(_ShpfyMetafield);
-        G_MetafieldViewSet := true;
-    end;
-    //OTE JR 28.08.2025 JR STOP 
 
     local procedure GetMaxMetafieldsToUpdate(): Integer
     begin
@@ -132,7 +146,7 @@ codeunit 88238 "Shpfy Metafield API"
         Parameters: Dictionary of [Text, Text];
     begin
         Parameters.Add('Metafields', MetafieldsQuery);
-        JResponse := CommunicationMgt.ExecuteGraphQL(Enum::"Shpfy GraphQL Type"::MetafieldSet, Parameters);
+        JResponse := CommunicationMgt.ExecuteGraphQL(Enum::"Shpfy GraphQL Type"::Metafields_MetafieldSet, Parameters);
     end;
 
     /// <summary>
@@ -141,9 +155,6 @@ codeunit 88238 "Shpfy Metafield API"
     /// <param name="MetafieldSet">Metafield record to create the query for.</param>
     /// <param name="GraphQuery">Return value: TextBuilder to append the query to.</param>
     internal procedure CreateMetafieldQuery(MetafieldSet: Record "Shpfy Metafield"; GraphQuery: TextBuilder)
-    var
-        ShpfyProductEvents: Codeunit "Shpfy Product Events";
-        ishandled: boolean;
     begin
         GraphQuery.Append('{');
         GraphQuery.Append('key: \"');
@@ -157,26 +168,13 @@ codeunit 88238 "Shpfy Metafield API"
         GraphQuery.Append('/');
         GraphQuery.Append(Format(MetafieldSet."Owner Id"));
         GraphQuery.Append('\",');
-        //OTE Metafield Formatting 28.10.2025 JR START
-        ShpfyProductEvents.OnBeforeAddMetafieldValueToGraphQL(MetafieldSet, GraphQuery, isHandled);
-        //OTE Metafield Formatting 28.10.2025 JR STOP
-        if not ishandled then begin
-            GraphQuery.Append('value: \"');
-            GraphQuery.Append(EscapeGrapQLData(MetafieldSet.Value));
-            GraphQuery.Append('\",');
-        end;
+        GraphQuery.Append('value: \"');
+        GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(MetafieldSet.Value));
+        GraphQuery.Append('\",');
         GraphQuery.Append('type: \"');
-        if MetafieldSet."List Metafield" then
-            GraphQuery.Append('list.' + GetTypeName(MetafieldSet.Type))
-        else
-            GraphQuery.Append(GetTypeName(MetafieldSet.Type));
+        GraphQuery.Append(GetTypeName(MetafieldSet.Type));
         GraphQuery.Append('\"');
         GraphQuery.Append('},');
-    end;
-
-    local procedure EscapeGrapQLData(Data: Text): Text
-    begin
-        exit(Data.Replace('\', '\\\\').Replace('"', '\\\"'));
     end;
 
     local procedure GetTypeName(Type: Enum "Shpfy Metafield Type"): Text
@@ -206,13 +204,18 @@ codeunit 88238 "Shpfy Metafield API"
         CollectMetafieldIds(ParentTableNo, OwnerId, MetafieldIds);
 
         foreach JItem in JMetafields do begin
-            if JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node') then begin
-                MetafieldId := UpdateMetadataField(ParentTableNo, OwnerId, JNode);
-                MetafieldIds.Remove(MetafieldId);
-            end;
+            JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node');
+            MetafieldId := UpdateMetadataField(ParentTableNo, OwnerId, JNode);
+            MetafieldIds.Remove(MetafieldId);
         end;
 
         DeleteUnusedMetafields(MetafieldIds);
+    end;
+
+    internal procedure GetMetafieldDefinitions(ParentTableNo: Integer; OwnerId: BigInteger; ShopCode: Code[20])
+    begin
+        SetShop(ShopCode);
+        GetMetafieldDefinitions(ParentTableNo, OwnerId);
     end;
 
     /// <summary>
@@ -224,7 +227,7 @@ codeunit 88238 "Shpfy Metafield API"
     ///</remarks>
     /// <param name="ParentTableNo">Table id of the parent resource.</param>
     /// <param name="OwnerId">Id of the parent resource.</param>
-    internal procedure GetMetafieldDefinitions(ParentTableNo: Integer; OwnerId: BigInteger)
+    local procedure GetMetafieldDefinitions(ParentTableNo: Integer; OwnerId: BigInteger)
     var
         Metafield: Record "Shpfy Metafield";
         OwnerType: Enum "Shpfy Metafield Owner Type";
@@ -236,28 +239,22 @@ codeunit 88238 "Shpfy Metafield API"
     begin
         OwnerType := Metafield.GetOwnerType(ParentTableNo);
         Parameters.Add('OwnerType', UpperCase(OwnerType.Names().Get(OwnerType.Ordinals.IndexOf(OwnerType.AsInteger()))));
-        JResponse := CommunicationMgt.ExecuteGraphQL(Enum::"Shpfy GraphQL Type"::GetMetafieldDefinitions, Parameters);
+        JResponse := CommunicationMgt.ExecuteGraphQL(Enum::"Shpfy GraphQL Type"::Metafields_GetMetafieldDefinitions, Parameters);
 
         if JsonHelper.GetJsonArray(JResponse, JMetafields, 'data.metafieldDefinitions.edges') then
             foreach JMetafield in JMetafields do begin
-                if JsonHelper.GetJsonObject(JMetafield.AsObject(), JNode, 'node') then
-                    CreateMetafieldDefinition(ParentTableNo, OwnerId, JNode);
+                JsonHelper.GetJsonObject(JMetafield.AsObject(), JNode, 'node');
+                CreateMetafieldDefinition(ParentTableNo, OwnerId, JNode);
             end;
-
-
     end;
 
     local procedure CreateMetafieldDefinition(ParentTableNo: Integer; OwnerId: BigInteger; JNode: JsonObject)
     var
         Metafield: Record "Shpfy Metafield";
         Type: Enum "Shpfy Metafield Type";
-        ShpfyOTESetup: Record "Shpfy OTE Setup";
         Namespace: Text;
         Name: Text;
         TypeText: Text;
-        JValidations: JsonArray;
-        JValidation: JsonToken;
-    // JResponse: JsonToken;
     begin
         Namespace := JsonHelper.GetValueAsText(JNode, 'namespace');
         Name := JsonHelper.GetValueAsText(JNode, 'key');
@@ -272,168 +269,24 @@ codeunit 88238 "Shpfy Metafield API"
         Metafield.SetRange(Namespace, Namespace);
         Metafield.SetRange(Name, Name);
         Metafield.SetRange(Type, Type);
-        if not Metafield.findfirst() then begin
-            // exit;
-
-            Metafield.Validate("Parent Table No.", ParentTableNo);
-            Metafield."Owner Id" := OwnerId;
-            //OTE Metafield 13.10.2025 JR START
-            Metafield."List Metafield" := TypeText.Contains('list');
-            //OTE Metafield 13.10.2025 JR STOP 
-            Metafield.Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
-            Metafield.Type := Type;
-#pragma warning disable AA0139
-            Metafield."Namespace" := Namespace;
-            Metafield.Name := Name;
-#pragma warning restore AA0139
-            Metafield.Insert(true);
-        end else begin
-            if Metafield."List Metafield" <> TypeText.Contains('list') then begin
-                Metafield."List Metafield" := TypeText.Contains('list');
-                Metafield.Modify(true);
-            end;
-        end;
-        //OTE Metafield 09.10.2025 JR START
-        if ShpfyOTESetup.get() then
-            if ShpfyOTESetup."Get Metafield Values" then
-                if JsonHelper.GetJsonArray(JNode, JValidations, 'validations') then
-                    foreach JValidation in JValidations do begin
-                        // Process each validation
-                        CreateOrUpdateMetafieldValues(JValidation, Metafield);
-                    end;
-        //OTE Metafield 09.10.2025 JR STOP 
-
-    end;
-
-    //OTE Metafield 09.10.2025 JR START
-    local procedure CreateOrUpdateMetafieldValues(jValidation: JsonToken; _ShpfyMetafield: Record "Shpfy Metafield")
-    var
-        ShpfyMetafieldValue: Record "Shpfy Metafield Value";
-        ShpfyCommunicationMgt: Codeunit "Shpfy Communication Mgt.";
-        jObject: JsonObject;
-        jArray: JsonArray;
-        jValue: JsonToken;
-        valuetext: text;
-        ValueString: text;
-        tb: TextBuilder;
-    begin
-        jObject := jValidation.AsObject();
-        ValueString := JsonHelper.GetValueAsText(jObject, 'value');
-        if ValueString.ToLower().Contains('metaobjectdefinition') then begin
-            //Build Metafield definition query
-            tb.AppendLine('{');
-            tb.append(StrSubstNo(' "query": "query { metaobjectDefinition(id: \"%1\")', ValueString));
-            tb.append('{ id name type metaobjects(first: 50) { edges { node { id handle displayName fields { key value type } } } } } }" }');
-            jValidation := ShpfyCommunicationMgt.ExecuteGraphQL(tb.ToText());
-            // edges := JsonHelper.GetJsonArray(jValidation, 'data.metaobjectDefinition.metaobjects.edges');
-            ProcessMetaobjectDefinition(jValidation, _ShpfyMetafield);
+        if not Metafield.IsEmpty() then
             exit;
-        end;
-        // Handle regular array values (your existing logic)
-        if jArray.ReadFrom(ValueString) then begin
-            foreach jValue in jArray do begin
-                ValueText := jValue.AsValue().AsText();
-                CreateSingleMetafieldValue(_ShpfyMetafield, ValueText, '', '', '');
-            end;
-        end;
+
+        Metafield.Validate("Parent Table No.", ParentTableNo);
+        Metafield."Owner Id" := OwnerId;
+        Metafield.Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
+        Metafield.Type := Type;
+#pragma warning disable AA0139
+        Metafield."Namespace" := Namespace;
+        Metafield.Name := Name;
+#pragma warning restore AA0139
+        Metafield.Insert(true);
     end;
-
-    local procedure ProcessMetaobjectDefinition(JResponse: JsonToken; _ShpfyMetafield: Record "Shpfy Metafield")
-    var
-        JEdges: JsonArray;
-        JEdge: JsonToken;
-        JNode: JsonObject;
-        JFields: JsonArray;
-        JField: JsonToken;
-        NodeId: Text;
-        Handle: Text;
-        DisplayName: Text;
-        FieldKey: Text;
-        FieldValue: Text;
-        FieldType: Text;
-        ShpfyProductEvents: Codeunit "Shpfy Product Events";
-        IsHandled: boolean;
-    begin
-        // Get the edges array
-        if JsonHelper.GetJsonArray(JResponse, JEdges, 'data.metaobjectDefinition.metaobjects.edges') then begin
-            foreach JEdge in JEdges do begin
-                // Get the node object
-                if JsonHelper.GetJsonObject(JEdge.AsObject(), JNode, 'node') then begin
-                    // Extract node properties
-                    NodeId := JsonHelper.GetValueAsText(JNode, 'id');
-                    Handle := JsonHelper.GetValueAsText(JNode, 'handle');
-                    DisplayName := JsonHelper.GetValueAsText(JNode, 'displayName');
-
-                    // Get fields array
-                    if JsonHelper.GetJsonArray(JNode, JFields, 'fields') then begin
-                        foreach JField in JFields do begin
-                            // Extract field properties
-                            FieldKey := JsonHelper.GetValueAsText(JField.AsObject(), 'key');
-                            FieldValue := JsonHelper.GetValueAsText(JField.AsObject(), 'value');
-                            FieldType := JsonHelper.GetValueAsText(JField.AsObject(), 'type');
-
-                            //OTE Metafield 29.01.2026 JR START
-                            IsHandled := false;
-                            ShpfyProductEvents.OnBeforeAddSingleMetafieldValue(_ShpfyMetafield, FieldKey, FieldValue, FieldType, NodeId, Handle, DisplayName, IsHandled);
-                            //OTE Metafield 29.01.2026 JR STOP 
-                            // Create metafield value record with all extracted data
-                            if not IsHandled then
-                                CreateSingleMetafieldValue(_ShpfyMetafield, FieldValue, NodeId, Handle, DisplayName);
-                        end;
-                    end else begin
-                        // If no fields, create entry with just the node data
-                        CreateSingleMetafieldValue(_ShpfyMetafield, DisplayName, NodeId, Handle, DisplayName);
-                    end;
-                end;
-            end;
-        end;
-    end;
-
-    local procedure CreateSingleMetafieldValue(_ShpfyMetafield: Record "Shpfy Metafield"; ValueText: Text; NodeId: Text; Handle: Text; DisplayName: Text)
-    var
-        ShpfyMetafieldValue: Record "Shpfy Metafield Value";
-    begin
-        // if _ShpfyMetafield.Type = _ShpfyMetafield.Type::metaobject_reference then
-        //     exit;
-        // Check if this value already exists
-        ShpfyMetafieldValue.Reset();
-        ShpfyMetafieldValue.SetRange("Parent Table No.", _ShpfyMetafield."Parent Table No.");
-        ShpfyMetafieldValue.SetRange(Namespace, _ShpfyMetafield.Namespace);
-        ShpfyMetafieldValue.SetRange(Name, _ShpfyMetafield.Name);
-        ShpfyMetafieldValue.SetRange(Type, _ShpfyMetafield.Type);
-        ShpfyMetafieldValue.SetRange(Value, copystr(ValueText, 1, MaxStrLen(ShpfyMetafieldValue.Value)));
-
-        if ShpfyMetafieldValue.IsEmpty() then begin
-            // Create new metafield value record
-            ShpfyMetafieldValue.Init();
-            ShpfyMetafieldValue."Entry No." := 0;
-            ShpfyMetafieldValue."Parent Table No." := _ShpfyMetafield."Parent Table No.";
-            ShpfyMetafieldValue.Namespace := _ShpfyMetafield.Namespace;
-            ShpfyMetafieldValue.Name := _ShpfyMetafield.Name;
-            ShpfyMetafieldValue.Type := _ShpfyMetafield.Type;
-            ShpfyMetafieldValue.Value := copystr(ValueText, 1, MaxStrLen(ShpfyMetafieldValue.Value));
-
-            // Store additional metaobject data if available
-            if NodeId <> '' then
-                ShpfyMetafieldValue."Metafield ID" := NodeId;
-            if Handle <> '' then
-                ShpfyMetafieldValue."Metafield Handle" := Handle;
-            if DisplayName <> '' then
-                ShpfyMetafieldValue."Metafield Display Name" := DisplayName;
-
-            commit();
-            ShpfyMetafieldValue.Insert(true);
-            // commit();
-
-        end;
-    end;
-    //OTE Metafield 09.10.2025 JR STOP 
 
     local procedure UpdateMetadataField(ParentTableNo: Integer; OwnerId: BigInteger; JNode: JsonObject): BigInteger
     var
         Metafield: Record "Shpfy Metafield";
         ValueText: Text;
-        TypeText: text;
         Type: Enum "Shpfy Metafield Type";
     begin
         // Shopify has no limit on the length of the value, but Business Central has a limit of 2048 characters.
@@ -442,21 +295,14 @@ codeunit 88238 "Shpfy Metafield API"
         if StrLen(ValueText) > MaxStrLen(Metafield.Value) then
             exit(0);
 
-        //OTE Metafield 13.10.2025 JR START
-        TypeText := JsonHelper.GetValueAsText(JNode, 'type');
-        //OTE Metafield 13.10.2025 JR STOP 
-
         // Some metafield types are unsupported in Business Central (i.e. Rating)
-        if not ConvertToMetafieldType(TypeText, Type) then
+        if not ConvertToMetafieldType(JsonHelper.GetValueAsText(JNode, 'type'), Type) then
             exit(0);
 
         Metafield.Validate("Parent Table No.", ParentTableNo);
         Metafield."Owner Id" := OwnerId;
         Metafield.Id := JsonHelper.GetValueAsBigInteger(JNode, 'legacyResourceId');
         Metafield.Type := Type;
-        //OTE Metafield 13.10.2025 JR START
-        Metafield."List Metafield" := TypeText.Contains('list');
-        //OTE Metafield 13.10.2025 JR STOP 
 #pragma warning disable AA0139
         Metafield."Namespace" := JsonHelper.GetValueAsText(JNode, 'namespace');
         Metafield.Name := JsonHelper.GetValueAsText(JNode, 'key');
@@ -473,11 +319,6 @@ codeunit 88238 "Shpfy Metafield API"
         EnumOrdinal: Integer;
     begin
         // Some metafield types are unsupported in Business Central (i.e. Rating)
-        //OTE Metafield 13.10.2025 JR START
-        if value.Contains('list') then
-            Value := Value.Replace('list.', '');
-        //OTE Metafield 13.10.2025 JR STOP 
-
         if not Enum::"Shpfy Metafield Type".Ordinals().Get(Enum::"Shpfy Metafield Type".Names().IndexOf(Value), EnumOrdinal) then
             exit(false);
 
@@ -507,14 +348,5 @@ codeunit 88238 "Shpfy Metafield API"
             Metafield.Delete(false);
         end;
     end;
-
     #endregion
-
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterRetrieveMetafieldsFromShopify(ParentTableId: Integer; OwnerId: BigInteger; MetafieldIds: Dictionary of [BigInteger, DateTime])
-    begin
-    end;
-
-
 }

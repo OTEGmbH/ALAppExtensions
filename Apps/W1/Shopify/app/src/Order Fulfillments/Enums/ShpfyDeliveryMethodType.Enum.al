@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Delivery Method Type (ID 30152).
 /// </summary>
-enum 88031 "Shpfy Delivery Method Type"
+enum 30152 "Shpfy Delivery Method Type"
 {
     Caption = 'Shopify Delivery Method Type';
     Extensible = false;

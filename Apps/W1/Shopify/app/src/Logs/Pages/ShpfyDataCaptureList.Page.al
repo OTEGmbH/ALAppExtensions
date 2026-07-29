@@ -1,11 +1,16 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using System.Utilities;
 
 /// <summary>
 /// Page Shpfy Data Capture List (ID 30118).
 /// </summary>
-page 88026 "Shpfy Data Capture List"
+page 30118 "Shpfy Data Capture List"
 {
 
     Caption = 'Shopify Data Capture List';

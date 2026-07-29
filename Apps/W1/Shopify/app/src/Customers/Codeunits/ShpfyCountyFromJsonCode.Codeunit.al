@@ -1,8 +1,13 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Sales.Customer;
 
-codeunit 88028 "Shpfy County From Json Code" implements "Shpfy ICounty From Json"
+codeunit 30240 "Shpfy County From Json Code" implements "Shpfy ICounty From Json"
 {
     Access = Internal;
 

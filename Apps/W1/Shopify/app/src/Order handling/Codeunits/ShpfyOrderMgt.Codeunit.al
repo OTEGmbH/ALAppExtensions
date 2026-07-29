@@ -1,12 +1,17 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using System.Reflection;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Sales.Document;
+using System.Reflection;
 
 /// <summary>
 /// Codeunit Shpfy Order Mgt. (ID 30164).
 /// </summary>
-codeunit 88244 "Shpfy Order Mgt."
+codeunit 30164 "Shpfy Order Mgt."
 {
     Access = Internal;
 

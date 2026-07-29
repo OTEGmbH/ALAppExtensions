@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Table Shpfy Shop Inventory (ID 30112).
 /// </summary>
-table 88019 "Shpfy Shop Inventory"
+table 30112 "Shpfy Shop Inventory"
 {
     Access = Internal;
     Caption = 'Shopify Shop Inventory';
@@ -98,6 +103,9 @@ table 88019 "Shpfy Shop Inventory"
         key(PK; "Shop Code", "Product Id", "Variant Id", "Location Id")
         {
             Clustered = true;
+        }
+        key(Key2; "Variant Id")
+        {
         }
     }
 }

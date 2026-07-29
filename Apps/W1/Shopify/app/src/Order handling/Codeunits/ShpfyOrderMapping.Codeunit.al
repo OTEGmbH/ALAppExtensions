@@ -1,14 +1,18 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using OTE.Shopify;
-using Microsoft.Inventory.Item;
-using Microsoft.CRM.Contact;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.Inventory.Item;
 
 /// <summary>
 /// Codeunit Shpfy Order Mapping (ID 30163).
 /// </summary>
-codeunit 88243 "Shpfy Order Mapping"
+codeunit 30163 "Shpfy Order Mapping"
 {
     Access = Internal;
     Permissions =
@@ -91,15 +95,17 @@ codeunit 88243 "Shpfy Order Mapping"
         if OrderHeader."Bill-to Customer No." = '' then begin
             OrderEvents.OnBeforeMapCustomer(OrderHeader, IsHandled);
             if not IsHandled then begin
-                JCustomer.Add('Name', OrderHeader."Sell-to Customer Name");
-                JCustomer.Add('Name2', OrderHeader."Sell-to Customer Name 2");
-                JCustomer.Add('Address', OrderHeader."Sell-to Address");
-                JCustomer.Add('Address2', OrderHeader."Sell-to Address 2");
-                JCustomer.Add('PostCode', OrderHeader."Sell-to Post Code");
-                JCustomer.Add('City', OrderHeader."Sell-to City");
-                JCustomer.Add('County', OrderHeader."Sell-to County");
-                JCustomer.Add('CountryCode', OrderHeader."Sell-to Country/Region Code");
-                OrderHeader."Sell-to Customer No." := CustomerMapping.DoMapping(OrderHeader."Customer Id", JCustomer, OrderHeader."Shop Code", CustomerTemplateCode, AllowCreateCustomer);
+                if OrderHeader."Sell-to Customer No." = '' then begin
+                    JCustomer.Add('Name', OrderHeader."Sell-to Customer Name");
+                    JCustomer.Add('Name2', OrderHeader."Sell-to Customer Name 2");
+                    JCustomer.Add('Address', OrderHeader."Sell-to Address");
+                    JCustomer.Add('Address2', OrderHeader."Sell-to Address 2");
+                    JCustomer.Add('PostCode', OrderHeader."Sell-to Post Code");
+                    JCustomer.Add('City', OrderHeader."Sell-to City");
+                    JCustomer.Add('County', OrderHeader."Sell-to County");
+                    JCustomer.Add('CountryCode', OrderHeader."Sell-to Country/Region Code");
+                    OrderHeader."Sell-to Customer No." := CustomerMapping.DoMapping(OrderHeader."Customer Id", JCustomer, OrderHeader."Shop Code", CustomerTemplateCode, AllowCreateCustomer);
+                end;
 
                 Clear(JCustomer);
                 JCustomer.Add('Name', OrderHeader."Bill-to Name");
@@ -111,11 +117,13 @@ codeunit 88243 "Shpfy Order Mapping"
                 JCustomer.Add('County', OrderHeader."Bill-to County");
                 JCustomer.Add('CountryCode', OrderHeader."Bill-to Country/Region Code");
                 OrderHeader."Bill-to Customer No." := CustomerMapping.DoMapping(OrderHeader."Customer Id", JCustomer, OrderHeader."Shop Code", CustomerTemplateCode, AllowCreateCustomer);
-                if (OrderHeader."Bill-to Customer No." = '') and (not Shop."Auto Create Unknown Customers") and (Shop."Default Customer No." <> '') then
+                if (OrderHeader."Bill-to Customer No." = '') and (Shop."Default Customer No." <> '') then
                     OrderHeader."Bill-to Customer No." := Shop."Default Customer No.";
 
                 if OrderHeader."Sell-to Customer No." = '' then
                     OrderHeader."Sell-to Customer No." := OrderHeader."Bill-to Customer No.";
+                if OrderHeader."Bill-to Customer No." = '' then
+                    OrderHeader."Bill-to Customer No." := OrderHeader."Sell-to Customer No.";
 
                 if OrderHeader."Bill-to Customer No." <> Shop."Default Customer No." then
                     OrderHeader."Bill-to Contact No." := FindContactNo(OrderHeader."Bill-to Contact Name", OrderHeader."Bill-to Customer No.");
@@ -139,6 +147,7 @@ codeunit 88243 "Shpfy Order Mapping"
         CompanyMapping: Codeunit "Shpfy Company Mapping";
         CustomerTemplateCode: Code[20];
         IsHandled: Boolean;
+        MappedFromLocation: Boolean;
     begin
         CustomerTemplateCode := OrderHeader."Customer Templ. Code";
 
@@ -146,10 +155,15 @@ codeunit 88243 "Shpfy Order Mapping"
         if OrderHeader."Bill-to Customer No." = '' then begin
             OrderEvents.OnBeforeMapCompany(OrderHeader, IsHandled);
             if not IsHandled then begin
-                OrderHeader."Sell-to Customer No." := CompanyMapping.DoMapping(OrderHeader."Company Id", CustomerTemplateCode, AllowCreateCompany);
-                OrderHeader."Bill-to Customer No." := OrderHeader."Sell-to Customer No.";
+                if OrderHeader."Company Location Id" <> 0 then
+                    MappedFromLocation := MapSellToBillToCustomersFromCompanyLocation(OrderHeader);
 
-                if (OrderHeader."Bill-to Customer No." = '') and (not Shop."Auto Create Unknown Customers") and (Shop."Default Company No." <> '') then
+                if not MappedFromLocation then begin
+                    OrderHeader."Sell-to Customer No." := CompanyMapping.DoMapping(OrderHeader."Company Id", CustomerTemplateCode, AllowCreateCompany);
+                    OrderHeader."Bill-to Customer No." := OrderHeader."Sell-to Customer No.";
+                end;
+
+                if (OrderHeader."Bill-to Customer No." = '') and (Shop."Default Company No." <> '') then
                     OrderHeader."Bill-to Customer No." := Shop."Default Company No.";
                 if OrderHeader."Sell-to Customer No." = '' then
                     OrderHeader."Sell-to Customer No." := OrderHeader."Bill-to Customer No.";
@@ -167,6 +181,7 @@ codeunit 88243 "Shpfy Order Mapping"
         MapShippingMethodCode(OrderHeader);
         MapShippingAgent(OrderHeader);
         MapPaymentMethodCode(OrderHeader);
+        MapLocationCode(OrderHeader);
         OrderHeader.Modify();
         exit((OrderHeader."Bill-to Customer No." <> '') and (OrderHeader."Sell-to Customer No." <> ''));
     end;
@@ -181,17 +196,13 @@ codeunit 88243 "Shpfy Order Mapping"
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        IsHandled: boolean;
         ShopifyVariant: Record "Shpfy Variant";
         ProductImport: Codeunit "Shpfy Product Import";
-        ShpfyProductEvents: Codeunit "Shpfy Product Events";
     begin
         if not ShopifyVariant.Get(ShopifyOrderLine."Shopify Variant Id") or IsNullGuid(ShopifyVariant."Item SystemId") then begin
-            if SHop."Sync Item" = shop."Sync Item"::"From Shopify" then begin
-                ProductImport.SetShop(Shop);
-                ProductImport.SetProduct(ShopifyOrderLine."Shopify Product Id");
-                ProductImport.Run();
-            end;
+            ProductImport.SetShop(Shop);
+            ProductImport.SetProduct(ShopifyOrderLine."Shopify Product Id");
+            ProductImport.Run();
         end;
 
         if ShopifyVariant.Get(ShopifyOrderLine."Shopify Variant Id") then begin
@@ -199,34 +210,26 @@ codeunit 88243 "Shpfy Order Mapping"
                 ShopifyOrderLine."Item No." := Item."No.";
             if (not IsNullGuid(ShopifyVariant."Item Variant SystemId")) and ItemVariant.GetBySystemId(ShopifyVariant."Item Variant SystemId") then
                 ShopifyOrderLine."Variant Code" := ItemVariant.Code;
-
-            OnBeforeSetOrderLineUnitOfMeasure(ShopifyOrderLine, ShopifyVariant, Item, IsHandled);
-            if not IsHandled then
-                case ShopifyVariant."UoM Option Id" of
-                    1:
-                        if StrLen(ShopifyVariant."Option 1 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
-                            ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 1 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
-                    2:
-                        if StrLen(ShopifyVariant."Option 2 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
-                            ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 2 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
-                    3:
-                        if StrLen(ShopifyVariant."Option 3 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
-                            ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 3 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
-                end;
+            case ShopifyVariant."UoM Option Id" of
+                1:
+                    if StrLen(ShopifyVariant."Option 1 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
+                        ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 1 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
+                2:
+                    if StrLen(ShopifyVariant."Option 2 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
+                        ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 2 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
+                3:
+                    if StrLen(ShopifyVariant."Option 3 Value") <= MaxStrLen(ShopifyOrderLine."Unit of Measure Code") then
+                        ShopifyOrderLine."Unit of Measure Code" := CopyStr(ShopifyVariant."Option 3 Value", 1, MaxStrLen(ShopifyOrderLine."Unit of Measure Code"));
+            end;
         end;
         if (ShopifyOrderLine."Unit of Measure Code" = '') and (ShopifyOrderLine."Item No." <> '') then
             if Item.Get(ShopifyOrderLine."Item No.") then
                 ShopifyOrderLine."Unit of Measure Code" := Item."Sales Unit of Measure";
-        //OTE VariantMapping 03.12.2025 JR START
-        ShpfyProductEvents.OnBeforeModifyOrderLineAfterMapVariant(ShopifyOrderLine, SHop);
-        //OTE VariantMapping 03.12.2025 JR STOP 
         ShopifyOrderLine.Modify();
-
-        //Skip Item Mapping makes it possible to skip if its for example a g/l account or any other type etc.
-        exit((ShopifyOrderLine."Item No." <> '') or (ShopifyOrderLine."Skip Item Mapping"));
+        exit(ShopifyOrderLine."Item No." <> '');
     end;
 
-    local procedure FindContactNo(ContactName: Text[100]; CustomerNo: Code[20]): Code[20]
+    internal procedure FindContactNo(ContactName: Text[100]; CustomerNo: Code[20]): Code[20]
     var
         Contact: Record Contact;
         ContactBusinessRelation: Record "Contact Business Relation";
@@ -294,6 +297,7 @@ codeunit 88243 "Shpfy Order Mapping"
                 OrderTransaction.SetAutoCalcFields("Payment Method");
                 OrderTransaction.SetRange("Shopify Order Id", OrderHeader."Shopify Order Id");
                 OrderTransaction.SetRange(Status, "Shpfy Transaction Status"::Success);
+                OrderTransaction.SetFilter(Type, '%1|%2|%3', "Shpfy Transaction Type"::Sale, "Shpfy Transaction Type"::Capture, "Shpfy Transaction Type"::Authorization);
                 if OrderTransaction.FindSet() then begin
                     repeat
                         if not PaymentMethods.Contains(OrderTransaction."Payment Method") then
@@ -311,8 +315,53 @@ codeunit 88243 "Shpfy Order Mapping"
         end;
     end;
 
-    [BusinessEvent(false)]
-    local procedure OnBeforeSetOrderLineUnitOfMeasure(var ShopifyOrderLine: Record "Shpfy Order Line"; ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; var IsHandled: Boolean)
+    local procedure MapLocationCode(OrderHeader: Record "Shpfy Order Header")
+    var
+        ShopifyCompany: Record "Shpfy Company";
+        CompanyLocation: Record "Shpfy Company Location";
+        CompanyAPI: Codeunit "Shpfy Company API";
     begin
+        if OrderHeader."Company Location Id" = 0 then
+            exit;
+
+        if not ShopifyCompany.Get(OrderHeader."Company Id") then
+            exit;
+
+        CompanyLocation.ReadIsolation := IsolationLevel::ReadUncommitted;
+        CompanyLocation.SetRange(Id, OrderHeader."Company Location Id");
+        if not CompanyLocation.IsEmpty() then
+            exit;
+
+        CompanyAPI.SetShop(OrderHeader."Shop Code");
+        CompanyAPI.UpdateShopifyCompanyLocation(ShopifyCompany, OrderHeader."Company Location Id");
+    end;
+
+    local procedure MapSellToBillToCustomersFromCompanyLocation(var OrderHeader: Record "Shpfy Order Header"): Boolean
+    var
+        Company: Record "Shpfy Company";
+        CompanyLocation: Record "Shpfy Company Location";
+    begin
+        if not Company.Get(OrderHeader."Company Id") then
+            exit(false);
+
+        Company.CalcFields("Customer No.");
+
+        if not CompanyLocation.Get(OrderHeader."Company Location Id") then
+            exit(false);
+
+        if (Company."Customer No." <> '') and (CompanyLocation."Sell-to Customer No." = '') and (CompanyLocation."Bill-to Customer No." = '') then begin
+            OrderHeader."Sell-to Customer No." := Company."Customer No.";
+            OrderHeader."Bill-to Customer No." := Company."Customer No.";
+        end;
+        if (Company."Customer No." <> '') and (CompanyLocation."Sell-to Customer No." <> '') and (CompanyLocation."Bill-to Customer No." = '') then begin
+            OrderHeader."Sell-to Customer No." := CompanyLocation."Sell-to Customer No.";
+            OrderHeader."Bill-to Customer No." := CompanyLocation."Sell-to Customer No.";
+        end;
+        if (Company."Customer No." <> '') and (CompanyLocation."Sell-to Customer No." <> '') and (CompanyLocation."Bill-to Customer No." <> '') then begin
+            OrderHeader."Sell-to Customer No." := CompanyLocation."Sell-to Customer No.";
+            OrderHeader."Bill-to Customer No." := CompanyLocation."Bill-to Customer No.";
+        end;
+
+        exit((OrderHeader."Bill-to Customer No." <> '') and (OrderHeader."Sell-to Customer No." <> ''));
     end;
 }

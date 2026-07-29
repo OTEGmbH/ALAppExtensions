@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-table 88028 "Shpfy FulFillment Order Line"
+namespace Microsoft.Integration.Shopify;
+
+table 30144 "Shpfy FulFillment Order Line"
 {
     Caption = 'FulFillment Order Line';
     DataClassification = CustomerContent;
@@ -46,6 +51,8 @@ table 88028 "Shpfy FulFillment Order Line"
         {
             Caption = 'Qty. to Fulfill';
             DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
+            AutoFormatType = 0;
         }
         field(9; "Shopify Variant Id"; BigInteger)
         {
@@ -62,12 +69,29 @@ table 88028 "Shpfy FulFillment Order Line"
         {
             DataClassification = CustomerContent;
         }
+        field(12; "Line Item Id"; BigInteger)
+        {
+            Caption = 'Line Item Id';
+            DataClassification = SystemMetadata;
+        }
     }
     keys
     {
         key(PK; "Shopify Fulfillment Order Id", "Shopify Fulfillm. Ord. Line Id")
         {
             Clustered = true;
+        }
+        key(Key2; "Shopify Order Id", "Shopify Variant Id")
+        {
+        }
+        key(Key3; "Shopify Order Id", "Shopify Variant Id", "Fulfillment Status")
+        {
+        }
+        key(Key4; "Shopify Order Id", "Line Item Id")
+        {
+        }
+        key(Key5; "Shopify Location Id", "Shopify Fulfillment Order Id")
+        {
         }
     }
 }

@@ -1,10 +1,15 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using System.Threading;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
+using System.Threading;
 
-codeunit 88007 "Shpfy Initial Import"
+codeunit 30202 "Shpfy Initial Import"
 {
     Access = Internal;
 

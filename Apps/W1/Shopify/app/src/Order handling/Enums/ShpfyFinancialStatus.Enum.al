@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Enum Shpfy Financial Status (ID 30117).
 /// </summary>
-enum 88036 "Shpfy Financial Status"
+enum 30117 "Shpfy Financial Status"
 {
     Caption = 'Shopify Financial Status';
     Extensible = false;

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Order Risks (ID 30123).
 /// </summary>
-page 88053 "Shpfy Order Risks"
+page 30123 "Shpfy Order Risks"
 {
     Caption = 'Shopify Order Risks';
     PageType = List;

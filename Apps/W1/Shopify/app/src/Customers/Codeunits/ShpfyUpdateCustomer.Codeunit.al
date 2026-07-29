@@ -1,13 +1,18 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-using Microsoft.Sales.Customer;
+namespace Microsoft.Integration.Shopify;
+
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.Foundation.Address;
+using Microsoft.Sales.Customer;
 
 /// <summary>
 /// Codeunit Shpfy Update Customer (ID 30124).
 /// </summary>
-codeunit 88046 "Shpfy Update Customer"
+codeunit 30124 "Shpfy Update Customer"
 {
     Access = Internal;
     Permissions =
@@ -20,6 +25,7 @@ codeunit 88046 "Shpfy Update Customer"
         Shop: Record "Shpfy Shop";
         CustomerEvents: Codeunit "Shpfy Customer Events";
         NoLocationErr: Label 'No location was found for Shopify company id: %1', Comment = 'Shopify should not be translated. %1 = Shopify company id';
+        NoAddressErr: Label 'No address found for Shopify customer id: %1', Comment = '%1 = Shopify customer id';
 
     trigger OnRun()
     var
@@ -37,21 +43,23 @@ codeunit 88046 "Shpfy Update Customer"
     /// <summary> 
     /// Do Update Customer.
     /// </summary>
-    /// <param name="Shop">Parameter of type Record "Shopify Shop".</param>
+    /// <param name="ShopifyShop">Parameter of type Record "Shopify Shop".</param>
     /// <param name="ShopifyCustomer">Parameter of type Record "Shopify Customer".</param>
     /// <param name="Customer">Parameter of type Record Customer.</param>
-    local procedure DoUpdateCustomer(Shop: Record "Shpfy Shop"; var ShopifyCustomer: Record "Shpfy Customer"; var Customer: Record Customer);
+    local procedure DoUpdateCustomer(ShopifyShop: Record "Shpfy Shop"; var ShopifyCustomer: Record "Shpfy Customer"; var Customer: Record Customer);
     var
         CustomerAddress: Record "Shpfy Customer Address";
         CustContUpdate: Codeunit "CustCont-Update";
-        NoDefaltAddressErr: Label 'No default address found for Shopify customer id: %1', Comment = '%1 = Shopify customer id';
     begin
         CustomerAddress.SetRange("Customer Id", ShopifyCustomer.Id);
         CustomerAddress.SetRange(Default, true);
-        if not CustomerAddress.FindFirst() then
-            Error(NoDefaltAddressErr, ShopifyCustomer.Id);
+        if not CustomerAddress.FindFirst() then begin
+            CustomerAddress.SetRange(Default);
+            if not CustomerAddress.FindFirst() then
+                Error(NoAddressErr, ShopifyCustomer.Id);
+        end;
 
-        FillInCustomerFields(Customer, Shop, ShopifyCustomer, CustomerAddress);
+        FillInCustomerFields(Customer, ShopifyShop, ShopifyCustomer, CustomerAddress);
         Customer.Modify();
         CustContUpdate.OnModify(Customer);
     end;
@@ -61,26 +69,26 @@ codeunit 88046 "Shpfy Update Customer"
     /// Description for FillInCustomerFields.
     /// </summary>
     /// <param name="Customer">Parameter of type Record Customer.</param>
-    /// <param name="Shop">Parameter of type Record "Shopify Shop".</param>
+    /// <param name="ShopifyShop">Parameter of type Record "Shopify Shop".</param>
     /// <param name="ShopifyCustomer">Parameter of type Record "Shopify Customer".</param>
     /// <param name="CustomerAddress">Parameter of type Record "Shopify Customer Address".</param>
-    internal procedure FillInCustomerFields(var Customer: Record Customer; Shop: Record "Shpfy Shop"; ShopifyCustomer: Record "Shpfy Customer"; CustomerAddress: Record "Shpfy Customer Address")
+    internal procedure FillInCustomerFields(var Customer: Record Customer; ShopifyShop: Record "Shpfy Shop"; ShopifyCustomer: Record "Shpfy Customer"; CustomerAddress: Record "Shpfy Customer Address")
     var
         CountryRegion: Record "Country/Region";
         ShopifyTaxArea: Record "Shpfy Tax Area";
         IName: Interface "Shpfy ICustomer Name";
         ICounty: interface "Shpfy ICounty";
     begin
-        IName := Shop."Name Source";
+        IName := ShopifyShop."Name Source";
         Customer.Validate(Name, IName.GetName(CustomerAddress."First Name", CustomerAddress."Last Name", CustomerAddress.Company));
 
-        IName := Shop."Name 2 Source";
+        IName := ShopifyShop."Name 2 Source";
         if Customer.Name = '' then
             Customer.Validate(Name, IName.GetName(CustomerAddress."First Name", CustomerAddress."Last Name", CustomerAddress.Company))
         else
             Customer.Validate("Name 2", CopyStr(IName.GetName(CustomerAddress."First Name", CustomerAddress."Last Name", CustomerAddress.Company), 1, MaxStrLen(Customer."Name 2")));
 
-        IName := Shop."Contact Source";
+        IName := ShopifyShop."Contact Source";
         Customer.Validate(Contact, IName.GetName(CustomerAddress."First Name", CustomerAddress."Last Name", CustomerAddress.Company));
 
         if Customer.Name = '' then begin
@@ -97,7 +105,7 @@ codeunit 88046 "Shpfy Update Customer"
         else
             Customer."Country/Region Code" := CustomerAddress."Country/Region Code";
 
-        ICounty := Shop."County Source";
+        ICounty := ShopifyShop."County Source";
         Customer.Validate(County, ICounty.County((CustomerAddress)));
 
         Customer.Validate("Post Code", CustomerAddress.Zip);
@@ -129,6 +137,7 @@ codeunit 88046 "Shpfy Update Customer"
         CompanyLocation: Record "Shpfy Company Location";
         ShopifyTaxArea: Record "Shpfy Tax Area";
         ICounty: Interface "Shpfy ICounty";
+        ITaxRegistrationIdMapping: Interface "Shpfy Tax Registration Id Mapping";
     begin
         if not Customer.GetBySystemId(ShopifyCompany."Customer SystemId") then
             exit;
@@ -167,6 +176,9 @@ codeunit 88046 "Shpfy Update Customer"
 
         if CompanyLocation."Shpfy Payment Terms Id" <> 0 then
             Customer.Validate("Payment Terms Code", GetPaymentTermsCodeFromShopifyPaymentTermsId(CompanyLocation."Shpfy Payment Terms Id"));
+
+        ITaxRegistrationIdMapping := Shop."Shpfy Comp. Tax Id Mapping";
+        ITaxRegistrationIdMapping.UpdateTaxRegistrationId(Customer, CompanyLocation."Tax Registration Id");
 
         Customer.Modify();
     end;

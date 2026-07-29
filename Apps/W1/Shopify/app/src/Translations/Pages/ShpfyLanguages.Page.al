@@ -1,6 +1,11 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 
-page 88070 "Shpfy Languages"
+namespace Microsoft.Integration.Shopify;
+
+page 30138 "Shpfy Languages"
 {
     ApplicationArea = All;
     Caption = 'Shopify Languages';

@@ -1,9 +1,14 @@
-namespace OTE.Shopify;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
 
 /// <summary>
 /// Page Shpfy Order Transactions (ID 30131).
 /// </summary>
-page 88066 "Shpfy Order Transactions"
+page 30131 "Shpfy Order Transactions"
 {
     Caption = 'Shopify Order Transactions';
     PromotedActionCategories = 'New,Process,Report,Inspect';
@@ -33,6 +38,12 @@ page 88066 "Shpfy Order Transactions"
                     Visible = false;
 
                     ToolTip = 'Specifies a unique identifier for the order.';
+                }
+                field(ShpfyOrderNo; Rec."Shpfy Order No.")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                    ToolTip = 'Specifies the order number from Shopify.';
                 }
                 field(Type; Rec.Type)
                 {
@@ -72,7 +83,7 @@ page 88066 "Shpfy Order Transactions"
                 field(CreatedAt; Rec."Created At")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the date and time at which the transaction is processed.';
+                    ToolTip = 'Specifies the date and time when the transaction was created in Shopify.';
                 }
                 field(Authorization; Rec.Authorization)
                 {
