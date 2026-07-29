@@ -9,6 +9,7 @@ using Microsoft.Sales.Pricing;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Sales.Document;
 using Microsoft.Finance.SalesTax;
 using Microsoft.Foundation.Address;
 using Microsoft.Inventory.Item;
@@ -763,6 +764,26 @@ table 88002 "Shpfy Shop"
             Caption = 'Company Tax Id Mapping';
             DataClassification = CustomerContent;
         }
+        field(135; "Currency Handling"; Enum "Shpfy Currency Handling")
+        {
+            Caption = 'Currency Handling';
+            ToolTip = 'Specifies which currency is used in Shopify orders processing. Using presentment currency may cause differences between amounts in LCY after posting documents.';
+            InitValue = "Shop Currency";
+        }
+        field(136; "Use Shopify Order No."; Boolean)
+        {
+            Caption = 'Use Shopify Order No.';
+            ToolTip = 'Specifies whether the Shopify order number is used as the document number on the created Sales Order or Sales Invoice. You can overwrite the selection for the specific Shopify Order.';
+        }
+        field(137; "Process Returns As"; Enum "Sales Document Type")
+        {
+            Caption = 'Process Returns as';
+            ToolTip = 'Specifies what type of document to create when processing returns. Credit Memo creates a sales credit memo. Return Order creates a sales return order.';
+            DataClassification = CustomerContent;
+            ValuesAllowed = "Credit Memo", "Return Order";
+            InitValue = "Credit Memo";
+        }
+
         field(200; "Shop Id"; Integer)
         {
             DataClassification = SystemMetadata;

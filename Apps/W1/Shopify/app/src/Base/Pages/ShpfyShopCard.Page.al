@@ -504,6 +504,10 @@ page 88003 "Shpfy Shop Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies whether orders may be created automatically.';
                 }
+                field("Currency Handling"; Rec."Currency Handling")
+                {
+                    ApplicationArea = All;
+                }
                 field(AutoReleaseSalesOrders; rec."Auto Release Sales Orders")
                 {
                     Caption = 'Auto Release Sales Orders';
