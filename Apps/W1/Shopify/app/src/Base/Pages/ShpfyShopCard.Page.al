@@ -508,6 +508,12 @@ page 88003 "Shpfy Shop Card"
                 {
                     ApplicationArea = All;
                 }
+                field("Cash Roundings Account"; Rec."Cash Roundings Account")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the general ledger account to use when you post cash rounding differences from Shopify POS transactions.';
+                }
+
                 field(AutoReleaseSalesOrders; rec."Auto Release Sales Orders")
                 {
                     Caption = 'Auto Release Sales Orders';

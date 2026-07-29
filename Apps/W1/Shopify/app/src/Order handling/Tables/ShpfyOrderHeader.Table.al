@@ -6,6 +6,7 @@ using Microsoft.Sales.Document;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Foundation.Shipping;
 using System.Reflection;
+using app.app;
 
 /// <summary>
 /// Table Shpfy Order Header (ID 30118).
@@ -622,6 +623,34 @@ table 88032 "Shpfy Order Header"
             Caption = 'Due Date', comment = 'de-DE=Fälligkeitsdatum';
             DataClassification = CustomerContent;
         }
+        field(130; "Pres. Payment Rounding Amount"; Decimal)
+        {
+            Caption = 'Presentment Payment Rounding Amount';
+            DataClassification = SystemMetadata;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Presentment Currency Code";
+        }
+        field(131; "Payment Rounding Amount"; Decimal)
+        {
+            Caption = 'Payment Rounding Amount';
+            DataClassification = SystemMetadata;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Currency Code";
+        }
+        field(132; "Pres. Refund Rounding Amount"; Decimal)
+        {
+            Caption = 'Presentment Refund Rounding Amount';
+            DataClassification = SystemMetadata;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Presentment Currency Code";
+        }
+        field(133; "Refund Rounding Amount"; Decimal)
+        {
+            Caption = 'Refund Rounding Amount';
+            DataClassification = SystemMetadata;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Currency Code";
+        }
         field(500; "Shop Code"; Code[20])
         {
             Caption = 'Shop Code', comment = 'de-DE=Shop-Code';
@@ -801,6 +830,17 @@ table 88032 "Shpfy Order Header"
         {
             DataClassification = CustomerContent;
             Caption = 'Payment Terms Name', comment = 'de-DE=Zahlungsbedingungsname';
+        }
+        field(1050; "Salesperson Code"; Code[20])
+        {
+            Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
+        }
+        field(1060; "Processed Currency Handling"; Enum "Shpfy Currency Handling")
+        {
+            Caption = 'Processed Currency Handling';
+            DataClassification = SystemMetadata;
+            Editable = false;
         }
     }
     keys

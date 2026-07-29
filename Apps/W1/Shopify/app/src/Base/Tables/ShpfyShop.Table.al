@@ -806,6 +806,12 @@ table 88002 "Shpfy Shop"
         {
             Caption = 'Posted Invoice Sync';
         }
+        field(203; "Cash Roundings Account"; Code[20])
+        {
+            Caption = 'Cash Roundings Account';
+            ToolTip = 'Specifies the general ledger account to use when you post cash rounding differences from Shopify POS transactions.';
+            TableRelation = "G/L Account"."No.";
+        }
 
         field(88000; "Shop Access Token"; text[500])
         {
