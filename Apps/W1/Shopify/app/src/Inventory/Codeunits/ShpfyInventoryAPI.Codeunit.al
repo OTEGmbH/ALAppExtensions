@@ -325,4 +325,22 @@ codeunit 88199 "Shpfy Inventory API"
     begin
         StockCalculation := CalculationType;
     end;
+
+
+    procedure ImportStock(ShopLocation: Record "Shpfy Shop Location"; var ShpfyProducts: record "Shpfy Product")
+    var
+        Parameters: Dictionary of [Text, Text];
+        GraphQLType: Enum "Shpfy GraphQL Type";
+        JInventoryLevels: JsonObject;
+        JResponse: JsonToken;
+    begin
+        Parameters.Add('LocationId', Format(ShopLocation.Id));
+        GraphQLType := GraphQLType::GetInventoryByProduct;
+        Parameters.Add('ProductId', Format(ShpfyProducts."Id"));
+        repeat
+            JResponse := ShopifyCommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
+            if GetInventoryLevels(JResponse.AsObject(), JInventoryLevels) then
+                ImportInventoryLevels(ShopLocation, Parameters, GraphQLType, JInventoryLevels);
+        until not HasNextResults(JInventoryLevels);
+    end;
 }

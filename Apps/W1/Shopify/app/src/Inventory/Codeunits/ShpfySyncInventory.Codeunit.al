@@ -53,6 +53,22 @@ codeunit 88201 "Shpfy Sync Inventory"
         InventoryApi.RemoveUnusedInventoryIds();
     end;
 
+    procedure ImportStock(_shopCode: code[20]; var _shpfyProducts: record "Shpfy Product")
+    var
+        ShopLocation: Record "Shpfy Shop Location";
+    begin
+        ShopLocation.SetRange("Shop Code", _shopCode);
+        ShopLocation.SetFilter("Stock Calculation", '<>%1', ShopLocation."Stock Calculation"::Disabled);
+        if ShopLocation.FindSet(false) then begin
+            InventoryApi.SetShop(ShopLocation."Shop Code");
+            InventoryApi.SetInventoryIds();
+            repeat
+                InventoryApi.ImportStock(ShopLocation, _shpfyProducts);
+            until ShopLocation.Next() = 0;
+        end;
+        InventoryApi.RemoveUnusedInventoryIds();
+    end;
+
     procedure ExportStock(var _ShopInventory: Record "Shpfy Shop Inventory")
     var
         ShpfyShopInventory: Record "Shpfy Shop Inventory";

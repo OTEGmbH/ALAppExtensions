@@ -640,4 +640,9 @@ enum 88021 "Shpfy GraphQL Type" implements "Shpfy IGraphQL"
         Caption = 'Get Next Catalog Default Prices';
         Implementation = "Shpfy IGraphQL" = "Shpfy GQL NextCatalogDefPrc";
     }
+    value(129; GetInventoryByProduct)
+    {
+        Caption = 'Get Inventory By Product';
+        Implementation = "Shpfy IGraphQL" = "Shpfy GQL InventoryByItem";
+    }
 }
