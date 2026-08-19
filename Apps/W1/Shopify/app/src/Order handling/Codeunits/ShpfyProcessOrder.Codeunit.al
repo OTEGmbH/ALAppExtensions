@@ -271,6 +271,10 @@ codeunit 88246 "Shpfy Process Order"
                     if (SalesLine."Document Type" = SalesLine."Document Type"::Order) and (SalesLine.Type = SalesLine.Type::Item) and (SalesLine.Reserve = SalesLine.Reserve::Always) then
                         SalesLine.AutoReserve(false);
                 end;
+
+                //OTE Event 19.08.2026 JR START
+                OrderEvents.OnBeforeCreateItemSalesLineBeforeInsert(ShopifyOrderHeader, ShopifyOrderLine, SalesHeader, SalesLine);
+                //OTE Event 19.08.2026 JR STOP 
                 OrderEvents.OnAfterCreateItemSalesLine(ShopifyOrderHeader, ShopifyOrderLine, SalesHeader, SalesLine);
             until ShopifyOrderLine.Next() = 0;
 

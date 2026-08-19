@@ -127,6 +127,11 @@ codeunit 88242 "Shpfy Order Events"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCreateItemSalesLineBeforeInsert(ShopifyOrderHeader: Record "Shpfy Order Header"; ShopifyOrderLine: Record "Shpfy Order Line"; SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
+    begin
+    end;
+
 #pragma warning disable AS0025
     [IntegrationEvent(false, false)]
     /// <summary> 

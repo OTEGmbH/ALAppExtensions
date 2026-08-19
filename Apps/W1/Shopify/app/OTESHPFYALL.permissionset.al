@@ -525,5 +525,9 @@ permissionset 88005 "OTESHPFY-ALL"
         table "Shpfy Metafield Value" = X,
         table "Shpfy OTE Setup" = X,
         page "Shpfy Metafield Values" = X,
-        page "Shpfy OTE Setup Card" = X;
+        page "Shpfy OTE Setup Card" = X,
+        report "Shpfy Sync Catalog w.o Company" = X,
+        codeunit "Shpfy GQL CatalogDefPrices" = X,
+        codeunit "Shpfy GQL InventoryByItem" = X,
+        codeunit "Shpfy GQL NextCatalogDefPrc" = X;
 }
