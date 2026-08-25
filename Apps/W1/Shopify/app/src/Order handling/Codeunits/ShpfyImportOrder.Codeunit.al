@@ -1,5 +1,6 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
 using Microsoft.Sales.Document;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Setup;
@@ -549,6 +550,7 @@ codeunit 88241 "Shpfy Import Order"
     local procedure SetOrderLineValuesFromJson(JOrderLine: JsonToken; OrderId: BigInteger; var OrderLine: Record "Shpfy Order Line"): Boolean
     var
         LocalOrderLine: Record "Shpfy Order Line";
+        ShpfyOrderEvents: Codeunit "Shpfy Order Events";
         OrderLineRecordRef: RecordRef;
         LineId: BigInteger;
     begin
@@ -575,6 +577,10 @@ codeunit 88241 "Shpfy Import Order"
         OrderLineRecordRef.SetTable(OrderLine);
         OrderLine."Discount Amount" := GetTotalLineDiscountAmount(JsonHelper.GetJsonArray(JOrderLine, 'discountAllocations'), 'shopMoney');
         OrderLine."Presentment Discount Amount" := GetTotalLineDiscountAmount(JsonHelper.GetJsonArray(JOrderLine, 'discountAllocations'), 'presentmentMoney');
+
+        //OTE OrderLine 25.08.2026 JR START
+        ShpfyOrderEvents.OnAfterInsertOrderLineFromShopifyJson(JOrderLine, OrderId, OrderLine);
+        //OTE OrderLine 25.08.2026 JR STOP 
         exit(true);
     end;
 

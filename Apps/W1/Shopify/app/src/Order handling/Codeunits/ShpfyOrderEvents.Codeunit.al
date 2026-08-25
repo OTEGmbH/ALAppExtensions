@@ -273,4 +273,14 @@ codeunit 88242 "Shpfy Order Events"
     internal procedure OnAfterSetOrderClosed(var closed: Boolean; ShpfyOrderstoImport: Record "Shpfy Orders to Import"; var ShopifyShop: Record "Shpfy Shop")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterInsertOrderLineFromShopifyJson(JOrderLine: JsonToken; OrderId: BigInteger; var OrderLine: Record "Shpfy Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeMapOrderLine(var OrderLine: Record "Shpfy Order Line"; var OrderHeader: Record "Shpfy Order Header"; Shop: Record "Shpfy Shop"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
 }

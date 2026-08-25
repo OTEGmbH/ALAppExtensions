@@ -27,6 +27,8 @@ codeunit 88243 "Shpfy Order Mapping"
         CustomerTemplate: Record "Shpfy Customer Template";
         OrderLine: Record "Shpfy Order Line";
         Shop: Record "Shpfy Shop";
+        ShpfyOrderEvents: Codeunit "Shpfy Order Events";
+        IsHandled: boolean;
     begin
         Shop.Get(OrderHeader."Shop Code");
 
@@ -62,13 +64,18 @@ codeunit 88243 "Shpfy Order Mapping"
         OrderLine.SetRange("Shopify Order Id", OrderHeader."Shopify Order Id");
         if OrderLine.FindSet(true) then
             repeat
-                if OrderLine.Tip then
-                    Result := Result and (Shop."Tip Account" <> '')
-                else
-                    if OrderLine."Gift Card" then
-                        Result := Result and (Shop."Sold Gift Card Account" <> '')
+                //OTE OrderLine 25.08.2026 JR START
+                ShpfyOrderEvents.OnBeforeMapOrderLine(OrderLine, OrderHeader, Shop, Result, IsHandled);
+                //OTE OrderLine 25.08.2026 JR STOP 
+                if not ishandled then begin
+                    if OrderLine.Tip then
+                        Result := Result and (Shop."Tip Account" <> '')
                     else
-                        Result := Result and MapVariant(OrderLine, Shop);
+                        if OrderLine."Gift Card" then
+                            Result := Result and (Shop."Sold Gift Card Account" <> '')
+                        else
+                            Result := Result and MapVariant(OrderLine, Shop);
+                end;
             until OrderLine.Next() = 0;
     end;
 
