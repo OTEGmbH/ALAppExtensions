@@ -65,6 +65,7 @@ codeunit 88243 "Shpfy Order Mapping"
         if OrderLine.FindSet(true) then
             repeat
                 //OTE OrderLine 25.08.2026 JR START
+                ishandled := false;
                 ShpfyOrderEvents.OnBeforeMapOrderLine(OrderLine, OrderHeader, Shop, Result, IsHandled);
                 //OTE OrderLine 25.08.2026 JR STOP 
                 if not ishandled then begin
