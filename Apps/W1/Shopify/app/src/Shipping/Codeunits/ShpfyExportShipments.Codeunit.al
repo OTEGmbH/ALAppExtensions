@@ -1,5 +1,6 @@
 namespace OTE.Shopify;
 
+using OTE.Shopify;
 using Microsoft.Foundation.Shipping;
 using Microsoft.Sales.History;
 
@@ -81,6 +82,7 @@ codeunit 88286 "Shpfy Export Shipments"
         FulfillmentOrderLine: Record "Shpfy FulFillment Order Line";
         OrderLine: Record "Shpfy Order Line";
         TempFulfillmentOrderLine: Record "Shpfy FulFillment Order Line" temporary;
+        ShpfyOrderEvents: Codeunit "Shpfy Order Events";
         TrackingCompany: Enum "Shpfy Tracking Companies";
         PrevFulfillmentOrderId: BigInteger;
         IsHandled: Boolean;
@@ -89,6 +91,7 @@ codeunit 88286 "Shpfy Export Shipments"
         GraphQuery: TextBuilder;
         LineCount: Integer;
         GraphQueries: List of [Text];
+        ProcessLine: boolean;
     begin
         Clear(PrevFulfillmentOrderId);
 
@@ -99,22 +102,29 @@ codeunit 88286 "Shpfy Export Shipments"
         SalesShipmentLine.SetFilter(Quantity, '>%1', 0);
         if SalesShipmentLine.FindSet() then begin
             repeat
-                if OrderLine.Get(SalesShipmentHeader."Shpfy Order Id", SalesShipmentLine."Shpfy Order Line Id") then
-                    if (OrderLine."Location Id" = LocationId) and (OrderLine."Delivery Method Type" = DeliveryMethodType) then
-                        if FindFulfillmentOrderLine(SalesShipmentHeader, SalesShipmentLine, FulfillmentOrderLine) then begin
-                            FulfillmentOrderLine."Quantity to Fulfill" += Round(SalesShipmentLine.Quantity, 1, '=');
-                            FulfillmentOrderLine."Remaining Quantity" := FulfillmentOrderLine."Remaining Quantity" - Round(SalesShipmentLine.Quantity, 1, '=');
-                            FulfillmentOrderLine.Modify();
+                //OTE Fulfillment 10.09.2026 JR START
+                ProcessLine := OrderLine.Get(SalesShipmentHeader."Shpfy Order Id", SalesShipmentLine."Shpfy Order Line Id");
+                if not ProcessLine then
+                    continue;
+                ShpfyOrderEvents.OnBeforeProcessFulfillmentSalesShipmentLine(SalesShipmentHeader, SalesShipmentLine, OrderLine, Shop, ProcessLine, Ishandled);
+                if not ishandled then
+                    ProcessLine := (OrderLine."Location Id" = LocationId) and (OrderLine."Delivery Method Type" = DeliveryMethodType);
+                If processline then
+                    //OTE Fulfillment 10.09.2026 JR STOP 
+                    if FindFulfillmentOrderLine(SalesShipmentHeader, SalesShipmentLine, FulfillmentOrderLine) then begin
+                        FulfillmentOrderLine."Quantity to Fulfill" += Round(SalesShipmentLine.Quantity, 1, '=');
+                        FulfillmentOrderLine."Remaining Quantity" := FulfillmentOrderLine."Remaining Quantity" - Round(SalesShipmentLine.Quantity, 1, '=');
+                        FulfillmentOrderLine.Modify();
 
-                            if TempFulfillmentOrderLine.Get(FulfillmentOrderLine."Shopify Fulfillment Order Id", FulfillmentOrderLine."Shopify Fulfillm. Ord. Line Id") then begin
-                                TempFulfillmentOrderLine."Quantity to Fulfill" += Round(SalesShipmentLine.Quantity, 1, '=');
-                                TempFulfillmentOrderLine.Modify();
-                            end else begin
-                                TempFulfillmentOrderLine := FulfillmentOrderLine;
-                                TempFulfillmentOrderLine."Quantity to Fulfill" := Round(SalesShipmentLine.Quantity, 1, '=');
-                                TempFulfillmentOrderLine.Insert();
-                            end;
+                        if TempFulfillmentOrderLine.Get(FulfillmentOrderLine."Shopify Fulfillment Order Id", FulfillmentOrderLine."Shopify Fulfillm. Ord. Line Id") then begin
+                            TempFulfillmentOrderLine."Quantity to Fulfill" += Round(SalesShipmentLine.Quantity, 1, '=');
+                            TempFulfillmentOrderLine.Modify();
+                        end else begin
+                            TempFulfillmentOrderLine := FulfillmentOrderLine;
+                            TempFulfillmentOrderLine."Quantity to Fulfill" := Round(SalesShipmentLine.Quantity, 1, '=');
+                            TempFulfillmentOrderLine.Insert();
                         end;
+                    end;
             until SalesShipmentLine.Next() = 0;
 
             TempFulfillmentOrderLine.Reset();

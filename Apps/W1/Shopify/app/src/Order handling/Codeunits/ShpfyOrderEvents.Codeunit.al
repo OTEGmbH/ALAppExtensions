@@ -2,6 +2,7 @@ namespace OTE.Shopify;
 
 using OTE.Shopify;
 using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
 
 /// <summary>
 /// Codeunit Shpfy Order Events (ID 30162).
@@ -281,6 +282,11 @@ codeunit 88242 "Shpfy Order Events"
 
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeMapOrderLine(var OrderLine: Record "Shpfy Order Line"; var OrderHeader: Record "Shpfy Order Header"; Shop: Record "Shpfy Shop"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeProcessFulfillmentSalesShipmentLine(SalesShipmentHeader: Record "Sales Shipment Header"; SalesShipmentLine: Record "Sales Shipment Line"; OrderLine: Record "Shpfy Order Line"; Shop: Record "Shpfy Shop"; var ProcessLine: Boolean; var Ishandled: Boolean)
     begin
     end;
 }
