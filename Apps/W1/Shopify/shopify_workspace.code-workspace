@@ -11,7 +11,13 @@
 		"al.codeAnalyzers": [
 			"${CodeCop}",
 			"${UICop}",
-			"${analyzerFolder}BusinessCentral.LinterCop.dll"
+			"${analyzerFolder}ALCops.ApplicationCop.dll",
+			"${analyzerFolder}ALCops.DocumentationCop.dll",
+			"${analyzerFolder}ALCops.FormattingCop.dll",
+			"${analyzerFolder}ALCops.LinterCop.dll",
+			"${analyzerFolder}ALCops.PlatformCop.dll",
+			"${analyzerFolder}ALCops.TestAutomationCop.dll",
+			"${analyzerFolder}ALCops.Common.dll"
 		],
 		"CRS.AlSubFolderName": "src",
 		"CRS.ExtensionObjectNamePattern": null,
@@ -88,7 +94,7 @@
 			"ms-dynamics-smb.al",
 			"nabsolutions.nab-al-tools",
 			"rvanbekkum.xliff-sync",
-			"stefanmaron.businesscentral-lintercop",
+			"Arthurvdv.alcops",
 			"usernamehw.errorlens",
 			"vjeko.vjeko-al-objid",
 			"waldo.al-extension-pack",
