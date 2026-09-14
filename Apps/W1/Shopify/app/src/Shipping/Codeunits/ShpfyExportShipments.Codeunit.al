@@ -218,6 +218,10 @@ codeunit 88286 "Shpfy Export Shipments"
             FulfillmentOrderLine.SetRange("Delivery Method Type", OrderLine."Delivery Method Type");
             FulfillmentOrderLine.SetFilter("Remaining Quantity", '>=%1', Round(SalesShipmentLine.Quantity, 1, '='));
             FulfillmentOrderLine.SetFilter("Fulfillment Status", '<>%1', 'CLOSED');
+            //OTE Fulfillment 2026-09-14 JR START
+            if FulfillmentOrderLine.isempty() then
+                FulfillmentOrderLine.SetRange("Delivery Method Type");
+            //OTE Fulfillment 2026-09-14 JR STOP 
             if FulfillmentOrderLine.FindFirst() then
                 exit(true);
         end;
